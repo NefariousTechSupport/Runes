@@ -1,0 +1,522 @@
+25,3,Zook
+1,1,False,False,True,Series 2,
+18,1,False,False,True,Rare,
+16,4,False,False,True,Eon's Elite,
+12,1,Zap
+1,1,False,False,True,Series 2,
+23,2,Wrecking Ball
+1,1,False,False,True,Series 2,
+20,1,False,False,True,Rare,
+3011,1,Wind-Up
+4,2,False,True,False,Vicarious Visions,Gear Head VVind-Up
+458,1,Wildfire
+2,3,False,True,False,Special,Dark WildFire
+526,0,Whisper Elf
+0,5,Whirlwind
+2,1,False,True,True,Special,Polar Whirlwind
+1,1,False,False,True,Series 2,
+5,2,False,False,True,Series 3,Horn Blast Whirlwind
+18,1,False,False,True,Rare,
+16,3,False,False,True,Eon's Elite,
+13,1,Wham-Shell
+6,2,True,False,False,LightCore,
+507,1,Weeruptor
+2,3,False,True,False,Special,Eggsellent Weeruptor
+3231,2,Dive Bomber
+15,4,False,True,False,,Instant Dive Bomber
+2,-1,False,True,False,Special,Spring Ahead Dive Bomber
+3222,0,Reef Ripper
+2,1,Warnado
+6,2,True,False,False,LightCore,
+454,0,Wallop
+17,1,Voodood
+16,4,False,False,True,Eon's Elite,
+3473,0,Sub Woofer
+3474,0,Threat Rocket
+3471,0,Storm Striker
+3493,0,Rune Slider
+3482,0,Spirit Dragster
+3490,0,Wave Singer
+3481,0,Scale Biter
+3497,0,Doom Jet
+3492,0,Glitter Glider
+3480,0,Steam Roller
+3491,0,The Lil' Phantom Tide
+3472,0,Sky Scrambler
+3483,0,Chompy Buster
+3470,0,Toaster Bomber
+4502,0,Unity
+3227,0,Crypt Crusher
+3221,1,Tomb Buggy
+30,4,False,False,False,Special,
+475,0,Tuff Luck
+519,0,Trigger Snappy
+19,4,Trigger Happy
+1,1,False,False,True,Series 2,
+5,2,False,False,True,Series 3,Big Bang Trigger Happy
+2,2,False,True,True,Special,Springtime Trigger Happy
+16,3,False,False,True,Eon's Elite,
+419,1,Trigger Happy
+3,0,False,True,False,Special,Legendary Trigger Happy
+112,1,Tree Rex
+2,1,True,True,False,Special,Gnarly Tree Rex
+473,0,Tread Head
+211,7,Water Trap
+1,3,False,False,False,,Tidal Tiki
+2,3,False,False,False,,Wet Walter
+6,3,False,False,False,,Flood Flask
+7,3,False,False,False,,Soaking Staff
+11,3,False,False,False,,Aqua Axe
+22,3,False,False,False,,Frost Helm
+6,3,False,True,False,,Legendary Flood Flask
+214,6,Tech Trap
+1,3,False,False,False,,Tech Totem
+7,3,False,False,False,,Automatic Angel
+9,3,False,False,False,,Factory Flower
+12,3,False,False,False,,Grabbing Gadget
+22,3,False,False,False,,Makers Mana
+26,3,False,False,False,,Topsy Techy
+210,6,Magic Trap
+2,3,False,False,False,,Biter's Bane
+8,3,False,False,False,,Sorcerous Skull
+11,3,False,False,False,,Axe of Illusion
+14,3,False,False,False,,Arcane Hourglass
+18,3,False,False,False,,Spell Slapper
+21,3,False,False,False,,Rune Rocket
+219,3,Light Trap
+15,3,False,False,False,,Heavenly Hawk
+21,3,False,False,False,,Shining Ship
+27,3,False,False,False,,Beam Scream
+217,6,Life Trap
+3,3,False,False,False,,Oak Eagle
+5,3,False,False,False,,Emerald Energy
+10,3,False,False,False,,Weed Whacker
+16,3,False,False,False,,Seed Serpent
+24,3,False,False,False,,Jade Blade
+27,3,False,False,False,,Shrub Shrieker
+220,2,Kaos Trap
+30,3,False,False,False,,Kaos Trap
+31,3,False,True,False,,Ultimate Kaos Trap
+215,6,Fire Trap
+5,3,False,False,False,,Eternal Flame
+27,3,False,False,False,,Blazing Belch
+9,3,False,False,False,,Fire Flower
+17,3,False,False,False,,Scorching Stopper
+18,3,False,False,False,,Searing Spinner
+23,3,False,False,False,,Spark Spear
+216,6,Earth Trap
+3,3,False,False,False,,Rock Hawk
+4,3,False,False,False,,Banded Boulder
+10,3,False,False,False,,Slag Hammer
+14,3,False,False,False,,Dust of Time
+18,3,False,False,False,,Spinning Sandstorm
+26,3,False,False,False,,Rubble Trouble
+213,8,Undead Trap
+4,3,False,False,False,,Spirit Sphere
+8,3,False,False,False,,Spectral Skull
+11,3,False,False,False,,Haunted Hatchet
+12,3,False,False,False,,Grim Gripper
+16,3,False,False,False,,Spooky Snake
+23,3,False,False,False,,Dream Piercer
+4,3,False,True,False,,Legendary Spirit Sphere
+8,3,False,True,False,,Legendary Spectral Skull
+218,3,Dark Trap
+20,3,False,False,False,,Shadow Spider
+24,3,False,False,False,,Dark Dagger
+26,3,False,False,False,,Ghastly Grimace
+212,6,Air Trap
+3,3,False,False,False,,Breezy Bird
+6,3,False,False,False,,Drafty Decanter
+14,3,False,False,False,,Tempest Timer
+16,3,False,False,False,,Cloudy Cobra
+17,3,False,False,False,,Storm Warning
+24,3,False,False,False,,Cyclone Sabre
+460,0,Trail Blazer
+461,0,Torch
+3012,0,Roller Brawl
+451,0,Thunderbolt
+541,0,Thumpling
+107,0,Thumpback
+5,3,Terrafin
+1,1,False,False,True,Series 2,
+5,2,False,False,True,Series 3,Knockout Terrafin
+16,3,False,False,True,Eon's Elite,
+505,0,Terrabite
+4999,0,TemplateVehicle
+7999,0,TemplateSeaVehicle
+3999,0,TemplateLegacy
+5999,0,TemplateLandVehicle
+6999,0,TemplateAirVehicle
+3235,0,Shield Striker
+3234,1,Gold Rusher
+2,4,False,True,False,Special,Power Blue Gold Rusher
+4501,0,Synergy
+3014,0,Rip Tide
+101,0,Swarm
+3005,1,Smolderdash
+6,2,True,False,False,LightCore,
+8,0,Sunburn
+27,2,Stump Smash
+1,1,False,False,True,Series 2,
+20,1,False,False,True,Rare,
+26,5,Stealth Elf
+2,2,False,True,True,Special,Dark Stealth Elf
+3,1,False,True,True,Special,Legendary Stealth Elf
+1,1,False,False,True,Series 2,
+5,2,False,False,True,Series 3,Ninja Stealth Elf
+16,3,False,False,True,Eon's Elite,
+28,1,Spyro
+2,0,False,True,False,Special,Dark Spyro
+416,1,Spyro
+3,0,False,True,False,Special,Legendary Spyro
+16,4,Spyro
+1,1,False,False,True,Series 2,
+5,2,False,False,True,Series 3,Mega Ram Spyro
+2,2,False,True,True,Special,Dark Mega Ram Spyro
+16,3,False,False,True,Eon's Elite,
+503,0,Spry
+111,2,Sprocket
+5,2,False,False,True,Series 2,Heavy Duty Sprocket
+19,1,False,False,False,Rare,
+483,0,Spotlight
+3400,1,Fiesta
+21,4,False,True,False,Special,Frightful Fiesta
+1,3,Sonic Boom
+1,1,False,False,True,Series 2,
+17,1,False,False,True,Special,
+19,1,False,False,True,Rare,
+509,0,Small Fry
+15,3,Slam Bam
+3,1,False,True,True,Special,Legendary Slam Bam
+1,1,False,False,True,Series 2,
+16,4,False,False,True,Eon's Elite,
+113,2,Shroomboom
+6,1,True,False,False,LightCore,
+1,3,False,False,True,Series 2,Sure Shot Shroomboom
+479,0,Short Cut
+3007,1,Zoo Lou
+3,2,False,True,False,Special,Legendary Zoo Lou
+3003,0,Scorp
+457,0,Rocky Roll
+3013,2,Grim Creeper
+6,2,True,False,False,LightCore,
+3,2,True,True,False,Special,Legendary Grim Creeper
+3500,0,Sky Captains
+3502,0,Wave Runners
+3501,0,Road Racers
+3503,0,Kaos Trophy
+3001,0,Pop Thorn
+7,4,Prism Break
+6,1,True,False,False,LightCore,
+1,1,False,False,True,Series 2,
+5,2,False,False,True,Series 3,Hyper Beam Prism Break
+20,1,True,False,False,Rare,
+108,5,Pop Fizz
+2,1,False,True,False,Special,Punch Pop Fizz
+5,2,False,False,True,Series 2,Super Gulp Pop Fizz
+6,1,True,False,False,LightCore,
+2,-1,False,True,True,Special,Love Potion Pop Fizz
+5,3,False,False,True,Series 3,Fizzy Frenzy Pop Fizz
+508,1,Pet Vac
+2,3,False,True,False,Special,Power Punch Pet Vac
+3406,0,Stormblade
+3412,2,Spitfire
+2,4,False,True,False,Special,Dark Spitfire
+15,4,False,True,False,,Instant Spitfire
+109,1,Ninjini
+2,1,True,True,False,Special,Scarlet Ninjini
+542,0,Mini-Jini
+3238,1,Splatter Splasher
+2,4,False,True,False,Special,Power Blue Splatter Splasher
+206,0,Winged Boots
+304,0,Volcanic Vault
+233,0,Tiki Speaky
+307,0,Sunscraper Spire
+207,0,Sparx the Dragonfly
+205,0,Sky-Iron Shield
+3202,0,Platinum Sheep
+232,0,Rocket Ram
+302,0,Pirate Seas
+231,0,Piggy Bank
+306,0,Nightmare Express
+3302,0,Fiery Forge
+305,0,Mirror of Mystery
+308,0,Midnight Museum
+204,0,Time Twister Hourglass
+201,0,Hidden Treasure
+202,0,Healing Elixir
+3204,0,UFO Hat
+230,1,Hand of Fate
+3,3,False,True,False,,Hand of Fate, Legendary
+3200,0,Battle Hammer
+3203,0,Groove Machine
+203,0,Ghost Pirate Swords
+301,0,Empire of Ice
+300,0,Dragon's Peak
+3201,0,Sky Diamond
+303,0,Darklight Crypt
+209,0,Scorpion Striker Catapult
+208,1,Dragonfire Cannon
+2,1,True,True,False,,Golden Dragonfire Cannon
+3303,0,Arkeyan Crossbow
+200,0,Anvil Rain
+3239,1,Soda Skimmer
+2,4,False,True,False,Special,Nitro Soda Skimmer
+3002,1,Slobber Tooth
+2,2,False,True,False,Special,Dark Slobber Tooth
+463,1,Lob-Star
+2,-1,False,True,False,Special,Winterfest Lob-Star
+3236,1,Sun Runner
+3,4,False,True,False,Special,Legendary Sun Runner
+3,2,Lightning Rod
+1,1,False,False,True,Series 2,
+20,1,False,False,True,Rare,
+3426,1,Astroblast
+3,4,False,True,False,Special,Legendary Astroblast
+3401,0,High Volt
+3241,0,Buzz Wing
+3228,2,Stealth Stinger
+15,4,False,True,False,,Instant Stealth Stinger
+2,4,False,True,False,Special,Nitro Stealth Stinger
+3428,1,Thrillipede
+13,4,False,True,False,Special,Eggcited Thrillipede
+1012,1,Shift
+3,2,False,True,False,Special,
+1999,0,Template
+1001,1,Ranger
+3,2,False,True,False,Special,
+1003,0,Stone
+1011,0,Rise
+1015,1,Buckler
+2,2,False,True,False,Special,
+1009,0,Shadow
+1006,0,Bomb
+1002,0,Rouser
+1010,1,Charge
+2,2,False,True,False,Special,
+1007,0,Drilla
+1014,1,Blade
+2,2,False,True,False,Special,
+1008,1,Loop
+2,2,False,True,False,Special,
+1005,1,Kraken
+2,2,False,True,False,Special,
+1004,1,Zone
+2,2,False,True,False,Special,
+1013,1,Shake
+2,2,False,True,False,Special,
+1000,0,Jet
+478,1,Krypt King
+2,3,False,True,False,Special,Nitro Krypt King
+3411,1,Smash Hit
+2,4,False,True,False,Special,Steel Plated Smash Hit
+484,0,Knight Mare
+482,0,Knight Light
+459,0,Ka-Boom
+100,4,Jet-Vac
+3,1,False,True,False,Special,Legendary Jet-Vac
+6,1,True,False,False,LightCore,
+5,2,False,False,True,Series 2,Turbo Jet-Vac
+5,3,False,False,True,Series 3,Full Blast Jet-Vac
+470,1,Jawbreaker
+3,3,False,True,False,Special,Legendary Jawbreaker
+3402,1,Splat
+2,4,False,True,False,Special,Power Blue Splat
+10,2,Ignitor
+3,1,False,True,True,Special,Legendary Ignitor
+1,1,False,False,True,Series 2,
+104,1,Hot Head
+19,1,True,False,False,Rare,
+105,3,Hot Dog
+2,1,False,True,False,Special,Molten Hot Dog
+5,2,False,False,True,Series 2,Fire Bone Hot Dog
+21,1,False,False,False,Rare,
+504,0,Hijinx
+477,0,High Five
+29,2,Hex
+6,1,True,False,False,LightCore,
+1,1,False,False,True,Series 2,
+455,1,Head Rush
+2,3,False,True,False,Special,Nitro Head Rush
+450,0,Gusto
+514,0,Gill Runt
+14,4,Gill Grunt
+1,1,False,False,True,Series 2,
+5,2,False,False,True,Series 3,Anchors Away Gill Grunt
+16,3,False,False,True,Eon's Elite,
+9,3,False,False,True,Series 4,Tidal Wave Gill Grunt
+31,1,Ghost Roaster
+16,4,False,False,True,Eon's Elite,
+471,0,Gearshift
+4500,0,Fusion
+481,0,Funny Bone
+3004,1,Fryno
+1,3,False,False,True,Series 2,Hog Wild Fryno
+115,1,Fright Rider
+17,1,False,False,False,Special,
+476,1,Food Fight
+2,3,False,True,False,Special,Dark Food Fight
+464,0,Flip Wreck
+452,0,Fling Kong
+103,2,Flashwing
+2,1,False,True,False,Special,Jade Flashwing
+6,2,True,False,False,LightCore,
+11,2,Flameslinger
+1,1,False,False,True,Series 2,
+2,1,False,False,False,Special,
+456,0,Fist Bump
+3224,4,Hot Streak
+2,4,False,True,False,Special,Dark Hot Streak
+15,4,False,True,False,,Instant Hot Streak
+30,4,False,True,False,Special,Golden Hot Streak
+4,4,False,False,False,Exclusive Event Edition,
+3223,1,Burn-Cycle
+30,4,False,False,False,Special,
+3009,2,Star Strike
+6,2,True,False,False,LightCore,
+2,2,True,True,False,Special,Enchanted Star Strike
+543,0,Eye-Small
+114,1,Eye-Brawl
+20,1,True,False,False,Rare,
+3300,0,Sheep Wreck Island
+3301,0,Tower of Time
+9,7,Eruptor
+6,1,True,False,False,LightCore,
+1,1,False,False,True,Series 2,
+5,2,False,False,True,Series 3,Lava Barf Eruptor
+20,1,False,False,True,Rare,
+2,2,False,True,True,Special,Volcanic Eruptor 
+16,3,False,False,True,Eon's Elite,
+4,3,False,False,True,Special,
+467,0,Enigma
+3015,0,Punk Shock
+465,0,Echo
+3226,0,Thump Truck
+3225,0,Shark Tank
+3008,0,Dune Bug
+20,2,Drobot
+6,1,True,False,False,LightCore,
+1,1,False,False,True,Series 2,
+510,0,Drobit
+3443,0,Wolfgang
+3414,1,Double Dare Trigger Happy
+2,4,False,True,False,Special,Power Blue Trigger Happy
+3416,0,Shark Shooter Terrafin
+3441,0,Stratosfear
+3415,2,Super Shot Stealth Elf
+2,4,False,True,False,Special,Dark Super Shot Stealth Elf
+15,4,False,True,False,,Instant Super Shot Stealth Elf
+3463,0,Spellslamzer
+3417,1,Bone Bash Roller Brawl
+3,4,False,True,False,Special,Legendary Bone Bash Roller Brawl
+3420,1,Big Bubble Pop Fizz
+14,4,False,True,False,Special,Birthday Bash Big Bubble Pop Fizz
+3452,0,Moneybone
+3460,0,Mesmeralda
+3451,0,Dragon Hunter
+3467,0,Kaos
+3413,1,Hurricane Jet-Vac
+3,4,False,True,False,Special,Legendary Hurricane Jet-Vac
+3462,0,Golden Queen
+3450,0,Glumshanks
+3422,0,Deep Dive Gill Grunt
+3461,0,Captain Frightbeard
+3421,0,Lava Lance Eruptor
+3442,0,Capân Cluck
+3453,0,Chompy Mage
+3440,0,Chef Pepper Jack
+21,1,Drill Sergeant
+1,1,False,False,True,Series 2,
+18,2,Double Trouble
+2,1,False,True,True,Special,Royal Double Trouble
+1,1,False,False,True,Series 2,
+6,1,Dino-Rang
+16,4,False,False,True,Eon's Elite,
+468,1,DÃ©jÃ  Vu
+3,3,False,True,False,Special,Legendary DÃ©jÃ  Vu
+3237,1,Sea Shadow
+2,4,False,True,False,Special,Dark Sea Shadow
+3427,0,Nightfall
+3010,2,Countdown
+6,2,True,False,False,LightCore,
+2,2,False,True,False,Special,Kickoff CountDown
+32,3,Cynder
+1,1,False,False,True,Series 2,
+5,2,False,False,True,Series 3,Phantom Cynder
+17,1,False,False,True,Special,
+102,1,Crusher
+2,1,True,True,False,Special,Granite Crusher
+462,2,Snap Shot
+2,3,False,True,False,Special,Dark Snap Shot
+4,3,False,False,False,Special,
+469,1,Cobra Cadabra
+2,3,False,True,False,Special,King Cobra Cadabra
+472,0,Chopper
+30,4,Chop Chop
+1,1,False,False,True,Series 2,
+5,2,False,False,True,Series 3,Twin Blade Chop Chop
+4,1,False,False,True,Rare,
+16,3,False,False,True,Eon's Elite,
+430,1,Chop Chop
+3,0,False,True,False,Special,Legendary Chop Chop
+106,3,Chill
+5,2,False,False,True,Series 2,Blizzard Chill
+6,1,True,False,False,LightCore,
+3,1,True,True,False,Special,Legendary Chill
+3000,0,Scratch
+24,1,Camo
+5,2,False,False,True,Series 2,Thorn Horn Camo
+474,1,Bushwhack
+3,3,False,True,False,Special,Legendary Bushwhack
+506,0,Breeze
+110,1,Bouncer
+3,1,True,True,False,Special,Legendary Bouncer
+502,0,Bop
+22,1,Boomer
+16,4,False,False,True,Eon's Elite,
+2012,1,Night
+3,2,False,True,False,Special,Legendary Night
+2999,0,Template
+2001,1,Free
+3,2,False,True,False,Special,Legendary Free
+2003,0,Doom
+2011,0,Spy
+2015,1,Wash
+2,2,False,True,False,Special,Dark Wash
+2009,0,Trap
+2006,0,Stink
+2002,0,Rubble
+2010,1,Magna
+2,2,False,True,False,Special,Nitro Magna
+2007,0,Grilla
+2014,1,Freeze
+2,2,False,True,False,Special,Nitro Freeze
+2008,1,Hoot
+2,2,False,True,False,Special,Enchanted Hoot
+2005,1,Fire
+2,2,False,True,False,Special,Jade Fire
+2004,1,Blast
+2,2,False,True,False,Special,Dark Blast
+2013,1,Rattle
+2,2,False,True,False,Special,Quickdraw Rattle
+2000,0,Boom
+4503,0,BlueFalcon_Base
+466,0,Blastermind
+453,1,Blades
+3,3,False,True,False,Special,Legendary Blades
+485,0,Blackout
+3006,2,Bumble Blast
+6,2,True,False,False,LightCore,
+2,2,False,True,False,Special,Jolly Bumble Blast
+480,0,Bat Spin
+4,1,Bash
+1,1,False,False,True,Series 2,
+404,1,Bash
+3,0,False,True,False,Special,Legendary Bash
+540,1,Barkley
+2,3,False,True,False,Special,Gnarly Barkley
+3232,0,Sky Slicer
+3425,2,Dive-Clops
+14,4,False,True,False,Special,Missile-Tow Dive-Clops
+15,4,False,True,False,,Instant Dive-Clops
+3220,0,Jet Stream

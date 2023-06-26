@@ -1,0 +1,40 @@
+#pragma once
+
+#include <cstdint>
+
+enum kTfbSpyroTag_DecoID : int8_t
+{
+	kTfbSpyroTag_DecoID_INVALID = -1,
+	kTfbSpyroTag_DecoID_Normal = 0,
+	kTfbSpyroTag_DecoID_Repose1 = 1,
+	kTfbSpyroTag_DecoID_AlternateDeco = 2,
+	kTfbSpyroTag_DecoID_Legendary = 3,
+	kTfbSpyroTag_DecoID_Event = 4,
+	kTfbSpyroTag_DecoID_Repose2 = 5,
+	kTfbSpyroTag_DecoID_LightDirect = 6,
+	kTfbSpyroTag_DecoID_LightStored = 7,
+	kTfbSpyroTag_DecoID_LightEnhanced = 8,
+	kTfbSpyroTag_DecoID_Repose3 = 9,
+	kTfbSpyroTag_DecoID_Repose4 = 10,
+	kTfbSpyroTag_DecoID_Repose5 = 11,
+	kTfbSpyroTag_DecoID_Valentines = 12,
+	kTfbSpyroTag_DecoID_Easter = 13,
+	kTfbSpyroTag_DecoID_Winter = 14,
+	kTfbSpyroTag_DecoID_Virtual = 15,
+	kTfbSpyroTag_DecoID_Premium = 16,
+	kTfbSpyroTag_DecoID_GlowDark = 17,
+	kTfbSpyroTag_DecoID_StoneStatue = 18,
+	kTfbSpyroTag_DecoID_GlitterSpectrum = 19,
+	kTfbSpyroTag_DecoID_TreasureHunt2012 = 20,
+	kTfbSpyroTag_DecoID_Halloween = 21,
+	kTfbSpyroTag_DecoID_TreasureHunt2013 = 22,
+	kTfbSpyroTag_DecoID_ColorShift = 23,
+	kTfbSpyroTag_DecoID_WiiU = 24,
+	kTfbSpyroTag_DecoID_TH_BestBuy = 25,
+	kTfbSpyroTag_DecoID_TH_FritoLay = 26,
+	kTfbSpyroTag_DecoID_TreasureHunt2014 = 29,
+	kTfbSpyroTag_DecoID_TreasureHunt2015 = 30,
+	kTfbSpyroTag_DecoID_Mobile = 31,
+	kTfbSpyroTag_DecoID_MIN = 0,
+	kTfbSpyroTag_DecoID_MAX = 31,
+};

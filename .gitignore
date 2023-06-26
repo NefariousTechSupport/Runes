@@ -1,0 +1,6 @@
+Resources/salt.txt
+*.o
+*.dat
+*.exe
+.vscode
+.vs
