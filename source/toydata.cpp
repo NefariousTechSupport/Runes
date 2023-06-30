@@ -49,7 +49,7 @@ Runes::ToyDataManager* Runes::ToyDataManager::getInstance()
 	}
 	return _Instance;
 }
-Runes::ToyDataManager::ToyDataManager(char* csvPath)
+Runes::ToyDataManager::ToyDataManager(const char* csvPath)
 {
 	FILE* f = fopen(csvPath, "rb");
 	fseek(f, 0, SEEK_SET);

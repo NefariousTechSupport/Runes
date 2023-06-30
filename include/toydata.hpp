@@ -37,6 +37,6 @@ namespace Runes
 			FigureToyData* LookupCharacter(kTfbSpyroTag_ToyType toyType);
 		private:
 			static ToyDataManager* _Instance;
-			ToyDataManager(char* csvPath);
+			ToyDataManager(const char* csvPath);
 	};
 }

@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+#define to24(low, high) ((uint32_t)(low) + ((uint32_t)(high) << 16))
+
 void Runes::PortalTag::DecodeSubtype(uint16_t varId, ESkylandersGame* esg, bool* fullAltDeco, bool* wowPowFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId)
 {
 	*esg = (ESkylandersGame)((varId >> 12) & 0xF);
@@ -60,7 +62,103 @@ void Runes::PortalTag::StoreHeader()
 		this->_webCode[11] = '\0';
 	}
 }
+void Runes::PortalTag::StoreTagData()
+{
+	this->_rfidTag->CopyBlocks(&this->_tagData, 8, 0xB);
+}
 void Runes::PortalTag::StoreMagicMoment()
 {
-	this->_rfidTag->CopyBlocks(&this->_tagMagicMoment, 8, 1);
+	this->_rfidTag->CopyBlocks(&this->_tagData, 8, 1);
+}
+uint32_t Runes::PortalTagData::getExperience()
+{
+	printf("%d + %d + %d = %d\n", to24(this->_experience2011_low, this->_experience2011_high), this->_experience2012, this->_experience2013, to24(this->_experience2011_low, this->_experience2011_high) + (uint32_t)this->_experience2012 + this->_experience2013);
+	return to24(this->_experience2011_low, this->_experience2011_high) + (uint32_t)this->_experience2012 + this->_experience2013;
+}
+void Runes::PortalTagData::setExperience(uint32_t experience)
+{
+	uint32_t currentExp = experience;
+	this->_experience2011_low = 0;
+	this->_experience2011_high = 0;
+	this->_experience2012 = 0;
+	this->_experience2013 = 0;
+
+	//2011 (level 1->10)
+	if(currentExp >= 33000)
+	{
+		this->_experience2011_low = 33000;
+		currentExp -= 33000;
+	}
+	else
+	{
+		this->_experience2011_low = (uint16_t)currentExp;
+		return;
+	}
+	//2012 (level 10->15)
+	if(currentExp >= 63500)
+	{
+		this->_experience2012 = 63500;
+		currentExp -= 63500;
+	}
+	else
+	{
+		this->_experience2012 = currentExp;
+		return;
+	}
+	//2013 (level 15->20)
+	if(currentExp >= 101000)
+	{
+		this->_experience2013 = 101000;
+	}
+	else
+	{
+		this->_experience2013 = currentExp;
+		return;
+	}
+}
+
+uint16_t Runes::PortalTagData::getMoney()
+{
+	return this->_coinCount;
+}
+void Runes::PortalTagData::setMoney(uint16_t money)
+{
+	this->_coinCount = money;
+}
+
+kTfbSpyroTag_HatType Runes::PortalTagData::getHat()
+{
+	if(this->_hat2011 > 0) return (kTfbSpyroTag_HatType)this->_hat2011;
+	if(this->_hat2012 > 0) return (kTfbSpyroTag_HatType)this->_hat2012;
+	if(this->_hat2013 > 0) return (kTfbSpyroTag_HatType)this->_hat2013;
+	if(this->_hat2015 > 0) return (kTfbSpyroTag_HatType)(this->_hat2015 + kTfbSpyroTag_Hat_OFFSET_2015);
+	return kTfbSpyroTag_Hat_NONE;
+}
+void Runes::PortalTagData::setHat(kTfbSpyroTag_HatType hat)
+{
+	this->_hat2011 = 0;
+	this->_hat2012 = 0;
+	this->_hat2013 = 0;
+	this->_hat2015 = 0;
+	if(hat <= kTfbSpyroTag_Hat_MAX_2011)
+	{
+		this->_hat2011 = hat;
+		return;
+	}
+	else if(hat <= kTfbSpyroTag_Hat_MAX_2012)
+	{
+		this->_hat2012 = hat;
+		return;
+	}
+	else if(hat <= kTfbSpyroTag_Hat_MAX_2014)
+	{
+		this->_hat2013 = hat;
+		return;
+	}
+	else if(hat >= kTfbSpyroTag_Hat_MIN_2015 && hat <= kTfbSpyroTag_Hat_MAX_2015)
+	{
+		this->_hat2015 = hat - kTfbSpyroTag_Hat_OFFSET_2015;
+		return;
+	}
+	printf("Invalid Hat ID");
 }

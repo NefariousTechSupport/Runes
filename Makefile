@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 # The path to your g++ install, leaving it as g++ is normally good enough
 # -----------------------------------------------------------------------------
-GPP			=	g++
+GPP			=	$(shell fltk-config --cxx)
 
 # -----------------------------------------------------------------------------
 # TARGET   : The final output file for
@@ -29,8 +29,8 @@ export OBJECTS	:=	$(foreach dir,$(OFILES),-o $(dir))
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
 
 all:
-	"$(GPP)" -c $(SOURCE) $(INCLUDE) $(CPPFLAGS)
-	"$(GPP)" -o $(TARGET).exe $(OFILES) $(LDFLAGS)
+	"$(GPP)" -c $(SOURCE) $(shell fltk-config --use-gl --use-images --cxxflags ) $(INCLUDE) $(CPPFLAGS)
+	"$(GPP)" -o $(TARGET).exe $(OFILES) $(shell fltk-config --use-gl --use-images --ldstaticflags ) $(LDFLAGS)
 osx:
 	"$(GPP)" -c $(SOURCE) $(INCLUDE) $(CPPFLAGS)
 	"$(GPP)" -o $(TARGET) $(OFILES)
