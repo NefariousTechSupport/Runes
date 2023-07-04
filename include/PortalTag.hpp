@@ -57,7 +57,7 @@ namespace Runes
 		/* 0x13 */ uint8_t _platformUse2011;
 		/* 0x14 */ uint8_t _hat2011;
 		/* 0x15 */ uint8_t unk15[2];
-		/* 0x17 */ uint8_t _platform2013;
+		/* 0x17 */ uint8_t _platformUse2013;
 		/* 0x18 */ uint8_t unk18[8];
 
 		/* 0x20 */ uint16_t _nickname[16];
@@ -123,13 +123,41 @@ namespace Runes
 			PortalTagData _tagData;
 			RfidTag* _rfidTag;
 
+			uint32_t _serial;
+			kTfbSpyroTag_ToyType _toyType;
+			uint16_t _subType;
+
+			uint32_t _exp;
+			uint16_t _coins;
+			uint32_t _cumulativeTime;
+			uint16_t _platformUse;
+			uint64_t _heroics;
+			kTfbSpyroTag_HatType _hatType;
+			PortalTagTimeOfDay _firstUsed;
+			PortalTagTimeOfDay _recentlyUsed;
+			uint16_t _heroPoints;
+			uint8_t _ownerCount;
+			uint8_t _ownerId[9];
+			uint8_t _quests;
+			uint16_t _upgrades;
+			uint8_t _elementCollectionCounts[2];
+			uint8_t _elementCollection;
+			uint8_t _accoladeRanks[2];
 			char _webCode[12];
+			uint16_t _nickname[16];
+
 			void StoreHeader();
 			void StoreTagData();
 			void StoreMagicMoment();
+			void StoreRemainingData();
 			static void DecodeSubtype(uint16_t varId, ESkylandersGame* esg, bool* fullAltDeco, bool* wowPowFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId);
 			void DecodeSubtype(ESkylandersGame* esg, bool* fullAltDeco, bool* wowPowFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId);
 			void DebugPrintHeader();
+		private:
+			bool _tagHeaderStored;
+			bool _tagDataStored;
+			bool _tagMagicMomentStored;
+			bool _tagRemainingDataStored;
 	};
 }
 
@@ -165,7 +193,7 @@ assert_offset(Runes::PortalTagData, 0x0E, _crcType1);
 assert_offset(Runes::PortalTagData, 0x10, _flags1);
 assert_offset(Runes::PortalTagData, 0x13, _platformUse2011);
 assert_offset(Runes::PortalTagData, 0x14, _hat2011);
-assert_offset(Runes::PortalTagData, 0x17, _platform2013);
+assert_offset(Runes::PortalTagData, 0x17, _platformUse2013);
 assert_offset(Runes::PortalTagData, 0x20, _nickname);
 assert_offset(Runes::PortalTagData, 0x40, _recentlyUsed);
 assert_offset(Runes::PortalTagData, 0x46, _heroics2011);

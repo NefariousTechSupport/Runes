@@ -14,7 +14,7 @@ TARGET		=	Runes
 BUILD		=	build
 SOURCES		=	source source/3rd_party
 INCLUDES	=	include include/3rd_party
-CPPFLAGS	=	-Wall -g
+CPPFLAGS	=	-Wall -g -DDEBUG
 LDFLAGS		=	-static-libgcc -static-libstdc++ -static -g
 
 # -----------------------------------------------------------------------------
@@ -30,7 +30,7 @@ export OUTPUT	:=	$(CURDIR)/$(TARGET)
 
 all:
 	"$(GPP)" -c $(SOURCE) $(shell fltk-config --use-gl --use-images --cxxflags ) $(INCLUDE) $(CPPFLAGS)
-	"$(GPP)" -o $(TARGET).exe $(OFILES) $(shell fltk-config --use-gl --use-images --ldstaticflags ) $(LDFLAGS)
+	"$(GPP)" -o $(TARGET).exe $(OFILES) $(LDFLAGS) $(shell fltk-config --use-gl --use-images --ldstaticflags )
 osx:
 	"$(GPP)" -c $(SOURCE) $(INCLUDE) $(CPPFLAGS)
 	"$(GPP)" -o $(TARGET) $(OFILES)

@@ -38,6 +38,12 @@ void Runes::PortalTag::StoreHeader()
 {
 	this->_rfidTag->CopyBlocks(&this->_tagHeader, 0, 2);
 
+	this->_serial = this->_tagHeader._serial;
+	this->_toyType = this->_tagHeader._toyType;
+	this->_subType = this->_tagHeader._subType;
+
+	//Web code
+
 	//basically 0->9, A->Z except not 0, 1, or any vowels
 	const char* webCodeTable = "23456789BCDFGHJKLMNPQRSTVWXYZ";
 
@@ -64,11 +70,44 @@ void Runes::PortalTag::StoreHeader()
 }
 void Runes::PortalTag::StoreTagData()
 {
-	this->_rfidTag->CopyBlocks(&this->_tagData, 8, 0xB);
+	if(!this->_tagDataStored)
+	{
+		this->_rfidTag->CopyBlocks(&this->_tagData, 8, 0xB);
+		this->_tagDataStored = true;
+	}
 }
 void Runes::PortalTag::StoreMagicMoment()
 {
-	this->_rfidTag->CopyBlocks(&this->_tagData, 8, 1);
+	this->StoreTagData();
+
+	this->_tagMagicMomentStored = true;
+	this->_exp = to24(this->_tagData._experience2011_low, this->_tagData._experience2011_high) + (uint32_t)this->_tagData._experience2012 + this->_tagData._experience2013;
+	this->_coins = this->_tagData._coinCount;
+	this->_cumulativeTime = this->_tagData._cumulativeTime;
+	this->_platformUse = (this->_tagData._platformUse2013 << 8) | this->_tagData._platformUse2011;
+
+	     if(this->_tagData._hat2011 > 0) this->_hatType = (kTfbSpyroTag_HatType)this->_tagData._hat2011;
+	else if(this->_tagData._hat2012 > 0) this->_hatType = (kTfbSpyroTag_HatType)this->_tagData._hat2012;
+	else if(this->_tagData._hat2013 > 0) this->_hatType = (kTfbSpyroTag_HatType)this->_tagData._hat2013;
+	else if(this->_tagData._hat2015 > 0) this->_hatType = (kTfbSpyroTag_HatType)(this->_tagData._hat2015 + kTfbSpyroTag_Hat_OFFSET_2015);
+
+	this->_upgrades = ((this->_tagData._flags2 & 0xF) << 10) | (this->_tagData._flags1 & 0x3FF);
+	this->_elementCollectionCounts[0] = (this->_tagData._flags1 >> 10) & 3;
+	this->_elementCollectionCounts[1] = (this->_tagData._flags1 >> 14) & 7;
+	this->_elementCollection = this->_elementCollectionCounts[0] + this->_elementCollectionCounts[1] + ((this->_tagData._flags2 >> 11) & 7);
+	this->_accoladeRanks[0] = (this->_tagData._flags2 >> 9) & 3;
+	this->_accoladeRanks[1] = (this->_tagData._flags2 >> 4) & 3;
+
+	memcpy(&this->_nickname, &this->_tagData._nickname, 0x20);
+}
+void Runes::PortalTag::StoreRemainingData()
+{
+	this->_firstUsed = this->_tagData._firstUsed;
+	this->_recentlyUsed = this->_tagData._recentlyUsed;
+	this->_heroics = ((uint64_t)to24(this->_tagData._heroics2012_low, this->_tagData._heroics2012_high) << 32) | this->_tagData._heroics2011;
+	this->_quests = this->_tagData._quests;
+	this->_ownerCount = this->_tagData._ownerCount;
+	this->_heroPoints = this->_tagData._heroPoints;
 }
 uint32_t Runes::PortalTagData::getExperience()
 {

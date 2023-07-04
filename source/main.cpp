@@ -6,6 +6,7 @@
 #include "3rd_party/crc.h"
 #include "PortalAlgos.hpp"
 #include "toydata.hpp"
+#include "debug.hpp"
 
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
@@ -14,39 +15,38 @@
  
 int main(int argc, char **argv)
 {
+	RedirectIOToConsole();
 	Runes::PortalTag* tag = new Runes::PortalTag();
 	tag->_rfidTag = new Runes::RfidTag();
 	tag->_rfidTag->ReadFromFile(argv[1]);
 
 	tag->StoreHeader();
-	tag->StoreTagData();
+	tag->StoreMagicMoment();
+	tag->StoreRemainingData();
 	tag->DebugPrintHeader();
 
 	Runes::ToyDataManager* toyMan = Runes::ToyDataManager::getInstance();
 
 	Fl_Window *window = new Fl_Window(720,480, "Runes");
 
-	const char* toyName = toyMan->LookupCharacter(tag->_tagHeader._toyType)->_toyName;
+	const char* toyName = toyMan->LookupCharacter(tag->_toyType)->_toyName;
 	Fl_Box* skylanderNameBox = new Fl_Box(12, 12, 100, 20, toyName);
 	skylanderNameBox->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 
 	char txtCoin[6];
-	sprintf(txtCoin, "%d", tag->_tagData.getMoney());
+	sprintf(txtCoin, "%d", tag->_coins);
 	Fl_Input* iptCoins = new Fl_Input(skylanderNameBox->x() + 100, skylanderNameBox->y() + 32, 100, 20, "Money");
 	iptCoins->value(txtCoin);
-	//iptCoins->align(FL_ALIGN_INSIDE | FL_ALIGN_RIGHT);
 
 	char txtExp[11];
-	sprintf(txtExp, "%d", tag->_tagData.getExperience());
+	sprintf(txtExp, "%d", tag->_exp);
 	Fl_Input* iptExp = new Fl_Input(iptCoins->x(), iptCoins->y() + 32, 100, 20, "Exp");
 	iptExp->value(txtExp);
-	//iptExp->align(FL_ALIGN_INSIDE | FL_ALIGN_RIGHT);
 
 	char txtHat[6];
-	sprintf(txtHat, "%d", tag->_tagData.getHat());
+	sprintf(txtHat, "%d", tag->_hatType);
 	Fl_Input* iptHat = new Fl_Input(iptExp->x(), iptExp->y() + 32, 100, 20, "Hat");
 	iptHat->value(txtHat);
-	//iptHat->align(FL_ALIGN_INSIDE | FL_ALIGN_RIGHT);
 
 	window->end();
 	window->show(0, NULL);
