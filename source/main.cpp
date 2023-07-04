@@ -24,6 +24,8 @@ int main(int argc, char **argv)
 	tag->StoreMagicMoment();
 	tag->StoreRemainingData();
 	tag->DebugPrintHeader();
+	tag->DebugSaveTagData();
+	return 0;
 
 	Runes::ToyDataManager* toyMan = Runes::ToyDataManager::getInstance();
 

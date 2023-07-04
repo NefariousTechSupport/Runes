@@ -52,13 +52,13 @@ namespace Runes
 		/* 0x0C */ uint16_t _crcType3;
 		/* 0x0E */ uint16_t _crcType1;
 
-		/* 0x10 */ uint16_t _flags1;
-		/* 0x12 */ uint8_t unk12;
+		/* 0x10 */ uint16_t _flags1_low;
+		/* 0x12 */ uint8_t _flags1_high;
 		/* 0x13 */ uint8_t _platformUse2011;
 		/* 0x14 */ uint8_t _hat2011;
 		/* 0x15 */ uint8_t unk15[2];
 		/* 0x17 */ uint8_t _platformUse2013;
-		/* 0x18 */ uint8_t unk18[8];
+		/* 0x18 */ uint8_t unk18[8];			//Maybe an owner id?
 
 		/* 0x20 */ uint16_t _nickname[16];
 
@@ -71,7 +71,8 @@ namespace Runes
 		/* 0x50 */ PortalTagTimeOfDay _firstUsed;
 		/* 0x56 */ uint8_t unk56[10];
 
-		/* 0x60 */ uint8_t unk60[16];
+		/* 0x60 */ uint8_t unk60[12];
+		/* 0x6C */ uint32_t _challengeLevel;
 
 		/* 0x70 */ uint8_t unk70[3];
 		/* 0x73 */ uint16_t _experience2012;
@@ -86,11 +87,12 @@ namespace Runes
 		/* 0x80 */ uint8_t unk80[4];
 		/* 0x84 */ uint16_t _heroics2012_low;
 		/* 0x86 */ uint8_t _heroics2012_high;
-		/* 0x87 */ uint8_t unk87[9];
+		/* 0x97 */ uint64_t _sgQuestsLow;
+		/* 0x9F */ uint8_t _sgQuestsHigh;
 
 		/* 0x90 */ uint8_t unk90[7];
-		/* 0x97 */ uint8_t _quests;
-		/* 0x98 */ uint8_t unk98[8];
+		/* 0x97 */ uint64_t _ssfQuestsLow;
+		/* 0x9F */ uint8_t _ssfQuestsHigh;
 
 		/* 0xA0 */ uint8_t unkA0[16];
 
@@ -138,7 +140,8 @@ namespace Runes
 			uint16_t _heroPoints;
 			uint8_t _ownerCount;
 			uint8_t _ownerId[9];
-			uint8_t _quests;
+			uint16_t _giantsQuests[9];
+			uint16_t _swapforceQuests[9];
 			uint16_t _upgrades;
 			uint8_t _elementCollectionCounts[2];
 			uint8_t _elementCollection;
@@ -150,9 +153,11 @@ namespace Runes
 			void StoreTagData();
 			void StoreMagicMoment();
 			void StoreRemainingData();
+			void StoreQuests(uint16_t* target, uint8_t* source);
 			static void DecodeSubtype(uint16_t varId, ESkylandersGame* esg, bool* fullAltDeco, bool* wowPowFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId);
 			void DecodeSubtype(ESkylandersGame* esg, bool* fullAltDeco, bool* wowPowFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId);
 			void DebugPrintHeader();
+			void DebugSaveTagData();
 		private:
 			bool _tagHeaderStored;
 			bool _tagDataStored;
@@ -190,7 +195,8 @@ assert_offset(Runes::PortalTagData, 0x09, _accessSpecifier);
 assert_offset(Runes::PortalTagData, 0x0A, _crcType2);
 assert_offset(Runes::PortalTagData, 0x0C, _crcType3);
 assert_offset(Runes::PortalTagData, 0x0E, _crcType1);
-assert_offset(Runes::PortalTagData, 0x10, _flags1);
+assert_offset(Runes::PortalTagData, 0x10, _flags1_low);
+assert_offset(Runes::PortalTagData, 0x12, _flags1_high);
 assert_offset(Runes::PortalTagData, 0x13, _platformUse2011);
 assert_offset(Runes::PortalTagData, 0x14, _hat2011);
 assert_offset(Runes::PortalTagData, 0x17, _platformUse2013);
@@ -208,4 +214,7 @@ assert_offset(Runes::PortalTagData, 0x7C, _hat2013);
 assert_offset(Runes::PortalTagData, 0x7E, _hat2015);
 assert_offset(Runes::PortalTagData, 0x84, _heroics2012_low);
 assert_offset(Runes::PortalTagData, 0x86, _heroics2012_high);
-assert_offset(Runes::PortalTagData, 0x97, _quests);
+assert_offset(Runes::PortalTagData, 0x87, _sgQuestsLow);
+assert_offset(Runes::PortalTagData, 0x8F, _sgQuestsHigh);
+assert_offset(Runes::PortalTagData, 0x97, _ssfQuestsLow);
+assert_offset(Runes::PortalTagData, 0x9F, _ssfQuestsHigh);

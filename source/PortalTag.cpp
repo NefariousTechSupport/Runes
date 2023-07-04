@@ -1,5 +1,6 @@
 #include "PortalTag.hpp"
 #include "toydata.hpp"
+#include "Constants.hpp"
 
 #include <iostream>
 
@@ -33,6 +34,15 @@ void Runes::PortalTag::DebugPrintHeader()
 	printf("_subType:\n\t_yearCode: %d\n\t_fullAltDeco: %hhu\n\t_wowPowFlag: %hhu\n\t_lightcore: %hhu\n\t_decoId: %02X\n\t_variantText: %s\n\t_toyName: %s\n", esg, fullAltDeco, wowPowFlag, lightcore, decoId, (varData ? varData->_variantText : "N/A"), (varData ? varData->_toyName : "N/A"));
 	printf("_tradingCardId: %08X%08X\n", this->_tagHeader._tradingCardId2, this->_tagHeader._tradingCardId1);
 	printf("_webCode: %s\n", this->_webCode);
+}
+void Runes::PortalTag::DebugSaveTagData()
+{
+	std::string fileName(Runes::ToyDataManager::getInstance()->LookupCharacter(this->_toyType)->_toyName);
+	fileName += ".dat";
+	FILE* f = fopen(fileName.c_str(), "wb");
+	fwrite(&this->_tagData, 1, sizeof(Runes::PortalTagData), f);
+	fflush(f);
+	fclose(f);
 }
 void Runes::PortalTag::StoreHeader()
 {
@@ -91,9 +101,10 @@ void Runes::PortalTag::StoreMagicMoment()
 	else if(this->_tagData._hat2013 > 0) this->_hatType = (kTfbSpyroTag_HatType)this->_tagData._hat2013;
 	else if(this->_tagData._hat2015 > 0) this->_hatType = (kTfbSpyroTag_HatType)(this->_tagData._hat2015 + kTfbSpyroTag_Hat_OFFSET_2015);
 
-	this->_upgrades = ((this->_tagData._flags2 & 0xF) << 10) | (this->_tagData._flags1 & 0x3FF);
-	this->_elementCollectionCounts[0] = (this->_tagData._flags1 >> 10) & 3;
-	this->_elementCollectionCounts[1] = (this->_tagData._flags1 >> 14) & 7;
+	uint32_t flags1 = to24(this->_tagData._flags1_low, this->_tagData._flags1_high);
+	this->_upgrades = ((this->_tagData._flags2 & 0xF) << 10) | (flags1 & 0x3FF);
+	this->_elementCollectionCounts[0] = (flags1 >> 10) & 3;
+	this->_elementCollectionCounts[1] = (flags1 >> 14) & 7;
 	this->_elementCollection = this->_elementCollectionCounts[0] + this->_elementCollectionCounts[1] + ((this->_tagData._flags2 >> 11) & 7);
 	this->_accoladeRanks[0] = (this->_tagData._flags2 >> 9) & 3;
 	this->_accoladeRanks[1] = (this->_tagData._flags2 >> 4) & 3;
@@ -105,9 +116,24 @@ void Runes::PortalTag::StoreRemainingData()
 	this->_firstUsed = this->_tagData._firstUsed;
 	this->_recentlyUsed = this->_tagData._recentlyUsed;
 	this->_heroics = ((uint64_t)to24(this->_tagData._heroics2012_low, this->_tagData._heroics2012_high) << 32) | this->_tagData._heroics2011;
-	this->_quests = this->_tagData._quests;
 	this->_ownerCount = this->_tagData._ownerCount;
 	this->_heroPoints = this->_tagData._heroPoints;
+	StoreQuests((uint16_t*)&this->_giantsQuests, (uint8_t*)&this->_tagData._sgQuestsLow);
+	StoreQuests((uint16_t*)&this->_swapforceQuests, (uint8_t*)&this->_tagData._ssfQuestsLow);
+}
+void Runes::PortalTag::StoreQuests(uint16_t* target, uint8_t* source)
+{
+	uint64_t questsLow = *(uint64_t*)source;
+	uint8_t questsHigh = source[8];
+	target[0] = (questsLow >> kQuest1Shift) & kQuest1Mask;
+	target[1] = (questsLow >> kQuest2Shift) & kQuest2Mask;
+	target[2] = (questsLow >> kQuest3Shift) & kQuest3Mask;
+	target[3] = (questsLow >> kQuest4Shift) & kQuest4Mask;
+	target[4] = (questsLow >> kQuest5Shift) & kQuest5Mask;
+	target[5] = (questsLow >> kQuest6Shift) & kQuest6Mask;
+	target[6] = (questsLow >> kQuest7Shift) & kQuest7Mask;
+	target[7] = (questsLow >> kQuest8Shift) & kQuest8Mask;
+	target[8] = ((questsLow >> kQuest9Shift) & kQuest9Mask) | ((uint16_t)(questsHigh & 2) << 14);
 }
 uint32_t Runes::PortalTagData::getExperience()
 {
