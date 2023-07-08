@@ -82,7 +82,8 @@ void Runes::PortalTag::StoreTagData()
 {
 	if(!this->_tagDataStored)
 	{
-		this->_rfidTag->CopyBlocks(&this->_tagData, 8, 0xB);
+		int32_t regionIndex = this->_rfidTag->DetermineActiveDataRegion();
+		this->_rfidTag->CopyBlocks(&this->_tagData, regionIndex == 0 ? 0x08 : 0x24, 0xB);
 		this->_tagDataStored = true;
 	}
 }
@@ -134,6 +135,29 @@ void Runes::PortalTag::StoreQuests(uint16_t* target, uint8_t* source)
 	target[6] = (questsLow >> kQuest7Shift) & kQuest7Mask;
 	target[7] = (questsLow >> kQuest8Shift) & kQuest8Mask;
 	target[8] = ((questsLow >> kQuest9Shift) & kQuest9Mask) | ((uint16_t)(questsHigh & 2) << 14);
+}
+void Runes::PortalTag::FillOutputFromStoredData()
+{
+	Runes::PortalTagData* tagData = &this->_tagData;
+
+
+	//Set exp
+	uint32_t currentExp = this->_exp;
+	tagData->_experience2011_low = (currentExp > 33000 ? 33000 : currentExp);
+	tagData->_experience2011_high = 0;
+	if(currentExp > 33000) currentExp -= 33000;
+
+	tagData->_experience2012 = (currentExp > 63500 ? 63500 : currentExp);
+	if(currentExp > 63500) currentExp -= 63500;
+
+	tagData->_experience2013 = (currentExp > 101000 ? 101000 : currentExp);
+	if(currentExp > 101000) currentExp -= 101000;
+
+	//Set money
+	tagData->_coinCount = this->_coins;
+
+	//Set cumulative time
+	tagData->_cumulativeTime = this->_cumulativeTime;
 }
 uint32_t Runes::PortalTagData::getExperience()
 {

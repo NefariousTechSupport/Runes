@@ -15,6 +15,7 @@ namespace Runes
 			bool ReadFromFile(const char* path);
 			bool CopyBlocks(void* dst, uint8_t blockId, uint8_t numBlocks);
 			void decrypt();
+			uint8_t DetermineActiveDataRegion();
 		private:
 			uint8_t _tag[1024];
 	};

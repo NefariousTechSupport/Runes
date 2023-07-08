@@ -25,7 +25,7 @@ namespace Runes
 		/* 0x04 */ uint8_t _bcc;
 		/* 0x05 */ uint8_t _manufacturerData[0x0B];
 		/* 0x10 */ kTfbSpyroTag_ToyType _toyType;
-		/* 0x12 */ uint8_t unk12;
+		/* 0x12 */ uint8_t _toyType_high;
 		/* 0x13 */ uint8_t _importantByte;		//MUST BE SET TO 0 OR THE GAME WILL REFUSE TO READ THIS TOY
 		/* 0x14 */ uint32_t _tradingCardId1;
 		/* 0x18 */ uint32_t _tradingCardId2;
@@ -47,7 +47,7 @@ namespace Runes
 		/* 0x02 */ uint8_t _experience2011_high;
 		/* 0x03 */ uint16_t _coinCount;
 		/* 0x05 */ uint32_t _cumulativeTime;
-		/* 0x09 */ uint8_t _accessSpecifier;
+		/* 0x09 */ uint8_t _areaSequence;
 		/* 0x0A */ uint16_t _crcType2;
 		/* 0x0C */ uint16_t _crcType3;
 		/* 0x0E */ uint16_t _crcType1;
@@ -55,8 +55,8 @@ namespace Runes
 		/* 0x10 */ uint16_t _flags1_low;
 		/* 0x12 */ uint8_t _flags1_high;
 		/* 0x13 */ uint8_t _platformUse2011;
-		/* 0x14 */ uint8_t _hat2011;
-		/* 0x15 */ uint8_t unk15[2];
+		/* 0x14 */ uint16_t _hat2011;
+		/* 0x16 */ uint8_t _regionCountCoded;
 		/* 0x17 */ uint8_t _platformUse2013;
 		/* 0x18 */ uint8_t unk18[8];			//Maybe an owner id?
 
@@ -154,6 +154,7 @@ namespace Runes
 			void StoreMagicMoment();
 			void StoreRemainingData();
 			void StoreQuests(uint16_t* target, uint8_t* source);
+			void FillOutputFromStoredData();
 			static void DecodeSubtype(uint16_t varId, ESkylandersGame* esg, bool* fullAltDeco, bool* wowPowFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId);
 			void DecodeSubtype(ESkylandersGame* esg, bool* fullAltDeco, bool* wowPowFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId);
 			void DebugPrintHeader();
@@ -191,7 +192,7 @@ assert_offset(Runes::PortalTagData, 0x00, _experience2011_low);
 assert_offset(Runes::PortalTagData, 0x02, _experience2011_high);
 assert_offset(Runes::PortalTagData, 0x03, _coinCount);
 assert_offset(Runes::PortalTagData, 0x05, _cumulativeTime);
-assert_offset(Runes::PortalTagData, 0x09, _accessSpecifier);
+assert_offset(Runes::PortalTagData, 0x09, _areaSequence);
 assert_offset(Runes::PortalTagData, 0x0A, _crcType2);
 assert_offset(Runes::PortalTagData, 0x0C, _crcType3);
 assert_offset(Runes::PortalTagData, 0x0E, _crcType1);

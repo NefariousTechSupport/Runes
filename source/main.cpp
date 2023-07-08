@@ -10,11 +10,38 @@
 
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
+#include <FL/Fl_Value_Input.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Box.H>
- 
+
+#define createIntValueReader(field, minimum, maximum) \
+	Runes::PortalTag* tag = (Runes::PortalTag*)tagPtr; \
+	Fl_Value_Input* ipt = (Fl_Value_Input*)iptPtr; \
+	int32_t value = (int32_t)ipt->value(); \
+	if(value < minimum) value = minimum; \
+	if(value > maximum) value = maximum; \
+	tag->field = (decltype(tag->field))value; \
+	ipt->value(value); \
+	printf("new value for %s: %d\n", #field, tag->_coins);
+
+void onEditCoins(Fl_Widget* iptPtr, void* tagPtr)
+{
+	createIntValueReader(_coins, 0, 0xFFFF);
+}
+void onEditExp(Fl_Widget* iptPtr, void* tagPtr)
+{
+	createIntValueReader(_exp, 0, 197500);
+}
+void onEditHeroPoints(Fl_Widget* iptPtr, void* tagPtr)
+{
+	createIntValueReader(_heroPoints, 0, 100);
+}
+void decryptAndDump(int argc, char* argv[]);
+
 int main(int argc, char **argv)
 {
+	decryptAndDump(argc, argv); return 0;
+
 	RedirectIOToConsole();
 	Runes::PortalTag* tag = new Runes::PortalTag();
 	tag->_rfidTag = new Runes::RfidTag();
@@ -25,7 +52,7 @@ int main(int argc, char **argv)
 	tag->StoreRemainingData();
 	tag->DebugPrintHeader();
 	tag->DebugSaveTagData();
-	return 0;
+
 
 	Runes::ToyDataManager* toyMan = Runes::ToyDataManager::getInstance();
 
@@ -35,15 +62,15 @@ int main(int argc, char **argv)
 	Fl_Box* skylanderNameBox = new Fl_Box(12, 12, 100, 20, toyName);
 	skylanderNameBox->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 
-	char txtCoin[6];
-	sprintf(txtCoin, "%d", tag->_coins);
-	Fl_Input* iptCoins = new Fl_Input(skylanderNameBox->x() + 100, skylanderNameBox->y() + 32, 100, 20, "Money");
-	iptCoins->value(txtCoin);
+	Fl_Value_Input* iptCoins = new Fl_Value_Input(skylanderNameBox->x() + 100, skylanderNameBox->y() + 32, 100, 20, "Money");
+	iptCoins->callback(onEditCoins, tag);
+	iptCoins->value(tag->_coins);
+	iptCoins->step(1);
 
-	char txtExp[11];
-	sprintf(txtExp, "%d", tag->_exp);
-	Fl_Input* iptExp = new Fl_Input(iptCoins->x(), iptCoins->y() + 32, 100, 20, "Exp");
-	iptExp->value(txtExp);
+	Fl_Value_Input* iptExp = new Fl_Value_Input(iptCoins->x(), iptCoins->y() + 32, 100, 20, "Exp");
+	//iptExp->callback(onEditCoins, tag);
+	iptExp->value(tag->_exp);
+	iptExp->step(1);
 
 	char txtHat[6];
 	sprintf(txtHat, "%d", tag->_hatType);
@@ -53,31 +80,6 @@ int main(int argc, char **argv)
 	window->end();
 	window->show(0, NULL);
 	return Fl::run();
-}
-/*void loadToydata(int argc, char* argv[]);
-
-int main(int argc, char* argv[])
-{
-	assert(sizeof(Runes::PortalTagHeader) == 0x20);
-
-	Runes::PortalTag* tag = new Runes::PortalTag();
-	tag->_rfidTag = new Runes::RfidTag();
-	tag->_rfidTag->ReadFromFile(argv[1]);
-
-	tag->StoreHeader();
-	tag->StoreMagicMoment();
-	tag->DebugPrintHeader();
-
-	printf("coins: %d\n", tag->_tagData._coinCount);
-}
-
-void loadToydata(int argc, char* argv[])
-{
-	Runes::ToyDataManager* toyMan = Runes::ToyDataManager::getInstance();
-	printf("looking for vvind up\n");
-	Runes::FigureToyData* toyData = toyMan->LookupCharacter(kTfbSpyroTag_ToyType_Character_GillGrunt);
-	Runes::VariantIdentifier* varData = toyData->LookupVariant(0x2405);
-	printf("display text for variant: %s, %s\n", (varData ? varData->_variantText : "N/A"), (varData ? varData->_toyName : "N/A"));
 }
 
 void decryptAndDump(int argc, char* argv[])
@@ -105,4 +107,4 @@ void decryptAndDump(int argc, char* argv[])
 		fwrite(decryBlock, 1, 0x10, of);
 	}
 	fclose(f);
-}*/
+}
