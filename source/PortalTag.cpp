@@ -3,6 +3,8 @@
 #include "Constants.hpp"
 
 #include <iostream>
+#include <cstring>
+#include "3rd_party/crc.h"
 
 #define to24(low, high) ((uint32_t)(low) + ((uint32_t)(high) << 16))
 
@@ -140,24 +142,66 @@ void Runes::PortalTag::FillOutputFromStoredData()
 {
 	Runes::PortalTagData* tagData = &this->_tagData;
 
-
 	//Set exp
 	uint32_t currentExp = this->_exp;
 	tagData->_experience2011_low = (currentExp > 33000 ? 33000 : currentExp);
 	tagData->_experience2011_high = 0;
 	if(currentExp > 33000) currentExp -= 33000;
+	else currentExp = 0;
 
-	tagData->_experience2012 = (currentExp > 63500 ? 63500 : currentExp);
-	if(currentExp > 63500) currentExp -= 63500;
+	if((this->_subType >> 0xC) > 1)
+	{
+		tagData->_experience2012 = (currentExp > 63500 ? 63500 : currentExp);
+		if(currentExp > 63500) currentExp -= 63500;
+		else currentExp = 0;
+	}
+	else
+	{
+		tagData->_experience2012 = (currentExp > 0xFFFF ? 0xFFFF : currentExp);
+		if(currentExp > 0xFFFF) currentExp -= 0xFFFF;
+		else currentExp = 0;
+	}
 
 	tagData->_experience2013 = (currentExp > 101000 ? 101000 : currentExp);
 	if(currentExp > 101000) currentExp -= 101000;
+	else currentExp = 0;
 
 	//Set money
 	tagData->_coinCount = this->_coins;
 
 	//Set cumulative time
-	tagData->_cumulativeTime = this->_cumulativeTime;
+	//tagData->_cumulativeTime = this->_cumulativeTime;
+}
+void Runes::PortalTag::SaveToFile(const char* fileName)
+{
+	//this->_tagData._areaSequence++;
+	this->RecalculateTagDataChecksums();
+	_rfidTag->SaveBlocks(&this->_tagData, this->_rfidTag->DetermineActiveDataRegion() ? 0x24 : 0x08, 0xB);
+	_rfidTag->SaveToFile(fileName);
+}
+void Runes::PortalTag::RecalculateTagDataChecksums()
+{
+	char checksumBuffer[0x110];
+	memset(checksumBuffer, 0x00, 0x110);
+
+	//Type 6
+	memcpy(checksumBuffer, ((uint8_t*)&this->_tagData) + 7 * BLOCK_SIZE, 4 * BLOCK_SIZE);
+	checksumBuffer[0] = 6;
+	checksumBuffer[1] = 1;
+	this->_tagData._crcType6 = crc16(checksumBuffer, 0x04 * BLOCK_SIZE);
+
+	//Type 3
+	memcpy(checksumBuffer, ((uint8_t*)&this->_tagData) + 4 * BLOCK_SIZE, 3 * BLOCK_SIZE);
+	this->_tagData._crcType3 = crc16(checksumBuffer, 0x11 * BLOCK_SIZE);
+
+	//Type 2
+	memcpy(checksumBuffer, ((uint8_t*)&this->_tagData) + 1 * BLOCK_SIZE, 3 * BLOCK_SIZE);
+	this->_tagData._crcType2 = crc16(checksumBuffer, 0x03 * BLOCK_SIZE);
+
+	//Type 1
+	this->_tagData._crcType1 = 5;
+	memcpy(checksumBuffer, ((uint8_t*)&this->_tagData), BLOCK_SIZE);
+	this->_tagData._crcType1 = crc16(checksumBuffer, 0x01 * BLOCK_SIZE);
 }
 uint32_t Runes::PortalTagData::getExperience()
 {

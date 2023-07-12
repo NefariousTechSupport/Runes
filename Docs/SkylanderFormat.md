@@ -82,8 +82,10 @@ Note that tfbSpyroTag_MagicMomentAll and tfbSpyroTag_RemainingDataAll are used b
 |  0x53  |  N/A   |  0x13  | `uint8_t`              | Month value of the last time this figure was reset (if never reset then the first time they were placed on a portal)
 |  0x54  |  N/A   |  0x14  | `uint16_t`             | Year value of the last time this figure was reset (if never reset then the first time they were placed on a portal)
 |  0x60  |  N/A   |  0x20  | `uint8_[9]`            | Something related to time spent on what platforms
-|  0x6C  |  N/A   |  0x2C  | `uint32_t`             | Challenge level
-|  0x73  |  0x43  |  N/A   | `uint16_t`             | 2012 [Experience](#experience) value (Max is 63500)
+|  0x70  |  0x40  |  N/A   | `uint16_t`             | crc16-ccit/false checksum of the bytes "06 01" followed by 0x3E bytes from 0x72
+|  0x72  |  0x42  |  N/A   | `uint8_t`              | Somehow related to the above checksum
+|  0x73  |  0x43  |  N/A   | `uint16_t`             | 2012 [Experience](#experience) value (Max is 63500 for ssf characters onwards, for ssa and giants it's 65535)
+|  0x73  |  0x43  |  N/A   | `uint16_t`             | 2012 [Experience](#experience) value (Max is 63500 for ssf characters onwards, for ssa and giants it's 65535)
 |  0x75  |  0x45  |  N/A   | `uint8_t`              | 2012 [Hat value](#hat-value)
 |  0x76  |  0x10  |  N/A   | `uint16_t`             | [Flags2](#flags)
 |  0x78  |  0x48  |  N/A   | `uint32_t`             | 2013 [Experience](#experience) value (Max is 101000)
@@ -96,6 +98,29 @@ Note that tfbSpyroTag_MagicMomentAll and tfbSpyroTag_RemainingDataAll are used b
 ### Experience
 
 Sum of all experience values
+
+| Level | Experience |
+|-------|------------|
+| 1     | 0          |
+| 2     | 1000       |
+| 3     | 2200       |
+| 4     | 3800       |
+| 5     | 6000       |
+| 6     | 9000       |
+| 7     | 13000      |
+| 8     | 18200      |
+| 9     | 24800      |
+| 10    | 33000      |
+| 11    | 42700      |
+| 12    | 53900      |
+| 13    | 66600      |
+| 14    | 80800      |
+| 15    | 96500      |
+| 16    | 113700     |
+| 17    | 132400     |
+| 18    | 152600     |
+| 19    | 174300     |
+| 20    | 197500     |
 
 ### Area sequence
 
@@ -139,6 +164,10 @@ Think of it as a 72 bit int.
 |   29   | 01FF | Elemental Quest 2    | Elemental Quest 2
 |   32   | FFFF | Individual Quest     | Individual Quest
 
+| Shift  | Mask | Swap Force Name      | Giants Name
+|--------|------|----------------------|-----------------
+|   00   | 03FF | Badguy Basher        | Monster Masher
+|   0A   | 000F | Fruit Frontiersman   | Chow Hound
 
 Credits:
 * Brandon Wilson:

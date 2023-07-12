@@ -20,12 +20,34 @@ bool Runes::RfidTag::ReadFromFile(const char* path)
 	if(res != 1024) goto error;
 
 	fclose(f);
-	decrypt();
 	return true;
 
 	error:
 	fclose(f);
 	return false;
+}
+bool Runes::RfidTag::SaveToFile(const char* path)
+{
+	FILE* f = fopen(path, "wb");
+	int res = 0;
+
+	if(!f) goto error;
+
+	fseek(f, 0, SEEK_SET);
+	res = fwrite(this->_tag, 0x01, 1024, f);
+
+	if(res != 1024) goto error;
+
+	fclose(f);
+	return true;
+
+	error:
+	fclose(f);
+	return false;
+}
+bool Runes::RfidTag::shouldEncrypt(uint8_t blockId)
+{
+	return blockId >= 8 && !Runes::RfidTag::isAccessControlBlock(blockId);
 }
 void Runes::RfidTag::decrypt()
 {
@@ -52,11 +74,48 @@ bool Runes::RfidTag::CopyBlocks(void* dst, uint8_t blockId, uint8_t numBlocks)
 			continue;
 		}
 
-		memcpy((uint8_t*)dst + blocksRead * BLOCK_SIZE, this->_tag + currentBlock * BLOCK_SIZE, BLOCK_SIZE);
+		if(Runes::RfidTag::shouldEncrypt(currentBlock) && !Runes::RfidTag::AllZero((uint8_t*)this->_tag + currentBlock * BLOCK_SIZE))
+		{
+			decryptBlock((Runes::PortalTagHeader*)this->_tag, this->_tag + currentBlock * BLOCK_SIZE, (uint8_t*)dst + blocksRead * BLOCK_SIZE, currentBlock);
+		}
+		else
+		{
+			memcpy((uint8_t*)dst + blocksRead * BLOCK_SIZE, this->_tag + currentBlock * BLOCK_SIZE, BLOCK_SIZE);
+		}
 		currentBlock++;
 		blocksRead++;
 	}
 	return blocksRead == numBlocks;
+}
+bool Runes::RfidTag::AllZero(uint8_t* block)
+{
+	return (*(uint64_t*)block + *((uint64_t*)(block + 8))) == 0;
+}
+bool Runes::RfidTag::SaveBlocks(void* src, uint8_t blockId, uint8_t numBlocks)
+{
+	uint8_t currentBlock = blockId;
+	uint8_t blocksWritten = 0;
+	uint8_t* dst = this->_tag;
+	while(blocksWritten < numBlocks && currentBlock < NUM_BLOCKS)
+	{
+		if(Runes::RfidTag::isAccessControlBlock(currentBlock))
+		{
+			currentBlock++;
+			continue;
+		}
+
+		if(Runes::RfidTag::shouldEncrypt(currentBlock))
+		{
+			encryptBlock((Runes::PortalTagHeader*)this->_tag, (uint8_t*)src + blocksWritten * BLOCK_SIZE, dst + currentBlock * BLOCK_SIZE, currentBlock);
+		}
+		else
+		{
+			memcpy(dst + currentBlock * BLOCK_SIZE, (uint8_t*)src + blocksWritten * BLOCK_SIZE, BLOCK_SIZE);
+		}
+		currentBlock++;
+		blocksWritten++;
+	}
+	return blocksWritten == numBlocks;
 }
 uint8_t Runes::RfidTag::DetermineActiveDataRegion()
 {

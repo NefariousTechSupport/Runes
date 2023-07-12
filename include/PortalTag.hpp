@@ -48,8 +48,8 @@ namespace Runes
 		/* 0x03 */ uint16_t _coinCount;
 		/* 0x05 */ uint32_t _cumulativeTime;
 		/* 0x09 */ uint8_t _areaSequence;
-		/* 0x0A */ uint16_t _crcType2;
 		/* 0x0C */ uint16_t _crcType3;
+		/* 0x0A */ uint16_t _crcType2;
 		/* 0x0E */ uint16_t _crcType1;
 
 		/* 0x10 */ uint16_t _flags1_low;
@@ -74,7 +74,8 @@ namespace Runes
 		/* 0x60 */ uint8_t unk60[12];
 		/* 0x6C */ uint32_t _challengeLevel;
 
-		/* 0x70 */ uint8_t unk70[3];
+		/* 0x70 */ uint16_t _crcType6;
+		/* 0x72 */ uint8_t unk72;
 		/* 0x73 */ uint16_t _experience2012;
 		/* 0x75 */ uint8_t _hat2012;
 		/* 0x76 */ uint16_t _flags2;
@@ -91,7 +92,7 @@ namespace Runes
 		/* 0x9F */ uint8_t _sgQuestsHigh;
 
 		/* 0x90 */ uint8_t unk90[7];
-		/* 0x97 */ uint64_t _ssfQuestsLow;
+		/* 0x97 */ uint64_t _ssfQuestsLow;	//Also ssc driver quests
 		/* 0x9F */ uint8_t _ssfQuestsHigh;
 
 		/* 0xA0 */ uint8_t unkA0[16];
@@ -155,6 +156,8 @@ namespace Runes
 			void StoreRemainingData();
 			void StoreQuests(uint16_t* target, uint8_t* source);
 			void FillOutputFromStoredData();
+			void SaveToFile(const char* fileName);
+			void RecalculateTagDataChecksums();
 			static void DecodeSubtype(uint16_t varId, ESkylandersGame* esg, bool* fullAltDeco, bool* wowPowFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId);
 			void DecodeSubtype(ESkylandersGame* esg, bool* fullAltDeco, bool* wowPowFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId);
 			void DebugPrintHeader();
@@ -193,8 +196,8 @@ assert_offset(Runes::PortalTagData, 0x02, _experience2011_high);
 assert_offset(Runes::PortalTagData, 0x03, _coinCount);
 assert_offset(Runes::PortalTagData, 0x05, _cumulativeTime);
 assert_offset(Runes::PortalTagData, 0x09, _areaSequence);
-assert_offset(Runes::PortalTagData, 0x0A, _crcType2);
-assert_offset(Runes::PortalTagData, 0x0C, _crcType3);
+assert_offset(Runes::PortalTagData, 0x0A, _crcType3);
+assert_offset(Runes::PortalTagData, 0x0C, _crcType2);
 assert_offset(Runes::PortalTagData, 0x0E, _crcType1);
 assert_offset(Runes::PortalTagData, 0x10, _flags1_low);
 assert_offset(Runes::PortalTagData, 0x12, _flags1_high);
@@ -207,6 +210,7 @@ assert_offset(Runes::PortalTagData, 0x46, _heroics2011);
 assert_offset(Runes::PortalTagData, 0x4A, _heroPoints);
 assert_offset(Runes::PortalTagData, 0x4F, _ownerCount);
 assert_offset(Runes::PortalTagData, 0x50, _firstUsed);
+assert_offset(Runes::PortalTagData, 0x70, _crcType6);
 assert_offset(Runes::PortalTagData, 0x73, _experience2012);
 assert_offset(Runes::PortalTagData, 0x75, _hat2012);
 assert_offset(Runes::PortalTagData, 0x76, _flags2);

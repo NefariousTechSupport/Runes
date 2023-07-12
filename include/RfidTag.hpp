@@ -11,9 +11,13 @@ namespace Runes
 	class RfidTag
 	{
 		public:
+			static bool shouldEncrypt(uint8_t blockId);
 			static bool isAccessControlBlock(int blockId);
+			static bool AllZero(uint8_t* block);
 			bool ReadFromFile(const char* path);
+			bool SaveToFile(const char* path);
 			bool CopyBlocks(void* dst, uint8_t blockId, uint8_t numBlocks);
+			bool SaveBlocks(void* src, uint8_t blockId, uint8_t numBlocks);
 			void decrypt();
 			uint8_t DetermineActiveDataRegion();
 		private:

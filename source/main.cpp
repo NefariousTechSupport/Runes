@@ -13,8 +13,12 @@
 #include <FL/Fl_Value_Input.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Box.H>
+#include <FL/Fl_Menu_Item.H>
+#include <FL/Fl_Menu_Bar.H>
 
-#define createIntValueReader(field, minimum, maximum) \
+#define createIntValueReader(method, field, minimum, maximum) \
+void method(Fl_Widget* iptPtr, void* tagPtr) \
+{ \
 	Runes::PortalTag* tag = (Runes::PortalTag*)tagPtr; \
 	Fl_Value_Input* ipt = (Fl_Value_Input*)iptPtr; \
 	int32_t value = (int32_t)ipt->value(); \
@@ -22,28 +26,29 @@
 	if(value > maximum) value = maximum; \
 	tag->field = (decltype(tag->field))value; \
 	ipt->value(value); \
-	printf("new value for %s: %d\n", #field, tag->_coins);
+	printf("new value for %s: %d\n", #field, tag->field); \
+}
 
-void onEditCoins(Fl_Widget* iptPtr, void* tagPtr)
+Runes::PortalTag* tag = NULL;
+
+createIntValueReader(onEditCoins, _coins, 0, 0xFFFF);
+createIntValueReader(onEditExp, _exp, 0, 197500);
+createIntValueReader(onEditHeroPoints, _heroPoints, 0, 100);
+
+void onSave(Fl_Widget* savePtr, void* tagPtr)
 {
-	createIntValueReader(_coins, 0, 0xFFFF);
+	tag->FillOutputFromStoredData();
+	tag->SaveToFile("test.dat");
 }
-void onEditExp(Fl_Widget* iptPtr, void* tagPtr)
-{
-	createIntValueReader(_exp, 0, 197500);
-}
-void onEditHeroPoints(Fl_Widget* iptPtr, void* tagPtr)
-{
-	createIntValueReader(_heroPoints, 0, 100);
-}
+
 void decryptAndDump(int argc, char* argv[]);
 
 int main(int argc, char **argv)
 {
-	decryptAndDump(argc, argv); return 0;
+	//decryptAndDump(argc, argv); return 0;
 
 	RedirectIOToConsole();
-	Runes::PortalTag* tag = new Runes::PortalTag();
+	tag = new Runes::PortalTag();
 	tag->_rfidTag = new Runes::RfidTag();
 	tag->_rfidTag->ReadFromFile(argv[1]);
 
@@ -53,13 +58,12 @@ int main(int argc, char **argv)
 	tag->DebugPrintHeader();
 	tag->DebugSaveTagData();
 
-
 	Runes::ToyDataManager* toyMan = Runes::ToyDataManager::getInstance();
 
 	Fl_Window *window = new Fl_Window(720,480, "Runes");
 
 	const char* toyName = toyMan->LookupCharacter(tag->_toyType)->_toyName;
-	Fl_Box* skylanderNameBox = new Fl_Box(12, 12, 100, 20, toyName);
+	Fl_Box* skylanderNameBox = new Fl_Box(12, 42, 100, 20, toyName);
 	skylanderNameBox->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 
 	Fl_Value_Input* iptCoins = new Fl_Value_Input(skylanderNameBox->x() + 100, skylanderNameBox->y() + 32, 100, 20, "Money");
@@ -68,7 +72,7 @@ int main(int argc, char **argv)
 	iptCoins->step(1);
 
 	Fl_Value_Input* iptExp = new Fl_Value_Input(iptCoins->x(), iptCoins->y() + 32, 100, 20, "Exp");
-	//iptExp->callback(onEditCoins, tag);
+	iptExp->callback(onEditExp, tag);
 	iptExp->value(tag->_exp);
 	iptExp->step(1);
 
@@ -76,6 +80,17 @@ int main(int argc, char **argv)
 	sprintf(txtHat, "%d", tag->_hatType);
 	Fl_Input* iptHat = new Fl_Input(iptExp->x(), iptExp->y() + 32, 100, 20, "Hat");
 	iptHat->value(txtHat);
+
+	Fl_Menu_Item menuItems[] = {
+		{ "&File",      0, 0, 0, FL_SUBMENU },
+		{ "&Open File", FL_COMMAND + 'o', NULL },
+		{ "&Save File", FL_COMMAND + 's', onSave },
+		{0},
+		{0}
+	};
+
+	Fl_Menu_Bar *m = new Fl_Menu_Bar(0, 0, 640, 30);
+	m->copy(menuItems);
 
 	window->end();
 	window->show(0, NULL);

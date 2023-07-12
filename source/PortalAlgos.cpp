@@ -31,6 +31,15 @@ void Runes::decryptBlock(Runes::PortalTagHeader* header, uint8_t* cBlockData, ui
 	uint32_t rounds = rijndaelSetupDecrypt(rk, key, 128);
 	rijndaelDecrypt(rk, rounds, cBlockData, pBlockData);
 }
+void Runes::encryptBlock(Runes::PortalTagHeader* header, uint8_t* pBlockData, uint8_t* cBlockData, uint8_t blockId)
+{
+	uint8_t key[0x10];
+	Runes::computeKey(header, blockId, key);
+
+	unsigned long rk[RKLENGTH(128)];
+	uint32_t rounds = rijndaelSetupEncrypt(rk, key, 128);
+	rijndaelEncrypt(rk, rounds, pBlockData, cBlockData);
+}
 void Runes::readSalt()
 {
 	if(saltReady) return;
