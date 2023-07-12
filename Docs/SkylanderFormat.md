@@ -53,47 +53,47 @@ Note that tfbSpyroTag_MagicMomentAll and tfbSpyroTag_RemainingDataAll are used b
 * The 0x10 bytes from offset 0x70 are the remaining 0x10 bytes of tfbSpyroTag_MagicMomentAll
 * The 0x30 bytes from offset 0x80 are the remaining 0x30 bytes of tfbSpyroTag_RemainingDataAll
 
-| Offset | MM_Off | RD_Off | Type                   | Description
+| St_Off | Block  | Bl_Off | Type                   | Description
 |--------|--------|--------|------------------------|---------------
-|  0x00  |  0x00  |  N/A   | `uint24_t`             | 2011 [Experience](#experience) value (Max is 33000)
-|  0x03  |  0x03  |  N/A   | `uint16_t`             | Money
-|  0x05  |  0x05  |  N/A   | `uint32_t`             | Cumulative time in seconds
-|  0x09  |  0x09  |  N/A   | `uint8_t`              | [area sequence](#area-sequence)
-|  0x0A  |  0x0A  |  N/A   | `uint16_t`             | crc16-ccit/false checksum of 0x30 bytes starting from 0x10
-|  0x0E  |  0x0E  |  N/A   | `uint16_t`             | crc16-ccit/false checksum of 0x30 bytes starting from 0x40, followed by 0xE0 bytes of 0
-|  0x0E  |  0x0E  |  N/A   | `uint16_t`             | crc16-ccit/false checksum of the first 14 bytes of this struct + the bytes "05 00" at the end
-|  0x10  |  0x10  |  N/A   | `uint24_t`             | [Flags1](#flags)
-|  0x13  |  0x13  |  N/A   | `uint8_t`              | 2011 [Platform bitfield](#platform-bitfield)
-|  0x14  |  0x14  |  N/A   | `uint16_t`             | 2011 [Hat value](#hat-value)
-|  0x16  |  0x16  |  N/A   | `uint8_t`              | `(1 << (dataRegionCount - 1)) - 1`. since `dataRegionCount` is always set to 2 on core figures, this always evaluates to 1
-|  0x17  |  0x17  |  N/A   | `uint8_t`              | 2013 [Platform bitfield](#platform-bitfield)
-|  0x20  |  0x20  |  N/A   | `wchar_t[16]`          | Nickname
-|  0x40  |  N/A   |  0x00  | `uint8_t`              | Minute value of the last time this figure was placed on the portal
-|  0x41  |  N/A   |  0x01  | `uint8_t`              | Hour value of the last time this figure was placed on the portal
-|  0x42  |  N/A   |  0x02  | `uint8_t`              | Day value of the last time this figure was placed on the portal
-|  0x43  |  N/A   |  0x03  | `uint8_t`              | Month value of the last time this figure was placed on the portal
-|  0x44  |  N/A   |  0x04  | `uint16_t`             | Year value of the last time this figure was placed on the portal
-|  0x46  |  N/A   |  0x06  | `uint32_t`             | Completed ssa heroic challenges
-|  0x4A  |  N/A   |  0x0A  | `uint16_t`             | Hero points (Max is 100)
-|  0x4F  |  N/A   |  0x0F  | `uint8_t`              | Owner count(?)
-|  0x50  |  N/A   |  0x10  | `uint8_t`              | Minute value of the last time this figure was reset (if never reset then the first time they were placed on a portal)
-|  0x51  |  N/A   |  0x11  | `uint8_t`              | Hour value of the last time this figure was reset (if never reset then the first time they were placed on a portal)
-|  0x52  |  N/A   |  0x12  | `uint8_t`              | Day value of the last time this figure was reset (if never reset then the first time they were placed on a portal)
-|  0x53  |  N/A   |  0x13  | `uint8_t`              | Month value of the last time this figure was reset (if never reset then the first time they were placed on a portal)
-|  0x54  |  N/A   |  0x14  | `uint16_t`             | Year value of the last time this figure was reset (if never reset then the first time they were placed on a portal)
-|  0x60  |  N/A   |  0x20  | `uint8_[9]`            | Something related to time spent on what platforms
-|  0x70  |  0x40  |  N/A   | `uint16_t`             | crc16-ccit/false checksum of the bytes "06 01" followed by 0x3E bytes from 0x72
-|  0x72  |  0x42  |  N/A   | `uint8_t`              | Somehow related to the above checksum
-|  0x73  |  0x43  |  N/A   | `uint16_t`             | 2012 [Experience](#experience) value (Max is 63500 for ssf characters onwards, for ssa and giants it's 65535)
-|  0x73  |  0x43  |  N/A   | `uint16_t`             | 2012 [Experience](#experience) value (Max is 63500 for ssf characters onwards, for ssa and giants it's 65535)
-|  0x75  |  0x45  |  N/A   | `uint8_t`              | 2012 [Hat value](#hat-value)
-|  0x76  |  0x10  |  N/A   | `uint16_t`             | [Flags2](#flags)
-|  0x78  |  0x48  |  N/A   | `uint32_t`             | 2013 [Experience](#experience) value (Max is 101000)
-|  0x7C  |  0x4C  |  N/A   | `uint8_t`              | 2013/2014 [Hat value](#hat-value)
-|  0x7E  |  0x4E  |  N/A   | `uint8_t`              | 2015 [Hat value](#hat-value) (add 256 to get the true hat id)
-|  0x84  |  N/A   |  0x34  | `uint24_t`             | Completed sg heroic challenges
-|  0x87  |  N/A   |  0x37  | `uint72_t`             | Giants [quests](#quests)
-|  0x97  |  N/A   |  0x47  | `uint72_t`             | Swap Force [quests](#quests)
+|  0x00  | 08/24  |  0x00   | `uint24_t`             | 2011 [Experience](#experience) value (Max is 33000)
+|  0x03  | 08/24  |  0x03  | `uint16_t`             | Money
+|  0x05  | 08/24  |  0x05  | `uint32_t`             | Cumulative time in seconds
+|  0x09  | 08/24  |  0x09  | `uint8_t`              | [area sequence](#area-sequence)
+|  0x0A  | 08/24  |  0x0A  | `uint16_t`             | crc16-ccit/false checksum of 0x30 bytes starting from 0x10
+|  0x0C  | 08/24  |  0x0C  | `uint16_t`             | crc16-ccit/false checksum of 0x30 bytes starting from 0x40, followed by 0xE0 bytes of 0
+|  0x0E  | 08/24  |  0x0E  | `uint16_t`             | crc16-ccit/false checksum of the first 14 bytes of this struct + the bytes "05 00" at the end
+|  0x10  | 09/25  |  0x00  | `uint24_t`             | [Flags1](#flags)
+|  0x13  | 09/25  |  0x03  | `uint8_t`              | 2011 [Platform bitfield](#platform-bitfield)
+|  0x14  | 09/25  |  0x04  | `uint16_t`             | 2011 [Hat value](#hat-value)
+|  0x16  | 09/25  |  0x06  | `uint8_t`              | `(1 << (dataRegionCount - 1)) - 1`. since `dataRegionCount` is always set to 2 on core figures, this always evaluates to 1
+|  0x17  | 09/25  |  0x07  | `uint8_t`              | 2013 [Platform bitfield](#platform-bitfield)
+|  0x20  | 0A/26  |  0x00  | `wchar_t[8]`           | First 16 bytes of nickname
+|  0x30  | 0C/28  |  0x00  | `wchar_t[8]`           | First 16 bytes of nickname
+|  0x40  | 0D/29  |  0x00  | `uint8_t`              | Minute value of the last time this figure was placed on the portal
+|  0x41  | 0D/29  |  0x01  | `uint8_t`              | Hour value of the last time this figure was placed on the portal
+|  0x42  | 0D/29  |  0x02  | `uint8_t`              | Day value of the last time this figure was placed on the portal
+|  0x43  | 0D/29  |  0x03  | `uint8_t`              | Month value of the last time this figure was placed on the portal
+|  0x44  | 0D/29  |  0x04  | `uint16_t`             | Year value of the last time this figure was placed on the portal
+|  0x46  | 0D/29  |  0x06  | `uint32_t`             | Completed ssa heroic challenges
+|  0x4A  | 0D/29  |  0x0A  | `uint16_t`             | Hero points (Max is 100)
+|  0x4F  | 0D/29  |  0x0F  | `uint8_t`              | Owner count(?)
+|  0x50  | 0E/2A  |  0x00  | `uint8_t`              | Minute value of the last time this figure was reset (if never reset then the first time they were placed on a portal)
+|  0x51  | 0E/2A  |  0x01  | `uint8_t`              | Hour value of the last time this figure was reset (if never reset then the first time they were placed on a portal)
+|  0x52  | 0E/2A  |  0x02  | `uint8_t`              | Day value of the last time this figure was reset (if never reset then the first time they were placed on a portal)
+|  0x53  | 0E/2A  |  0x03  | `uint8_t`              | Month value of the last time this figure was reset (if never reset then the first time they were placed on a portal)
+|  0x54  | 0E/2A  |  0x04  | `uint16_t`             | Year value of the last time this figure was reset (if never reset then the first time they were placed on a portal)
+|  0x60  | 10/2C  |  0x00  | `uint8_[9]`            | Something related to time spent on what platforms
+|  0x70  | 11/2D  |  0x00  | `uint16_t`             | crc16-ccit/false checksum of the bytes "06 01" followed by 0x3E bytes from 0x72
+|  0x72  | 11/2D  |  0x02  | `uint8_t`              | Somehow related to the above checksum
+|  0x73  | 11/2D  |  0x03  | `uint16_t`             | 2012 [Experience](#experience) value (Max is 63500 for ssf characters onwards, for ssa and giants it's 65535)
+|  0x75  | 11/2D  |  0x05  | `uint8_t`              | 2012 [Hat value](#hat-value)
+|  0x76  | 11/2D  |  0x06  | `uint16_t`             | [Flags2](#flags)
+|  0x78  | 11/2D  |  0x08  | `uint32_t`             | 2013 [Experience](#experience) value (Max is 101000)
+|  0x7C  | 11/2D  |  0x0C  | `uint8_t`              | 2013/2014 [Hat value](#hat-value)
+|  0x7E  | 11/2D  |  0x0E  | `uint8_t`              | 2015 [Hat value](#hat-value) (add 256 to get the true hat id)
+|  0x84  | 12/2E  |  0x04  | `uint24_t`             | Completed sg heroic challenges
+|  0x87  | 12/2E  |  0x07  | `uint72_t`             | Giants [quests](#quests)
+|  0x97  | 14/30  |  0x07  | `uint72_t`             | Swap Force [quests](#quests)
 
 ### Experience
 
