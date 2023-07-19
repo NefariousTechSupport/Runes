@@ -29,11 +29,19 @@ void method(Fl_Widget* iptPtr, void* tagPtr) \
 	printf("new value for %s: %d\n", #field, tag->field); \
 }
 
+#define createIntValueField(variableName, name, previous, field, cb) \
+	Fl_Value_Input* variableName = new Fl_Value_Input(previous->x(), previous->y() + 32, 100, 20, name); \
+	variableName->callback(cb, tag); \
+	variableName->value(tag->field); \
+	variableName->step(1);
+
 Runes::PortalTag* tag = NULL;
 
 createIntValueReader(onEditCoins, _coins, 0, 0xFFFF);
 createIntValueReader(onEditExp, _exp, 0, 197500);
 createIntValueReader(onEditHeroPoints, _heroPoints, 0, 100);
+createIntValueReader(onEditHat, _hatType, kTfbSpyroTag_Hat_MIN, kTfbSpyroTag_Hat_MAX);
+createIntValueReader(onEditOwnerCount, _ownerCount, 0, 255);
 
 void onSave(Fl_Widget* savePtr, void* tagPtr)
 {
@@ -71,19 +79,14 @@ int main(int argc, char **argv)
 	iptCoins->value(tag->_coins);
 	iptCoins->step(1);
 
-	Fl_Value_Input* iptExp = new Fl_Value_Input(iptCoins->x(), iptCoins->y() + 32, 100, 20, "Exp");
-	iptExp->callback(onEditExp, tag);
-	iptExp->value(tag->_exp);
-	iptExp->step(1);
-
-	char txtHat[6];
-	sprintf(txtHat, "%d", tag->_hatType);
-	Fl_Input* iptHat = new Fl_Input(iptExp->x(), iptExp->y() + 32, 100, 20, "Hat");
-	iptHat->value(txtHat);
+	createIntValueField(iptExp, "Exp", iptCoins, _exp, onEditExp);
+	createIntValueField(iptHat, "Hat", iptExp, _hatType, onEditHat);
+	createIntValueField(iptHeroPoints, "Hero Points", iptHat, _heroPoints, onEditHeroPoints);
+	createIntValueField(iptOwnerCount, "Owner Count", iptHeroPoints, _ownerCount, onEditOwnerCount);
 
 	Fl_Menu_Item menuItems[] = {
 		{ "&File",      0, 0, 0, FL_SUBMENU },
-		{ "&Open File", FL_COMMAND + 'o', NULL },
+		//{ "&Open File", FL_COMMAND + 'o', NULL },
 		{ "&Save File", FL_COMMAND + 's', onSave },
 		{0},
 		{0}

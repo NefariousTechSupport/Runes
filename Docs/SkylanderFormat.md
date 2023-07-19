@@ -55,7 +55,7 @@ Note that tfbSpyroTag_MagicMomentAll and tfbSpyroTag_RemainingDataAll are used b
 
 | St_Off | Block  | Bl_Off | Type                   | Description
 |--------|--------|--------|------------------------|---------------
-|  0x00  | 08/24  |  0x00   | `uint24_t`             | 2011 [Experience](#experience) value (Max is 33000)
+|  0x00  | 08/24  |  0x00  | `uint24_t`             | 2011 [Experience](#experience) value (Max is 33000)
 |  0x03  | 08/24  |  0x03  | `uint16_t`             | Money
 |  0x05  | 08/24  |  0x05  | `uint32_t`             | Cumulative time in seconds
 |  0x09  | 08/24  |  0x09  | `uint8_t`              | [area sequence](#area-sequence)
@@ -172,7 +172,7 @@ Think of it as a 72 bit int.
 Credits:
 * Brandon Wilson:
   * The encryption method
-  * Checkums and access specifier
+  * Checkum types 0->3 and access specifier
   * The Wii and Xbox 360 values for the platform usage
   * Hero points max value
 * Mandar1jn:
