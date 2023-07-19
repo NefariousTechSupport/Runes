@@ -170,7 +170,11 @@ void Runes::PortalTag::FillOutputFromStoredData()
 	tagData->_coinCount = this->_coins;
 
 	//Set cumulative time
-	//tagData->_cumulativeTime = this->_cumulativeTime;
+	tagData->_cumulativeTime = this->_cumulativeTime;
+	//Set hero points
+	tagData->_heroPoints = this->_heroPoints;
+	//Set owner count
+	tagData->_ownerCount = this->_ownerCount;
 }
 void Runes::PortalTag::SaveToFile(const char* fileName)
 {
