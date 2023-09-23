@@ -85,7 +85,7 @@ namespace Runes
 		/* 0x7E */ uint8_t _hat2015;
 		/* 0x7F */ uint8_t unk7F;
 
-		/* 0x80 */ uint8_t unk80[4];
+		/* 0x80 */ uint32_t _battlegroundsFlags;
 		/* 0x84 */ uint16_t _heroics2012_low;
 		/* 0x86 */ uint8_t _heroics2012_high;
 		/* 0x97 */ uint64_t _sgQuestsLow;
@@ -217,6 +217,7 @@ assert_offset(Runes::PortalTagData, 0x76, _flags2);
 assert_offset(Runes::PortalTagData, 0x78, _experience2013);
 assert_offset(Runes::PortalTagData, 0x7C, _hat2013);
 assert_offset(Runes::PortalTagData, 0x7E, _hat2015);
+assert_offset(Runes::PortalTagData, 0x80, _battlegroundsFlags);
 assert_offset(Runes::PortalTagData, 0x84, _heroics2012_low);
 assert_offset(Runes::PortalTagData, 0x86, _heroics2012_high);
 assert_offset(Runes::PortalTagData, 0x87, _sgQuestsLow);

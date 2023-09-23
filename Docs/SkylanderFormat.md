@@ -36,16 +36,31 @@ The lookup table consists of the characters `23456789BCDFGHJKLMNPQRSTVWXYZ` in t
 
 Moreover, you can look at `Runes::PortalTag::StoreHeader()` for easier to read code.
 
-## tfbSpyroTagData
-
-0xB0 byte long struct
-
 ### Trap
 
 * The 0x40 bytes from offset 0x00 is the magic moment data
 * The 0x110 bytes from 0x40 is the remaining data;
 
-### Not a trap
+| St_Off | Block  | Bl_Off | Type                       | Description
+|--------|--------|--------|----------------------------|---------------
+|  0x07  | 08/24  |  0x07  | `kTfbSpyroTag_VillainType` | ID of currently trapped villain, used if the other one is 0
+|  0x09  | 08/24  |  0x09  | `uint8_t`                  | [area sequence](#area-sequence)
+|  0x0A  | 08/24  |  0x0A  | `uint16_t`                 | crc16-ccit/false checksum of 0x30 bytes starting from 0x10
+|  0x0C  | 08/24  |  0x0C  | `uint16_t`                 | crc16-ccit/false checksum of 0x30 bytes starting from 0x40, followed by 0xE0 bytes of 0
+|  0x0E  | 08/24  |  0x0E  | `uint16_t`                 | crc16-ccit/false checksum of the first 14 bytes of this struct + the bytes "05 00" at the end
+|  0x10  | 09/25  |  0x00  | `kTfbSpyroTag_VillainType` | ID of currently trapped villain, always checked first (not locked to element) (See [kTfbSpyroTag_VillainType.hpp](../include//kTfbSpyroTag_VillainType.hpp))
+
+### Racing Pack
+
+| St_Off | Block  | Bl_Off | Type                   | Description
+|--------|--------|--------|------------------------|---------------
+|  0x10  | 09/25  |  0x04  | `uint16_t`             | Number of captured villains (Superchargers). Something else (Superchargers Racing).
+
+### Vehicle
+
+Placeholder
+
+### Not a Trap or Vehicle
 
 Note that tfbSpyroTag_MagicMomentAll and tfbSpyroTag_RemainingDataAll are used by the game internally
 * The 0x40 bytes from offset 0x00 are the first 0x40 bytes of tfbSpyroTag_MagicMomentAll
@@ -91,6 +106,7 @@ Note that tfbSpyroTag_MagicMomentAll and tfbSpyroTag_RemainingDataAll are used b
 |  0x78  | 11/2D  |  0x08  | `uint32_t`             | 2013 [Experience](#experience) value (Max is 101000)
 |  0x7C  | 11/2D  |  0x0C  | `uint8_t`              | 2013/2014 [Hat value](#hat-value)
 |  0x7E  | 11/2D  |  0x0E  | `uint8_t`              | 2015 [Hat value](#hat-value) (add 256 to get the true hat id)
+|  0x80  | 12/2E  |  0x00  | `uint32_t`             | [Battlegrounds Flags](#battlegrounds-flags)
 |  0x84  | 12/2E  |  0x04  | `uint24_t`             | Completed sg heroic challenges
 |  0x87  | 12/2E  |  0x07  | `uint72_t`             | Giants [quests](#quests)
 |  0x97  | 14/30  |  0x07  | `uint72_t`             | Swap Force [quests](#quests)
@@ -138,16 +154,23 @@ Sum of all experience values
 * 0x0001: Wii
 * 0x0002: Xbox 360
 * 0x0004: PS3
-* 0x8000: iOS 64 (Maybe iOS 32 as well)
+* 0x0800: iOS 64 (Maybe iOS 32 as well)
+* 0x0100: Android 32 (Maybe Android 64 as well)
 
 ### Flags
 
 * Upgrage flags: `((Flags2 & 0xF) << 10) | (Flags1 & 0x3FF)`
 * Element Collection Count 1: `(Flags1 >> 10) & 3`
-* Element Collection Count 2: `(Flags1 >> 14) & 7`
-* Element Collection: `((Flags1 >> 10) & 3) + ((Flags1 >> 14) & 7) + ((Flags2 >> 11) & 7)`
+* Element Collection Count 2: `(Flags2 >> 6) & 7`
+* Element Collection: `((Flags1 >> 10) & 3) + ((Flags2 >> 6) & 7) + ((Flags2 >> 11) & 3)`
 * Accolade Rank 1: `(Flags2 >> 9) & 3`
 * Accolade Rank 2: `(Flags2 >> 4) & 3`
+
+### Battlegrounds Flags
+
+* Portal Master Level: `(BGFlags << 0x06) >> 0x1A`
+* Ability Slot Count: `((BGFlags << 0x0C) >> 0x1E) + 1`
+* Ability Level: `(BGFlags >> ((abilityIndex * 3) & 0xFF)) & 0x7`
 
 ### Quests
 
