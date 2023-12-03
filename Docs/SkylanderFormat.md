@@ -41,14 +41,17 @@ Moreover, you can look at `Runes::PortalTag::StoreHeader()` for easier to read c
 * The 0x40 bytes from offset 0x00 is the magic moment data
 * The 0x110 bytes from 0x40 is the remaining data;
 
-| St_Off | Block  | Bl_Off | Type                       | Description
-|--------|--------|--------|----------------------------|---------------
-|  0x07  | 08/24  |  0x07  | `kTfbSpyroTag_VillainType` | ID of currently trapped villain, used if the other one is 0
-|  0x09  | 08/24  |  0x09  | `uint8_t`                  | [area sequence](#area-sequence)
-|  0x0A  | 08/24  |  0x0A  | `uint16_t`                 | crc16-ccit/false checksum of 0x30 bytes starting from 0x10
-|  0x0C  | 08/24  |  0x0C  | `uint16_t`                 | crc16-ccit/false checksum of 0x30 bytes starting from 0x40, followed by 0xE0 bytes of 0
-|  0x0E  | 08/24  |  0x0E  | `uint16_t`                 | crc16-ccit/false checksum of the first 14 bytes of this struct + the bytes "05 00" at the end
-|  0x10  | 09/25  |  0x00  | `kTfbSpyroTag_VillainType` | ID of currently trapped villain, always checked first (not locked to element) (See [kTfbSpyroTag_VillainType.hpp](../include//kTfbSpyroTag_VillainType.hpp))
+NOTE: Some of this information may be incorrect and is actively being worked on.
+
+|  St_Off  | Block  | Bl_Off | Type                       | Description
+|----------|--------|--------|----------------------------|---------------
+|  0x0007  | 08/24  |  0x07  | `kTfbSpyroTag_VillainType` | ID of currently trapped villain, used if the other one is 0
+|  0x0009  | 08/24  |  0x09  | `uint8_t`                  | [area sequence](#area-sequence)
+|  0x000A  | 08/24  |  0x0A  | `uint16_t`                 | crc16-ccit/false checksum of 0x30 bytes starting from 0x10
+|  0x000C  | 08/24  |  0x0C  | `uint16_t`                 | crc16-ccit/false checksum of 0x30 bytes starting from 0x40, followed by 0xE0 bytes of 0
+|  0x000E  | 08/24  |  0x0E  | `uint16_t`                 | crc16-ccit/false checksum of the first 14 bytes of this struct + the bytes "05 00" at the end
+|  0x0010  | 09/25  |  0x00  | `kTfbSpyroTag_VillainType` | ID of currently trapped villain, always checked first (not locked to element) (See [kTfbSpyroTag_VillainType.hpp](../include//kTfbSpyroTag_VillainType.hpp))
+|  0x0130  | 21/3D  |  0x00  | `uint8_[9]`                | Something related to time spent on what platforms
 
 ### Racing Pack
 
@@ -186,11 +189,6 @@ Think of it as a 72 bit int.
 |   21   | 00FF | Elemental Quest 1    | Elemental Quest 1
 |   29   | 01FF | Elemental Quest 2    | Elemental Quest 2
 |   32   | FFFF | Individual Quest     | Individual Quest
-
-| Shift  | Mask | Swap Force Name      | Giants Name
-|--------|------|----------------------|-----------------
-|   00   | 03FF | Badguy Basher        | Monster Masher
-|   0A   | 000F | Fruit Frontiersman   | Chow Hound
 
 Credits:
 * Brandon Wilson:
