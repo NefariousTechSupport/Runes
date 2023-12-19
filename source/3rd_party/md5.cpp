@@ -26,7 +26,7 @@ documentation and/or software.
 */
 
 #include <memory.h>
-#include "md5.h"
+#include "3rd_party/md5.h"
 
 void MD5Open(MD5 *md5)
 {

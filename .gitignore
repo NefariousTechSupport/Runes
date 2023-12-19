@@ -4,3 +4,11 @@ Resources/salt.txt
 *.exe
 .vscode
 .vs
+
+# build files
+Makefile
+Makefile.Debug
+Makefile.Release
+.qmake.stash
+debug
+release

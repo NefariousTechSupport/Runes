@@ -38,6 +38,7 @@ bool Runes::RfidTag::SaveToFile(const char* path)
 
 	if(res != 1024) goto error;
 
+	fflush(f);
 	fclose(f);
 	return true;
 

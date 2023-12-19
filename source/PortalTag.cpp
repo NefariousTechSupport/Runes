@@ -176,9 +176,23 @@ void Runes::PortalTag::FillOutputFromStoredData()
 	//Set owner count
 	tagData->_ownerCount = this->_ownerCount;
 }
+void Runes::PortalTag::ReadFromFile(const char* fileName)
+{
+	this->_tagHeaderStored = false;
+	this->_tagMagicMomentStored = false;
+	this->_tagRemainingDataStored = false;
+	this->_tagDataStored = false;
+
+	this->_rfidTag->ReadFromFile(fileName);
+
+	this->StoreHeader();
+	this->StoreMagicMoment();
+	this->StoreRemainingData();
+}
 void Runes::PortalTag::SaveToFile(const char* fileName)
 {
 	//this->_tagData._areaSequence++;
+	this->FillOutputFromStoredData();
 	this->RecalculateTagDataChecksums();
 	_rfidTag->SaveBlocks(&this->_tagData, this->_rfidTag->DetermineActiveDataRegion() ? 0x24 : 0x08, 0xB);
 	_rfidTag->SaveToFile(fileName);
@@ -298,4 +312,8 @@ void Runes::PortalTagData::setHat(kTfbSpyroTag_HatType hat)
 		return;
 	}
 	printf("Invalid Hat ID");
+}
+bool Runes::PortalTag::isTrap()
+{
+	return this->_toyType >= kTfbSpyroTag_ToyType_TRAP_2014 && this->_toyType <= kTfbSpyroTag_ToyType_TRAP_2014_MAX;
 }

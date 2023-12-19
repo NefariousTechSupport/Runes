@@ -156,12 +156,14 @@ namespace Runes
 			void StoreRemainingData();
 			void StoreQuests(uint16_t* target, uint8_t* source);
 			void FillOutputFromStoredData();
+			void ReadFromFile(const char* fileName);
 			void SaveToFile(const char* fileName);
 			void RecalculateTagDataChecksums();
 			static void DecodeSubtype(uint16_t varId, ESkylandersGame* esg, bool* fullAltDeco, bool* wowPowFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId);
 			void DecodeSubtype(ESkylandersGame* esg, bool* fullAltDeco, bool* wowPowFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId);
 			void DebugPrintHeader();
 			void DebugSaveTagData();
+			bool isTrap();
 		private:
 			bool _tagHeaderStored;
 			bool _tagDataStored;
