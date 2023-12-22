@@ -7,6 +7,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QFileDialog>
+#include <QComboBox>
 
 #include "kTfbSpyroTag_HatType.hpp"
 #include "Constants.hpp"
@@ -36,11 +37,21 @@ RunesWidget::RunesWidget(Runes::PortalTag* tag, char* fileName, QWidget* parent)
     {
         this->_tag->_heroPoints = newHeroPoints;
     });
+    this->_cmbHat = new QComboBox(this);
+    for(int i = 0; i <= kTfbSpyroTag_Hat_MAX; i++)
+    {
+        this->_cmbHat->addItem(tr(hatNames_en[i]));
+    }
+    connect(this->_cmbHat, &QComboBox::currentIndexChanged, [=](int newIndex)
+    {
+        this->_tag->_hatType = (kTfbSpyroTag_HatType)newIndex;
+    });
 
     QFormLayout* layout = new QFormLayout(this);
     layout->addRow(tr("Experience"), this->_spinExp);
     layout->addRow(tr("Money"), this->_spinMoney);
     layout->addRow(tr("Hero Points"), this->_spinHeroPoints);
+    layout->addRow(tr("Hat"), this->_cmbHat);
 
     QMenuBar* menubar = new QMenuBar(this);
     QMenu* menuFile = new QMenu(tr("&File"), this);
@@ -81,4 +92,5 @@ void RunesWidget::updateFields()
     this->_spinExp->setValue(this->_tag->_exp);
     this->_spinMoney->setValue(this->_tag->_coins);
     this->_spinHeroPoints->setValue(this->_tag->_heroPoints);
+    this->_cmbHat->setCurrentIndex(this->_tag->_hatType);
 }

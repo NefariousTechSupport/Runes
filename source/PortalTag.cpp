@@ -124,6 +124,7 @@ void Runes::PortalTag::StoreRemainingData()
 	StoreQuests((uint16_t*)&this->_giantsQuests, (uint8_t*)&this->_tagData._sgQuestsLow);
 	StoreQuests((uint16_t*)&this->_swapforceQuests, (uint8_t*)&this->_tagData._ssfQuestsLow);
 }
+//TODO: correct this for giants
 void Runes::PortalTag::StoreQuests(uint16_t* target, uint8_t* source)
 {
 	uint64_t questsLow = *(uint64_t*)source;

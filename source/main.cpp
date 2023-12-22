@@ -4,9 +4,12 @@
 #include <QApplication>
 #include "RunesWidget.hpp"
 #include "PortalTag.hpp"
+#include "debug.hpp"
 
 int main(int argc, char *argv[])
 {
+    assertHatIds();
+
     QApplication a(argc, argv);
 
     Runes::PortalTag tag;

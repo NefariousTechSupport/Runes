@@ -2,9 +2,13 @@
 #include <fcntl.h>
 #include <iostream>
 #include <io.h>
+#include <assert.h>
+#include <string.h>
 #if defined(DEBUG) && defined(WIN32)
 #include <Windows.h>
 #endif
+
+#include "kTfbSpyroTag_HatType.hpp"
 
 //https://stackoverflow.com/questions/60328079/piping-console-output-from-winmain-when-running-from-a-console
 void RedirectIOToConsole() {
@@ -45,4 +49,36 @@ void RedirectIOToConsole() {
     std::wcin.clear();
     std::cin.clear();
 #endif
+}
+
+void assertHatIds()
+{
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Sunday], "Fancy Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Carmen], "Tropical Turban") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Mercury], "Winged Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Pumpkin], "Pumpkin Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_FirefighterHelmet], "Firefighter Helmet") == 0);
+    assert(strcmp(hatNames_en[60], "Hat 60") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Carrot], "Carrot Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Trucker], "Trucker Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Rasta], "Rasta Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Volcano], "Volcano Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Tricorn], "Tricorn Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_AviatorsCap], "Aviator's Cap") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_GlitteringTiara], "Glittering Tiara") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Cactus], "Cactus Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_AwesomeHat], "Awesome Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Fan], "Ceiling Fan Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Skull], "Dragon Skull") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Melon], "Melon Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_RubberGlove], "Rubber Glove Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Tibet], "Sherpa Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_PorkPieChecker], "Pork Pie Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Fireflies], "Firefly Jar") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Wizard02], "Wizard Hat (Trap Team)") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Raver], "Raver Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Molekin], "Molekin Mountain Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_DiveBomber], "Dive Bomber Hat") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_SplatterSplasher], "Splatter Splasher Spires") == 0);
+    assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_EonHelm], "Eon's Helm") == 0);
 }

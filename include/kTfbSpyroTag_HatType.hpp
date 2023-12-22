@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string_view>
 
 enum kTfbSpyroTag_HatType : uint16_t
 {
@@ -284,3 +285,5 @@ enum kTfbSpyroTag_HatType : uint16_t
 	kTfbSpyroTag_Hat_MAX_2015 = 280,
 	kTfbSpyroTag_Hat_MAX = 280,
 };
+
+extern const char* hatNames_en[kTfbSpyroTag_Hat_MAX + 1];

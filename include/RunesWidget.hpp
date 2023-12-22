@@ -5,6 +5,7 @@
 #include "PortalTag.hpp"
 
 class QSpinBox;
+class QComboBox;
 
 class RunesWidget : public QWidget
 {
@@ -22,4 +23,5 @@ private:
     QSpinBox* _spinExp;
     QSpinBox* _spinMoney;
     QSpinBox* _spinHeroPoints;
+    QComboBox* _cmbHat;
 };
