@@ -102,7 +102,7 @@ Note that tfbSpyroTag_MagicMomentAll and tfbSpyroTag_RemainingDataAll are used b
 |  0x54  | 0E/2A  |  0x04  | `uint16_t`             | Year value of the last time this figure was reset (if never reset then the first time they were placed on a portal)
 |  0x60  | 10/2C  |  0x00  | `uint8_[9]`            | Something related to time spent on what platforms
 |  0x70  | 11/2D  |  0x00  | `uint16_t`             | crc16-ccit/false checksum of the bytes "06 01" followed by 0x3E bytes from 0x72
-|  0x72  | 11/2D  |  0x02  | `uint8_t`              | Somehow related to the above checksum
+|  0x72  | 11/2D  |  0x02  | `uint8_t`              | Area sequence for this data area
 |  0x73  | 11/2D  |  0x03  | `uint16_t`             | 2012 [Experience](#experience) value (Max is 63500 for ssf characters onwards, for ssa and giants it's 65535)
 |  0x75  | 11/2D  |  0x05  | `uint8_t`              | 2012 [Hat value](#hat-value)
 |  0x76  | 11/2D  |  0x06  | `uint16_t`             | [Flags2](#flags)
@@ -143,9 +143,10 @@ Sum of all experience values
 
 ### Area sequence
 
-* The core skylanders at least store the tfbSpyroTagData struct twice, once from block 0x08 and again from block 0x24, these are called data regions or data areas.
-* The recently written to area is the one with the higher area sequence value.
+* The core skylanders at least store the tfbSpyroTagData struct twice, once from block 0x08/0x24 and again from block 0x11/0x2D, these are called data regions or data areas.
+* The recently written to area is the one with the area sequence value that is one higher than the other, remember to take overflows into accounts (e.g., an area sequence of 0 is considered higher than one of 255).
 * When writing to a figure, the game will switch to the lower area sequence value and increment it by 2 (so that it becomes higher than the other one).
+* Note that there are two area sequences, one for blocks 0x08/0x24->0x10/0x2C and another for blocks 0x11/0x2D->0x15/0x31 (inclusive)
 
 ### Hat value
 
