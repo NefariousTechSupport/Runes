@@ -47,7 +47,7 @@ namespace Runes
 		/* 0x02 */ uint8_t _experience2011_high;
 		/* 0x03 */ uint16_t _coinCount;
 		/* 0x05 */ uint32_t _cumulativeTime;
-		/* 0x09 */ uint8_t _areaSequence;
+		/* 0x09 */ uint8_t _areaSequence0;
 		/* 0x0C */ uint16_t _crcType3;
 		/* 0x0A */ uint16_t _crcType2;
 		/* 0x0E */ uint16_t _crcType1;
@@ -75,7 +75,7 @@ namespace Runes
 		/* 0x6C */ uint32_t _challengeLevel;
 
 		/* 0x70 */ uint16_t _crcType6;
-		/* 0x72 */ uint8_t unk72;
+		/* 0x72 */ uint8_t _areaSequence1;
 		/* 0x73 */ uint16_t _experience2012;
 		/* 0x75 */ uint8_t _hat2012;
 		/* 0x76 */ uint16_t _flags2;
@@ -170,6 +170,9 @@ namespace Runes
 			bool _tagRemainingDataStored;
 			void StoreQuestsSwapForce();
 			void StoreQuestsGiants();
+			void FillQuestsSwapForce();
+			void FillQuestsGiants();
+			void getQuestsGiantsElementalBits(uint8_t* bits);
 	};
 }
 
@@ -198,7 +201,7 @@ assert_offset(Runes::PortalTagData, 0x00, _experience2011_low);
 assert_offset(Runes::PortalTagData, 0x02, _experience2011_high);
 assert_offset(Runes::PortalTagData, 0x03, _coinCount);
 assert_offset(Runes::PortalTagData, 0x05, _cumulativeTime);
-assert_offset(Runes::PortalTagData, 0x09, _areaSequence);
+assert_offset(Runes::PortalTagData, 0x09, _areaSequence0);
 assert_offset(Runes::PortalTagData, 0x0A, _crcType3);
 assert_offset(Runes::PortalTagData, 0x0C, _crcType2);
 assert_offset(Runes::PortalTagData, 0x0E, _crcType1);
@@ -214,6 +217,7 @@ assert_offset(Runes::PortalTagData, 0x4A, _heroPoints);
 assert_offset(Runes::PortalTagData, 0x4F, _ownerCount);
 assert_offset(Runes::PortalTagData, 0x50, _firstUsed);
 assert_offset(Runes::PortalTagData, 0x70, _crcType6);
+assert_offset(Runes::PortalTagData, 0x72, _areaSequence1);
 assert_offset(Runes::PortalTagData, 0x73, _experience2012);
 assert_offset(Runes::PortalTagData, 0x75, _hat2012);
 assert_offset(Runes::PortalTagData, 0x76, _flags2);

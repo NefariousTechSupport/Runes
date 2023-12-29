@@ -19,7 +19,8 @@ namespace Runes
 			bool CopyBlocks(void* dst, uint8_t blockId, uint8_t numBlocks);
 			bool SaveBlocks(void* src, uint8_t blockId, uint8_t numBlocks);
 			void decrypt();
-			uint8_t DetermineActiveDataRegion();
+			uint8_t DetermineActiveDataRegion0();
+			uint8_t DetermineActiveDataRegion1();
 		private:
 			uint8_t _tag[1024];
 	};

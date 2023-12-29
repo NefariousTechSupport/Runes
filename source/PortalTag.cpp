@@ -86,8 +86,8 @@ void Runes::PortalTag::StoreTagData()
 {
 	if(!this->_tagDataStored)
 	{
-		int32_t regionIndex = this->_rfidTag->DetermineActiveDataRegion();
-		this->_rfidTag->CopyBlocks(&this->_tagData, regionIndex == 0 ? 0x08 : 0x24, 0xB);
+		this->_rfidTag->CopyBlocks(((uint8_t*)&this->_tagData) + 0x00, this->_rfidTag->DetermineActiveDataRegion0() ? 0x24 : 0x08, 0x7);
+		this->_rfidTag->CopyBlocks(((uint8_t*)&this->_tagData) + 0x70, this->_rfidTag->DetermineActiveDataRegion1() ? 0x2D : 0x11, 0x4);
 		this->_tagDataStored = true;
 	}
 }
@@ -138,48 +138,81 @@ void Runes::PortalTag::StoreQuestsGiants()
 	this->_giantsQuests[4] = questsLow & bitsToMask(kQuestGiantsArenaArtistBits); 		questsLow >>= kQuestGiantsArenaArtistBits;
 	this->_giantsQuests[5] = questsLow & bitsToMask(kQuestGiantsElementalistBits); 		questsLow >>= kQuestGiantsElementalistBits;
 
+	uint8_t elementQuests[2];
+	getQuestsGiantsElementalBits(elementQuests);
+
+	this->_giantsQuests[6] = questsLow & bitsToMask(elementQuests[0]); 	questsLow >>= elementQuests[0];
+	this->_giantsQuests[7] = questsLow & bitsToMask(elementQuests[1]); 	questsLow >>= elementQuests[1];
+	this->_giantsQuests[8] = (questsLow & bitsToMask(kQuestSwapForceIndividualBits)) | ((uint16_t)(questsHigh & 2) << 14);
+}
+void Runes::PortalTag::FillQuestsGiants()
+{
+	uint8_t accum = 0;
+	this->_tagData._sgQuestsLow = 0;
+	this->_tagData._sgQuestsHigh = 0;
+	this->_tagData._sgQuestsLow |= ((uint64_t)this->_giantsQuests[0] & bitsToMask(kQuestGiantsMonsterMasherBits)) << accum;    accum += kQuestGiantsMonsterMasherBits;
+	this->_tagData._sgQuestsLow |= ((uint64_t)this->_giantsQuests[1] & bitsToMask(kQuestGiantsBattleChampBits)) << accum;      accum += kQuestGiantsBattleChampBits;
+	this->_tagData._sgQuestsLow |= ((uint64_t)this->_giantsQuests[2] & bitsToMask(kQuestGiantsChowHoundBits)) << accum;        accum += kQuestGiantsChowHoundBits;
+	this->_tagData._sgQuestsLow |= ((uint64_t)this->_giantsQuests[3] & bitsToMask(kQuestGiantsHeroicChallengerBits)) << accum; accum += kQuestGiantsHeroicChallengerBits;
+	this->_tagData._sgQuestsLow |= ((uint64_t)this->_giantsQuests[4] & bitsToMask(kQuestGiantsArenaArtistBits)) << accum;      accum += kQuestGiantsArenaArtistBits;
+	this->_tagData._sgQuestsLow |= ((uint64_t)this->_giantsQuests[5] & bitsToMask(kQuestGiantsElementalistBits)) << accum;     accum += kQuestGiantsElementalistBits;
+
+	uint8_t elementQuests[2];
+	getQuestsGiantsElementalBits(elementQuests);
+
+	this->_tagData._sgQuestsLow |= ((uint64_t)this->_giantsQuests[6] & bitsToMask(elementQuests[0])) << accum; accum += elementQuests[0];
+	this->_tagData._sgQuestsLow |= ((uint64_t)this->_giantsQuests[7] & bitsToMask(elementQuests[1])) << accum; accum += elementQuests[1];
+
+	if(accum > 48)	//if the individual quests will overflow into _sgQuestsHigh
+	{
+		this->_tagData._sgQuestsLow |= ((uint64_t)this->_giantsQuests[8] & bitsToMask(64 - accum)) << accum;
+		this->_tagData._sgQuestsHigh |= this->_giantsQuests[8] >> (64 - accum);
+	}
+	else
+	{
+		this->_tagData._sgQuestsLow |= ((uint64_t)this->_giantsQuests[8] & bitsToMask(16)) << accum;
+	}
+}
+void Runes::PortalTag::getQuestsGiantsElementalBits(uint8_t* bits)
+{
 	FigureToyData* figure = ToyDataManager::getInstance()->LookupCharacter(this->_toyType);
-	uint32_t elementQuests[2];
 	switch(figure->_element)
 	{
 		case eET_Earth:
-			elementQuests[0] = kQuestGiantsEarthWreckerBits;
-			elementQuests[1] = kQuestGiantsEarthStonesmithBits;
+			bits[0] = kQuestGiantsEarthWreckerBits;
+			bits[1] = kQuestGiantsEarthStonesmithBits;
 			break;
 		case eET_Water:
-			elementQuests[0] = kQuestGiantsWaterExtinguisherBits;
-			elementQuests[1] = kQuestGiantsWaterWaterfallBits;
+			bits[0] = kQuestGiantsWaterExtinguisherBits;
+			bits[1] = kQuestGiantsWaterWaterfallBits;
 			break;
 		case eET_Air:
-			elementQuests[0] = kQuestGiantsAirFromAboveBits;
-			elementQuests[1] = kQuestGiantsAirSkyLooterBits;
+			bits[0] = kQuestGiantsAirFromAboveBits;
+			bits[1] = kQuestGiantsAirSkyLooterBits;
 			break;
 		case eET_Fire:
-			elementQuests[0] = kQuestGiantsFireBombardierBits;
-			elementQuests[1] = kQuestGiantsFireSteamerBits;
+			bits[0] = kQuestGiantsFireBombardierBits;
+			bits[1] = kQuestGiantsFireSteamerBits;
 			break;
 		case eET_Life:
-			elementQuests[0] = kQuestGiantsLifeFullyStockedBits;
-			elementQuests[1] = kQuestGiantsLifeMelonMaestroBits;
+			bits[0] = kQuestGiantsLifeFullyStockedBits;
+			bits[1] = kQuestGiantsLifeMelonMaestroBits;
 			break;
 		case eET_Death:
-			elementQuests[0] = kQuestGiantsUndeadBossedAroundBits;
-			elementQuests[1] = kQuestGiantsUndeadByAThreadBits;
+			bits[0] = kQuestGiantsUndeadBossedAroundBits;
+			bits[1] = kQuestGiantsUndeadByAThreadBits;
 			break;
 		case eET_Magic:
-			elementQuests[0] = kQuestGiantsMagicPuzzlePowerBits;
-			elementQuests[1] = kQuestGiantsMagicWarpWomperBits;
+			bits[0] = kQuestGiantsMagicPuzzlePowerBits;
+			bits[1] = kQuestGiantsMagicWarpWomperBits;
 			break;
 		case eET_Tech:
-			elementQuests[0] = kQuestGiantsTechMagicIsntMightBits;
-			elementQuests[1] = kQuestGiantsTechCrackerBits;
+			bits[0] = kQuestGiantsTechMagicIsntMightBits;
+			bits[1] = kQuestGiantsTechCrackerBits;
 			break;
 		default:
 			return;
 	}
-	this->_giantsQuests[6] = questsLow & bitsToMask(elementQuests[0]); 	questsLow >>= elementQuests[0];
-	this->_giantsQuests[7] = questsLow & bitsToMask(elementQuests[1]); 	questsLow >>= elementQuests[1];
-	this->_giantsQuests[8] = (questsLow & bitsToMask(kQuestSwapForceIndividualBits)) | ((uint16_t)(questsHigh & 2) << 14);
 }
 void Runes::PortalTag::StoreQuestsSwapForce()
 {
@@ -193,7 +226,20 @@ void Runes::PortalTag::StoreQuestsSwapForce()
 	this->_swapforceQuests[5] = questsLow & bitsToMask(kQuestSwapForceElementalistBits); 		questsLow >>= kQuestSwapForceElementalistBits;
 	this->_swapforceQuests[6] = questsLow & bitsToMask(kQuestSwapForceElemental1Bits); 			questsLow >>= kQuestSwapForceElemental1Bits;
 	this->_swapforceQuests[7] = questsLow & bitsToMask(kQuestSwapForceElemental2Bits); 			questsLow >>= kQuestSwapForceElemental2Bits;
-	this->_swapforceQuests[8] = (questsLow & bitsToMask(kQuestSwapForceIndividualBits)) | ((uint16_t)(questsHigh & 2) << 14);
+	this->_swapforceQuests[8] = (questsLow & bitsToMask(kQuestSwapForceIndividualBits)) | ((uint16_t)(questsHigh & 3) << 14);
+}
+void Runes::PortalTag::FillQuestsSwapForce()
+{
+	this->_tagData._ssfQuestsHigh = (this->_swapforceQuests[8] >> 14) & bitsToMask(2);
+	this->_tagData._ssfQuestsLow = this->_swapforceQuests[8] & bitsToMask(14);
+	this->_tagData._ssfQuestsLow <<= kQuestSwapForceElemental2Bits;         this->_tagData._ssfQuestsLow |= this->_swapforceQuests[7] & bitsToMask(kQuestSwapForceElemental2Bits);
+	this->_tagData._ssfQuestsLow <<= kQuestSwapForceElemental1Bits;         this->_tagData._ssfQuestsLow |= this->_swapforceQuests[6] & bitsToMask(kQuestSwapForceElemental1Bits);
+	this->_tagData._ssfQuestsLow <<= kQuestSwapForceElementalistBits;       this->_tagData._ssfQuestsLow |= this->_swapforceQuests[5] & bitsToMask(kQuestSwapForceElementalistBits);
+	this->_tagData._ssfQuestsLow <<= kQuestSwapForceTotallyMaxedOutBits;    this->_tagData._ssfQuestsLow |= this->_swapforceQuests[4] & bitsToMask(kQuestSwapForceTotallyMaxedOutBits);
+	this->_tagData._ssfQuestsLow <<= kQuestSwapForceTrueGladiatorBits;      this->_tagData._ssfQuestsLow |= this->_swapforceQuests[3] & bitsToMask(kQuestSwapForceTrueGladiatorBits);
+	this->_tagData._ssfQuestsLow <<= kQuestSwapForceFlawlessChallengerBits; this->_tagData._ssfQuestsLow |= this->_swapforceQuests[2] & bitsToMask(kQuestSwapForceFlawlessChallengerBits);
+	this->_tagData._ssfQuestsLow <<= kQuestSwapForceFruitFrontiersmanBits;  this->_tagData._ssfQuestsLow |= this->_swapforceQuests[1] & bitsToMask(kQuestSwapForceFruitFrontiersmanBits);
+	this->_tagData._ssfQuestsLow <<= kQuestSwapForceBadguyBasherBits;       this->_tagData._ssfQuestsLow |= this->_swapforceQuests[0] & bitsToMask(kQuestSwapForceBadguyBasherBits);
 }
 void Runes::PortalTag::FillOutputFromStoredData()
 {
@@ -232,6 +278,9 @@ void Runes::PortalTag::FillOutputFromStoredData()
 	tagData->_heroPoints = this->_heroPoints;
 	//Set owner count
 	tagData->_ownerCount = this->_ownerCount;
+
+	this->FillQuestsGiants();
+	this->FillQuestsSwapForce();
 }
 void Runes::PortalTag::ReadFromFile(const char* fileName)
 {
@@ -248,10 +297,13 @@ void Runes::PortalTag::ReadFromFile(const char* fileName)
 }
 void Runes::PortalTag::SaveToFile(const char* fileName)
 {
-	//this->_tagData._areaSequence++;
+	//this->_tagData._areaSequence0++;
+	//this->_tagData._areaSequence1++;
 	this->FillOutputFromStoredData();
 	this->RecalculateTagDataChecksums();
-	_rfidTag->SaveBlocks(&this->_tagData, this->_rfidTag->DetermineActiveDataRegion() ? 0x24 : 0x08, 0xB);
+	_rfidTag->SaveBlocks(((uint8_t*)&this->_tagData) + 0x00, this->_rfidTag->DetermineActiveDataRegion0() ? 0x24 : 0x08, 0x7);
+	_rfidTag->SaveBlocks(((uint8_t*)&this->_tagData) + 0x70, this->_rfidTag->DetermineActiveDataRegion1() ? 0x2D : 0x11, 0x4);
+	//this->DebugSaveTagData();
 	_rfidTag->SaveToFile(fileName);
 }
 void Runes::PortalTag::RecalculateTagDataChecksums()
