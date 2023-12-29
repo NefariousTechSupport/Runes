@@ -154,7 +154,6 @@ namespace Runes
 			void StoreTagData();
 			void StoreMagicMoment();
 			void StoreRemainingData();
-			void StoreQuests(uint16_t* target, uint8_t* source);
 			void FillOutputFromStoredData();
 			void ReadFromFile(const char* fileName);
 			void SaveToFile(const char* fileName);
@@ -169,6 +168,8 @@ namespace Runes
 			bool _tagDataStored;
 			bool _tagMagicMomentStored;
 			bool _tagRemainingDataStored;
+			void StoreQuestsSwapForce();
+			void StoreQuestsGiants();
 	};
 }
 

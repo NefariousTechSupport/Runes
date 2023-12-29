@@ -465,17 +465,46 @@ Sum of all experience values
 ### Quests
 
 Think of it as a 72 bit int.
-| Shift  | Mask | Swap Force Name      | Giants Name
-|--------|------|----------------------|-----------------
-|   00   | 03FF | Badguy Basher        | Monster Masher
-|   0A   | 000F | Fruit Frontiersman   | Chow Hound
-|   0E   | 0001 | Flawless Challenger  | Arena Artist
-|   0F   | 000F | True Gladiator       | Battle Champ
-|   13   | 0001 | Totally Maxed Out    | Heroic Challenger
-|   14   | 1FFF | Elementalist         | Elementalist
-|   21   | 00FF | Elemental Quest 1    | Elemental Quest 1
-|   29   | 01FF | Elemental Quest 2    | Elemental Quest 2
-|   32   | FFFF | Individual Quest     | Individual Quest
+
+Giants Quests
+|  Bits  | Giants Name      
+|--------|----------------------
+|   0A   | Monster Masher
+|   04   | Battle Champ
+|   05   | Chow Hound
+|   01   | Heroic Challenger
+|   01   | Arena Artist
+|   0D   | Elementalist
+|   05   | Stonesmith (Earth)
+|   05   | Wrecker (Earth)
+|   01   | Extinguisher (Water)
+|   04   | Waterfall (Water)
+|   09   | Sky Looter (Air)
+|   05   | From Above (Air)
+|   05   | Bombardier (Fire)
+|   01   | Steamer (Fire)
+|   08   | Fully Stocked (Life)
+|   08   | Melon Maestro (Life)
+|   01   | By a Thread (Undead)
+|   02   | Bossed Around (Undead)
+|   05   | Puzzle Power (Magic)
+|   01   | Warp Womper (Magic)
+|   06   | Magic Isn't Might (Tech)
+|   05   | Cracker (Tech)
+|   10   | Individul Quest
+
+Swap Force Quests
+| Shift  | Mask | Swap Force Name      
+|--------|------|----------------------
+|   00   | 03FF | Badguy Basher
+|   0A   | 000F | Fruit Frontiersman
+|   0E   | 0001 | Flawless Challenger
+|   0F   | 000F | True Gladiator
+|   13   | 0001 | Totally Maxed Out
+|   14   | 1FFF | Elementalist
+|   21   | 00FF | Elemental Quest 1
+|   29   | 01FF | Elemental Quest 2
+|   32   | FFFF | Individual Quest
 
 Credits:
 * Brandon Wilson:

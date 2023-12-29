@@ -37,6 +37,7 @@ RunesWidget::RunesWidget(Runes::PortalTag* tag, char* fileName, QWidget* parent)
     {
         this->_tag->_heroPoints = newHeroPoints;
     });
+
     this->_cmbHat = new QComboBox(this);
     for(int i = 0; i <= kTfbSpyroTag_Hat_MAX; i++)
     {

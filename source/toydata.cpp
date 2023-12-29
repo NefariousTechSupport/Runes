@@ -4,99 +4,83 @@
 #include <string.h>
 #include <sstream>
 #include <cstring>
+#include <assert.h>
+#include <yaml-cpp/yaml.h>
 
 #define parseBool(str) (strcmp(str, "True") == 0)
 
+std::string Runes::LocalizedString::get()
+{
+	return this->_en;
+}
+
 Runes::ToyDataManager* Runes::ToyDataManager::_Instance = NULL;
-
-std::vector<std::string> readLineAndSplit(FILE* f)
-{
-	std::vector<std::string> tokens;
-	std::string line;
-	char workBuf;
-	int prevComma = 0;
-	int place = 0;
-	while(true)
-	{
-		int res = fread(&workBuf, 1, 1, f);
-		if(res != 1 || workBuf == '\n' || workBuf == ',')
-		{
-			tokens.push_back(line.substr(prevComma, place-prevComma));
-			prevComma = place + 1;
-			//printf("%s, ", tokens[tokens.size()-1].c_str());
-			if(workBuf != ',') break;
-		}
-		line += workBuf;
-		place++;
-	}
-	//printf("\n");
-	return tokens;
-}
-
-//Required because std::string stuff is stored on the stack and will get freed after the function terminates
-const char* allocAndCopyString(const char* src)
-{
-	const char* dst = (const char*)malloc(strlen(src)+1);
-	strcpy((char*)dst, src);
-	return dst;
-}
 
 Runes::ToyDataManager* Runes::ToyDataManager::getInstance()
 {
 	if(_Instance == NULL)
 	{
-		_Instance = new Runes::ToyDataManager("Resources/runes.csv");
+		_Instance = new Runes::ToyDataManager("Resources/runes.yaml");
 	}
 	return _Instance;
 }
-Runes::ToyDataManager::ToyDataManager(const char* csvPath)
+Runes::ToyDataManager::ToyDataManager(const char* yamlPath)
 {
-	FILE* f = fopen(csvPath, "rb");
-	fseek(f, 0, SEEK_SET);
-	while(true)
+	YAML::Node root = YAML::LoadFile(yamlPath);
+	assert(root.Type() == YAML::NodeType::Map);
+	YAML::Node list = root["list"];
+	assert(list);
+	assert(list.Type() == YAML::NodeType::Sequence);
+	YAML::const_iterator it = list.begin();
+	while(it != list.end())
 	{
-		std::vector<std::string> tokens = readLineAndSplit(f);
-		if(tokens.size() != 3) break;
-
-		Runes::FigureToyData* toyData = new Runes::FigureToyData();
-
-		//Read toy type
-		const char* workStr = tokens[0].c_str();
-		toyData->_toyType = (kTfbSpyroTag_ToyType)atoi(workStr);
-
-		//Read variant count
-		workStr = tokens[1].c_str();
-		int variantCount = atoi(workStr);
-
-		//Read toy name
-		toyData->_toyName = allocAndCopyString(tokens[2].c_str());
-
-		for(int i = 0; i < variantCount; i++)
-		{
-			Runes::VariantIdentifier* varId = new Runes::VariantIdentifier();
-
-			tokens = readLineAndSplit(f);
-
-			workStr = tokens[0].c_str();
-			varId->_decoId = (kTfbSpyroTag_DecoID)atoi(workStr);
-
-			workStr = tokens[1].c_str();
-			varId->_yearCode = (ESkylandersGame)atoi(workStr);
-
-			workStr = tokens[2].c_str();
-			varId->_lightCore = parseBool(workStr);
-			workStr = tokens[3].c_str();
-			varId->_fullAltDeco = parseBool(workStr);
-			workStr = tokens[4].c_str();
-			varId->_wowPow = parseBool(workStr);
-			varId->_variantText = allocAndCopyString(tokens[5].c_str());
-			varId->_toyName = allocAndCopyString(tokens[6].c_str());
-
-			toyData->_variants.push_back(varId);
-		}
-
-		this->_toyTypeLookup[toyData->_toyType] = toyData;
+		readCharacter(it->as<YAML::Node>());
+		it++;
 	}
+}
+void Runes::ToyDataManager::readCharacter(YAML::Node charNode)
+{
+	Runes::FigureToyData* figure = new Runes::FigureToyData();
+	figure->_toyType = (kTfbSpyroTag_ToyType)charNode["toyId"].as<uint32_t>();
+	figure->_element = (EElementType)charNode["element"].as<uint32_t>();
+	readLocalizedString(&figure->_toyName, charNode["toyName"]);
+
+	YAML::Node variants = charNode["variants"];
+	YAML::const_iterator it = variants.begin();
+	while(it != variants.end())
+	{
+		figure->_variants.push_back(readVariant(it->as<YAML::Node>()));
+		it++;
+	}
+
+	this->_toyTypeLookup[figure->_toyType] = figure;
+}
+Runes::VariantIdentifier* Runes::ToyDataManager::readVariant(YAML::Node varNode)
+{
+	Runes::VariantIdentifier* variant = new Runes::VariantIdentifier();
+	variant->_decoId = (kTfbSpyroTag_DecoID)varNode["decoId"].as<int8_t>();
+	variant->_yearCode = (ESkylandersGame)varNode["yearCode"].as<int8_t>();
+	variant->_lightCore = varNode["lightcore"].as<bool>();
+	variant->_fullAltDeco = varNode["fullAltDeco"].as<bool>();
+	variant->_wowPow = varNode["wowPow"].as<bool>();
+	readLocalizedString(&variant->_variantText, varNode["variantText"]);
+	readLocalizedString(&variant->_toyName, varNode["toyName"]);
+	return variant;
+}
+void Runes::ToyDataManager::readLocalizedString(LocalizedString* lstring, YAML::Node textNode)
+{
+	lstring->_en = textNode["en"].as<std::string>();
+	lstring->_fr = textNode["fr"].as<std::string>();
+	lstring->_it = textNode["it"].as<std::string>();
+	lstring->_de = textNode["de"].as<std::string>();
+	lstring->_es = textNode["es"].as<std::string>();
+	lstring->_mx = textNode["mx"].as<std::string>();
+	lstring->_nl = textNode["nl"].as<std::string>();
+	lstring->_da = textNode["da"].as<std::string>();
+	lstring->_sv = textNode["sv"].as<std::string>();
+	lstring->_fi = textNode["fi"].as<std::string>();
+	lstring->_no = textNode["no"].as<std::string>();
+	lstring->_pt = textNode["pt"].as<std::string>();
 }
 Runes::FigureToyData* Runes::ToyDataManager::LookupCharacter(kTfbSpyroTag_ToyType toyType)
 {

@@ -2,18 +2,41 @@
 
 #include <map>
 #include <vector>
+#include <string>
 
 #include "ESkylandersGame.hpp"
 #include "kTfbSpyroTag_DecoID.hpp"
 #include "kTfbSpyroTag_ToyType.hpp"
+#include "EElementType.hpp"
+
+namespace YAML
+{
+	class Node;
+}
 
 namespace Runes
 {
+	struct LocalizedString
+	{
+		std::string _en;
+		std::string _fr;
+		std::string _it;
+		std::string _de;
+		std::string _es;
+		std::string _mx;
+		std::string _nl;
+		std::string _da;
+		std::string _sv;
+		std::string _fi;
+		std::string _no;
+		std::string _pt;
+		std::string get();
+	};
 	class VariantIdentifier
 	{
 		public:
-			const char* _variantText;
-			const char* _toyName;
+			LocalizedString _variantText;
+			LocalizedString _toyName;
 			ESkylandersGame _yearCode : 4;
 			bool _lightCore : 1;
 			bool _fullAltDeco : 1;
@@ -24,9 +47,10 @@ namespace Runes
 	class FigureToyData
 	{
 		public:
-			const char* _toyName;
+			LocalizedString _toyName;
 			std::vector<VariantIdentifier*> _variants;
 			kTfbSpyroTag_ToyType _toyType;
+			EElementType _element;
 			VariantIdentifier* LookupVariant(uint16_t varId);
 	};
 	class ToyDataManager
@@ -37,6 +61,9 @@ namespace Runes
 			FigureToyData* LookupCharacter(kTfbSpyroTag_ToyType toyType);
 		private:
 			static ToyDataManager* _Instance;
-			ToyDataManager(const char* csvPath);
+			ToyDataManager(const char* yamlPath);
+			void readCharacter(YAML::Node charNode);
+			VariantIdentifier* readVariant(YAML::Node varNode);
+			void readLocalizedString(LocalizedString* lstring, YAML::Node textNode);
 	};
 }

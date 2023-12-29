@@ -6,6 +6,7 @@ TEMPLATE = app
 TARGET = Runes
 INCLUDEPATH += ./include
 QT += widgets gui
+LIBS += -l:libyaml-cpp.a
 
 CONFIG(debug, debug|release) {
     DEFINES += DEBUG

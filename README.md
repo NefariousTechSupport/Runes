@@ -10,7 +10,9 @@ It is not yet ready for public use.
 
 Requires MSYS2.
 
-Install FLTK and run `make` to compile
+Dependencies: Install Qt and run the following `pacman -S mingw-w64-x86_64-yaml-cpp`
+
+Compiling: Run `make` to compile
 
 ## Usage
 
