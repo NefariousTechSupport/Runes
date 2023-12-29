@@ -88,8 +88,8 @@ namespace Runes
 		/* 0x80 */ uint32_t _battlegroundsFlags;
 		/* 0x84 */ uint16_t _heroics2012_low;
 		/* 0x86 */ uint8_t _heroics2012_high;
-		/* 0x97 */ uint64_t _sgQuestsLow;
-		/* 0x9F */ uint8_t _sgQuestsHigh;
+		/* 0x87 */ uint64_t _sgQuestsLow;
+		/* 0x8F */ uint8_t _sgQuestsHigh;
 
 		/* 0x90 */ uint8_t unk90[7];
 		/* 0x97 */ uint64_t _ssfQuestsLow;	//Also ssc driver quests

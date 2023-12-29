@@ -471,14 +471,14 @@ Giants Quests
 |--------|----------------------
 |   0A   | Monster Masher
 |   04   | Battle Champ
-|   05   | Chow Hound
+|   06   | Chow Hound
 |   01   | Heroic Challenger
 |   01   | Arena Artist
 |   0D   | Elementalist
 |   05   | Stonesmith (Earth)
 |   05   | Wrecker (Earth)
 |   01   | Extinguisher (Water)
-|   04   | Waterfall (Water)
+|   05   | Waterfall (Water)
 |   09   | Sky Looter (Air)
 |   05   | From Above (Air)
 |   05   | Bombardier (Fire)
@@ -514,3 +514,5 @@ Credits:
   * Hero points max value
 * Mandar1jn:
   * Bytes 0x04->0x10 of the tag header
+* Winner Nombre:
+  * Figured out Tech element quests

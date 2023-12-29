@@ -126,7 +126,7 @@ uint8_t Runes::RfidTag::DetermineActiveDataRegion()
 	areaSequences[0] = areaHeader[9];
 	CopyBlocks(areaHeader, 0x24, 1);
 	areaSequences[1] = areaHeader[9];
-	if((areaSequences[0] + 1) == areaSequences[1]) return 1;	//Use area 1
-	if((areaSequences[1] + 1) == areaSequences[0]) return 0;	//Use area 0
+	if((areaSequences[0] + 1) == areaSequences[1]) return 0;	//Use area 0
+	if((areaSequences[1] + 1) == areaSequences[0]) return 1;	//Use area 1
 	return -1;
 }

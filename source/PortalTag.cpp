@@ -130,29 +130,29 @@ void Runes::PortalTag::StoreQuestsGiants()
 {
 	uint64_t questsLow = this->_tagData._sgQuestsLow;
 	uint8_t questsHigh = this->_tagData._sgQuestsHigh;
-	this->_giantsQuests[0] = questsLow & bitsToMask(kQuestGiantsMonsterMasherBits); 	questsLow >>= kQuestSwapForceBadguyBasherBits;
+	this->_giantsQuests[0] = questsLow & bitsToMask(kQuestGiantsMonsterMasherBits); 	questsLow >>= kQuestGiantsMonsterMasherBits;
 	questsLow |= (uint64_t)questsHigh << 54;
-	this->_giantsQuests[1] = questsLow & bitsToMask(kQuestGiantsBattleChampBits); 		questsLow >>= kQuestSwapForceTrueGladiatorBits;
-	this->_giantsQuests[2] = questsLow & bitsToMask(kQuestGiantsChowHoundBits); 		questsLow >>= kQuestSwapForceFruitFrontiersmanBits;
-	this->_giantsQuests[3] = questsLow & bitsToMask(kQuestGiantsHeroicChallengerBits); 	questsLow >>= kQuestSwapForceTotallyMaxedOutBits;
-	this->_giantsQuests[4] = questsLow & bitsToMask(kQuestGiantsArenaArtistBits); 		questsLow >>= kQuestSwapForceFlawlessChallengerBits;
-	this->_giantsQuests[5] = questsLow & bitsToMask(kQuestGiantsElementalistBits); 		questsLow >>= kQuestSwapForceElementalistBits;
+	this->_giantsQuests[1] = questsLow & bitsToMask(kQuestGiantsBattleChampBits); 		questsLow >>= kQuestGiantsBattleChampBits;
+	this->_giantsQuests[2] = questsLow & bitsToMask(kQuestGiantsChowHoundBits); 		questsLow >>= kQuestGiantsChowHoundBits;
+	this->_giantsQuests[3] = questsLow & bitsToMask(kQuestGiantsHeroicChallengerBits); 	questsLow >>= kQuestGiantsHeroicChallengerBits;
+	this->_giantsQuests[4] = questsLow & bitsToMask(kQuestGiantsArenaArtistBits); 		questsLow >>= kQuestGiantsArenaArtistBits;
+	this->_giantsQuests[5] = questsLow & bitsToMask(kQuestGiantsElementalistBits); 		questsLow >>= kQuestGiantsElementalistBits;
 
 	FigureToyData* figure = ToyDataManager::getInstance()->LookupCharacter(this->_toyType);
 	uint32_t elementQuests[2];
 	switch(figure->_element)
 	{
 		case eET_Earth:
-			elementQuests[0] = kQuestGiantsEarthStonesmithBits;
-			elementQuests[1] = kQuestGiantsEarthWreckerBits;
+			elementQuests[0] = kQuestGiantsEarthWreckerBits;
+			elementQuests[1] = kQuestGiantsEarthStonesmithBits;
 			break;
 		case eET_Water:
 			elementQuests[0] = kQuestGiantsWaterExtinguisherBits;
 			elementQuests[1] = kQuestGiantsWaterWaterfallBits;
 			break;
 		case eET_Air:
-			elementQuests[0] = kQuestGiantsAirSkyLooterBits;
-			elementQuests[1] = kQuestGiantsAirFromAboveBits;
+			elementQuests[0] = kQuestGiantsAirFromAboveBits;
+			elementQuests[1] = kQuestGiantsAirSkyLooterBits;
 			break;
 		case eET_Fire:
 			elementQuests[0] = kQuestGiantsFireBombardierBits;
@@ -163,8 +163,8 @@ void Runes::PortalTag::StoreQuestsGiants()
 			elementQuests[1] = kQuestGiantsLifeMelonMaestroBits;
 			break;
 		case eET_Death:
-			elementQuests[0] = kQuestGiantsUndeadByAThreadBits;
-			elementQuests[1] = kQuestGiantsUndeadBossedAroundBits;
+			elementQuests[0] = kQuestGiantsUndeadBossedAroundBits;
+			elementQuests[1] = kQuestGiantsUndeadByAThreadBits;
 			break;
 		case eET_Magic:
 			elementQuests[0] = kQuestGiantsMagicPuzzlePowerBits;
