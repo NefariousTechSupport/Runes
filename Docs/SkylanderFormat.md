@@ -108,6 +108,7 @@ Note that tfbSpyroTag_MagicMomentAll and tfbSpyroTag_RemainingDataAll are used b
 |  0x76  | 11/2D  |  0x06  | `uint16_t`             | [Flags2](#flags)
 |  0x78  | 11/2D  |  0x08  | `uint32_t`             | 2013 [Experience](#experience) value (Max is 101000)
 |  0x7C  | 11/2D  |  0x0C  | `uint8_t`              | 2013/2014 [Hat value](#hat-value)
+|  0x7D  | 11/2D  |  0x0D  | `uint8_t`              | [Trinket value](#trinket-value)
 |  0x7E  | 11/2D  |  0x0E  | `uint8_t`              | 2015 [Hat value](#hat-value) (add 256 to get the true hat id)
 |  0x80  | 12/2E  |  0x00  | `uint32_t`             | [Battlegrounds Flags](#battlegrounds-flags)
 |  0x84  | 12/2E  |  0x04  | `uint24_t`             | Completed sg heroic challenges
@@ -440,6 +441,45 @@ Sum of all experience values
 |  0279  | Kaos Krown
 |  0280  | Eon's Helm
 
+### Trinket Value
+
+| ID | Trinket Name
+|----|------------------
+| 00 | No Trinket
+| 01 | T-Bone's Lucky Tie
+| 02 | Batterson's Bubble
+| 03 | Dark Water Daisy
+| 04 | Vote for Cyclops
+| 05 | Ramses' Dragon Horn
+| 06 | Iris' Iris
+| 07 | Kuckoo Kazoo
+| 08 | Ramses' Rune
+| 09 | Ullysses Uniclops
+| 0A | Billy Bison
+| 0B | Stealth Elf's Gift
+| 0C | Lizard Lilly
+| 0D | Pirate Pinwheel
+| 0E | Bubble Blower
+| 0F | Medal of Heroism
+| 10 | Blobber's Medal of Courage
+| 11 | Medal of Valiance
+| 12 | Medal of Gallantry
+| 13 | Medal of Mettle
+| 14 | Winged Medal of Bravery
+| 15 | Seadog Seashell
+| 16 | Snuckles' Sunflower
+| 17 | Teddy Cyclops
+| 18 | Goo Factory Gear
+| 19 | Elemental Opal
+| 1A | Elemental Radiant
+| 1B | Elemental Diamond
+| 1C | Cyclops Spinner
+| 1D | Wilikin Windmill
+| 1E | Time Town Ticker
+| 1F | Big Bow of Boom
+| 20 | Mabu's Medallion
+| 21 | Spyro's Shield	
+
 ### Platform bitfield
 
 2011 value:
@@ -526,3 +566,4 @@ Credits:
   * Figured out Tech element quests
   * Figured out what Accolade Ranks are
   * Corrections with crc checksums
+  * Figured out trinkets
