@@ -442,11 +442,18 @@ Sum of all experience values
 
 ### Platform bitfield
 
-* 0x0001: Wii
-* 0x0002: Xbox 360
-* 0x0004: PS3
-* 0x0800: iOS 64 (Maybe iOS 32 as well)
-* 0x0100: Android 32 (Maybe Android 64 as well)
+2011 value:
+
+* Bit 0: Wii
+* Bit 1: Xbox 360
+* Bit 2: PS3
+
+2013 value:
+
+* Bit 0: Android 32 (Maybe Android 64 as well)
+* Bit 3: iOS 64 (Maybe iOS 32 as well)
+
+So for example, if the 2011 value is set to 3, then bits 0 and 1 are set, and therefore the figure has been used on Wii and Xbox 360
 
 ### Flags
 
