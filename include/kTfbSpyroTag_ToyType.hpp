@@ -2,6 +2,9 @@
 
 #include <cstdint>
 
+//Are 2016 characters/crystals wanted to be appended? Same as potentially TT DEBUGs but I know they're a very different scenario
+//Also any name touchups, or are the raw ripped names fine as they are?
+//- Texthead
 enum kTfbSpyroTag_ToyType : int16_t
 {
 	kTfbSpyroTag_ToyType_CHARACTER_2011 = 0,

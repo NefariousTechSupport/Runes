@@ -63,7 +63,7 @@ Runes::VariantIdentifier* Runes::ToyDataManager::readVariant(YAML::Node varNode)
 	variant->_yearCode = (ESkylandersGame)varNode["yearCode"].as<int8_t>();
 	variant->_lightCore = varNode["lightcore"].as<bool>();
 	variant->_fullAltDeco = varNode["fullAltDeco"].as<bool>();
-	variant->_wowPow = varNode["wowPow"].as<bool>();
+	variant->_repose = varNode["wowPow"].as<bool>();
 	readLocalizedString(&variant->_variantText, varNode["variantText"]);
 	readLocalizedString(&variant->_toyName, varNode["toyName"]);
 	return variant;
@@ -94,13 +94,15 @@ Runes::FigureToyData* Runes::ToyDataManager::LookupCharacter(kTfbSpyroTag_ToyTyp
 Runes::VariantIdentifier* Runes::FigureToyData::LookupVariant(uint16_t varId)
 {
 	ESkylandersGame yearCode;
-	bool fullAltDeco, wowPow, lightCore;
+	bool fullAltDeco, repose, lightCore;
 	kTfbSpyroTag_DecoID decoId;
-	Runes::PortalTag::DecodeSubtype(varId, &yearCode, &fullAltDeco, &wowPow, &lightCore, &decoId);
+	Runes::PortalTag::DecodeSubtype(varId, &yearCode, &fullAltDeco, &repose, &lightCore, &decoId);
 	Runes::VariantIdentifier* bestMatch = NULL;
 	for(int i = 0; i < (int)_variants.size(); i++)
 	{
-		if(_variants[i]->_wowPow == wowPow && wowPow == true)
+		//Repose == true? Nout just Repose
+		//- Texthead
+		if(_variants[i]->_repose == repose && repose == true)
 		{
 			if(!bestMatch || (yearCode >= _variants[i]->_yearCode && _variants[i]->_yearCode >= bestMatch->_yearCode && decoId != bestMatch->_decoId))
 			{

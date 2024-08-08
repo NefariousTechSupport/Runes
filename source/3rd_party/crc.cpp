@@ -11,3 +11,11 @@ uint16_t crc16(char* pData, int length)
 	}
 	return wCrc & 0xffff;
 }
+
+//I'm not sure if this fits here, but I thought I'd add it regardless somewhere
+//Just so later Runes can perform some additional data integrity
+//- Texthead
+uint8_t calculateBCC(uint32_t serial)
+{
+	return ((serial >> 24) & 0xff) ^ ((serial >> 16) & 0xff) ^ ((serial >> 8) & 0xff) ^ (serial & 0xff);
+}

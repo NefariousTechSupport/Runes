@@ -10,24 +10,26 @@
 #define to24(low, high) ((uint32_t)(low) + ((uint32_t)(high) << 16))
 #define bitsToMask(bits) (0xFFFFFFFFFFFFFFFF >> (64 - (bits)))
 
-void Runes::PortalTag::DecodeSubtype(uint16_t varId, ESkylandersGame* esg, bool* fullAltDeco, bool* wowPowFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId)
+//Renamed `wowPowFlag` to `reposeFlag`, as not all figures with it actually have Wow Pows, but all are reposed
+//- Texthead
+void Runes::PortalTag::DecodeSubtype(uint16_t varId, ESkylandersGame* esg, bool* fullAltDeco, bool* reposeFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId)
 {
 	*esg = (ESkylandersGame)((varId >> 12) & 0xF);
-	*wowPowFlag = (varId >> 11) & 1;
+	*reposeFlag = (varId >> 11) & 1;
 	*fullAltDeco = (varId >> 10) & 1;
 	*lightcore = (varId >> 9) & 1;
 	*decoId = (kTfbSpyroTag_DecoID)(varId & 0xFF);
 }
-void Runes::PortalTag::DecodeSubtype(ESkylandersGame* esg, bool* fullAltDeco, bool* wowPowFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId)
+void Runes::PortalTag::DecodeSubtype(ESkylandersGame* esg, bool* fullAltDeco, bool* reposeFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId)
 {
-	DecodeSubtype(this->_tagHeader._subType, esg, fullAltDeco, wowPowFlag, lightcore, decoId);
+	DecodeSubtype(this->_tagHeader._subType, esg, fullAltDeco, reposeFlag, lightcore, decoId);
 }
 void Runes::PortalTag::DebugPrintHeader()
 {
 	ESkylandersGame esg;
-	bool fullAltDeco, wowPowFlag, lightcore;
+	bool fullAltDeco, reposeFlag, lightcore;
 	kTfbSpyroTag_DecoID decoId;
-	DecodeSubtype(&esg, &fullAltDeco, &wowPowFlag, &lightcore, &decoId);
+	DecodeSubtype(&esg, &fullAltDeco, &reposeFlag, &lightcore, &decoId);
 	Runes::ToyDataManager* toyMan = Runes::ToyDataManager::getInstance();
 	Runes::FigureToyData* toyData = toyMan->LookupCharacter(this->_tagHeader._toyType);
 	Runes::VariantIdentifier* varData = toyData->LookupVariant(this->_tagHeader._subType);
@@ -35,7 +37,7 @@ void Runes::PortalTag::DebugPrintHeader()
 	printf("_serial: %08X\n", this->_tagHeader._serial);
 	printf("_toyType: %04X\n", this->_tagHeader._toyType);
 	printf("_toyName: %s\n", toyData->_toyName.get().c_str());
-	printf("_subType:\n\t_yearCode: %d\n\t_fullAltDeco: %hhu\n\t_wowPowFlag: %hhu\n\t_lightcore: %hhu\n\t_decoId: %02X\n\t_variantText: %s\n\t_toyName: %s\n", esg, fullAltDeco, wowPowFlag, lightcore, decoId, (varData ? varData->_variantText.get().c_str() : "N/A"), (varData ? varData->_toyName.get().c_str() : "N/A"));
+	printf("_subType:\n\t_yearCode: %d\n\t_fullAltDeco: %hhu\n\t_reposeFlag: %hhu\n\t_lightcore: %hhu\n\t_decoId: %02X\n\t_variantText: %s\n\t_toyName: %s\n", esg, fullAltDeco, reposeFlag, lightcore, decoId, (varData ? varData->_variantText.get().c_str() : "N/A"), (varData ? varData->_toyName.get().c_str() : "N/A"));
 	printf("_tradingCardId: %08X%08X\n", this->_tagHeader._tradingCardId2, this->_tagHeader._tradingCardId1);
 	printf("_webCode: %s\n", this->_webCode);
 }
@@ -58,6 +60,9 @@ void Runes::PortalTag::StoreHeader()
 
 	//Web code
 
+	//Slightly optmised algo, only one array used
+	//- Texthead
+
 	//basically 0->9, A->Z except not 0, 1, or any vowels
 	const char* webCodeTable = "23456789BCDFGHJKLMNPQRSTVWXYZ";
 
@@ -67,17 +72,12 @@ void Runes::PortalTag::StoreHeader()
 	//420707233300200 is 29^10-1
 	if(tradingCardId < 420707233300200 && tradingCardId != 0)
 	{
-		for(int i = 0; i < 10; i++)
+		for(int i = 0; i < 10; i++, tradingCardId /= 29)
 		{
 			uint8_t index = tradingCardId % 29;
-			tradingCardId = tradingCardId / 29;
-			this->_webCode[9 - i] = webCodeTable[index];
+			this->_webCode[10 - (i + (i / 5))] = webCodeTable[index];
 		}
 		//Add the hyphen and a null byte
-		for(int i = 10; i > 5; i--)
-		{
-			this->_webCode[i] = this->_webCode[i-1];
-		}
 		this->_webCode[5] = '-';
 		this->_webCode[11] = '\0';
 	}
@@ -290,10 +290,15 @@ void Runes::PortalTag::FillOutputFromStoredData()
 	else if(this->_hatType >= kTfbSpyroTag_Hat_MIN_2012)    this->_tagData._hat2012 = this->_hatType;
 	else                                                    this->_tagData._hat2011 = this->_hatType;
 
+	//hi
+	//but we don't need you anymore
+	//-Texthead
+	/*
 	memcpy(this->_tagData._nickname, "&COLOR(10,255,255)", 18);
 	this->_tagData._nickname[9] = 'h';
 	this->_tagData._nickname[10] = 'i';
 	this->_tagData._nickname[11] = 0;
+	*/
 
 	this->FillQuestsGiants();
 	this->FillQuestsSwapForce();
@@ -447,7 +452,17 @@ void Runes::PortalTagData::setHat(kTfbSpyroTag_HatType hat)
 	}
 	printf("Invalid Hat ID");
 }
+
+//This method is unused for the moment (I think?), but type identifiers for all tags could be added in future?
+//Just for example, added "isVehicle()", it also has exclusive mentions for the Template Vehicles (although maybe unwanted)
+//- Texthead
 bool Runes::PortalTag::isTrap()
 {
 	return this->_toyType >= kTfbSpyroTag_ToyType_TRAP_2014 && this->_toyType <= kTfbSpyroTag_ToyType_TRAP_2014_MAX;
+}
+bool Runes::PortalTag::isVehicle()
+{
+	return (this->_toyType >= kTfbSpyroTag_ToyType_VEHICLE_2015 && this->_toyType <= kTfbSpyroTag_ToyType_VEHICLE_2015_MAX)
+		|| this->_toyType == kTfbSpyroTag_ToyType_Vehicle_Template || this->_toyType == kTfbSpyroTag_ToyType_Vehicle_TemplateLand
+		|| this->_toyType == kTfbSpyroTag_ToyType_Vehicle_TemplateAir || this->_toyType == kTfbSpyroTag_ToyType_Vehicle_TemplateSea;
 }

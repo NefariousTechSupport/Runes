@@ -40,7 +40,7 @@ namespace Runes
 			ESkylandersGame _yearCode : 4;
 			bool _lightCore : 1;
 			bool _fullAltDeco : 1;
-			bool _wowPow : 1;
+			bool _repose : 1;
 			bool : 0;
 			kTfbSpyroTag_DecoID _decoId : 8;
 	};

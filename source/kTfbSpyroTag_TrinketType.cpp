@@ -1,0 +1,40 @@
+#include "kTfbSpyroTag_TrinketType.hpp"
+
+//Added Trinket values/name to source
+//- Texthead
+const char* trinketNames_en[kTfbSpyroTag_Trinket_MAX + 1] = {
+    "None",
+    "T-Bone's Lucky Tie",
+    "Batterson's Bubble",
+    "Dark Water Daisy",
+    "Vote for Cyclops",
+    "Ramses' Dragon Horn",
+    "Iris' Iris",
+    "Kuckoo Kazoo",
+    "Ramses' Rune",
+    "Ullysses Uniclops",
+    "Billy Bison",
+    "Stealth Elf's Gift",
+    "Lizard Lilly",
+    "Pirate Pinwheel",
+    "Bubble Blower",
+    "Medal of Heroism",
+    "Blobber's Medal of Courage",
+    "Medal of Valiance",
+    "Medal of Gallantry",
+    "Medal of Mettle",
+    "Winged Medal of Bravery",
+    "Seadog Seashell",
+    "Snuckles' Sunflower",
+    "Teddy Cyclops",
+    "Goo Factory Gear",
+    "Elemental Opal",
+    "Elemental Radiant",
+    "Elemental Diamond",
+    "Cyclops Spinner",
+    "Wilikin Windmill",
+    "Time Town Ticker",
+    "Big Bow of Boom",
+    "Mabu's Medallion",
+    "Spyro's Shield"
+};

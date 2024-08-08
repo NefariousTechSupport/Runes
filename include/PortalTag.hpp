@@ -159,11 +159,12 @@ namespace Runes
 			void ReadFromFile(const char* fileName);
 			void SaveToFile(const char* fileName);
 			void RecalculateTagDataChecksums();
-			static void DecodeSubtype(uint16_t varId, ESkylandersGame* esg, bool* fullAltDeco, bool* wowPowFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId);
-			void DecodeSubtype(ESkylandersGame* esg, bool* fullAltDeco, bool* wowPowFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId);
+			static void DecodeSubtype(uint16_t varId, ESkylandersGame* esg, bool* fullAltDeco, bool* reposeFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId);
+			void DecodeSubtype(ESkylandersGame* esg, bool* fullAltDeco, bool* reposeFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId);
 			void DebugPrintHeader();
 			void DebugSaveTagData();
 			bool isTrap();
+			bool isVehicle();
 		private:
 			bool _tagHeaderStored;
 			bool _tagDataStored;
