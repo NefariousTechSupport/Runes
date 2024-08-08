@@ -975,5 +975,5 @@ Credits:
   * Additional Trap info
   * Figured out Vehicles
   * Racing pack additions/corrections
-  * The PC, PC, Nintendo 3DS, Xbox One, and PS4 values for the platform usage
+  * The PC, Nintendo 3DS, Xbox One, and PS4 values for the platform usage
   * Heroic challenges
