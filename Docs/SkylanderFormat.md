@@ -47,7 +47,7 @@ NOTE: Some of this information may be incorrect and is actively being worked on.
 |----------|--------|--------|----------------------------|---------------
 |  0x0000  | 08/24  |  0x00  | `uint8_t`                  | Set to 1 if this Trap contains a pre-trapped variant Villain (?)
 |  0x0001  | 08/24  | 0x01   | `uint8_t`                  | Number of villains captured (?)
-|  0x0007  | 08/24  |  0x07  | `kTfbSpyroTag_VillainType` | Variant Villain ID, used if he primary villain ID is 0 (is 0x00 used to determine if to do?) (locked to element)
+|  0x0007  | 08/24  |  0x07  | `kTfbSpyroTag_VillainType` | Variant Villain ID, used if the primary villain ID is 0 (is 0x00 used to determine if to do?) (locked to element)
 |  0x0009  | 08/24  |  0x09  | `uint8_t`                  | [Area Sequence](#area-sequence)
 |  0x000A  | 08/24  |  0x0C  | `uint16_t`                 | crc16-ccit/false checksum of 0x110 bytes from 0x40 (so blocks 0D/29 -> 23/3F excluding access control blocks)
 |  0x000C  | 08/24  |  0x0A  | `uint16_t`                 | crc16-ccit/false checksum of 0x30 bytes starting from 0x10 (so blocks 09/25 -> 0C/28 excluding access control blocks)
