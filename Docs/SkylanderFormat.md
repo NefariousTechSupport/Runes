@@ -104,7 +104,7 @@ NOTE: Some of this information may be incorrect and is actively being worked on.
 
 ### Vehicle
 
-The full purpose of "Last platform identifier" bytes are quite unknown. When the figure is written to by Skylanders SuperChargers Racing, all of these are set to 00. When the figure is written to by Skylanders SuperChargers (mainline), all of these a`re set to 0F.
+The full purpose of "Last platform identifier" bytes are quite unknown. When the figure is written to by Skylanders SuperChargers Racing, all of these are set to 00. When the figure is written to by Skylanders SuperChargers (mainline), all of these are set to 0F.
 
 | St_Off | Block  | Bl_Off | Type                   | Description
 |--------|--------|--------|------------------------|---------------
