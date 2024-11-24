@@ -18,6 +18,9 @@ CONFIG(release, debug|release) {
 	copyfiles.commands = xcopy ".\Resources" ".\release\Resources" //y //s //i
 }
 
+win32 {
+	LIBS += -lHid -lSetupapi
+}
 
 QMAKE_EXTRA_TARGETS += copyfiles
 POST_TARGETDEPS += copyfiles
@@ -54,7 +57,12 @@ HEADERS += include/Constants.hpp \
 		   include/3rd_party/crc.h \
 		   include/RfidTag.hpp \
 		   include/FigureTabWidget.hpp \
-		   include/RunesMainWidget.hpp
+		   include/RunesMainWidget.hpp \
+		   include/hardware/HardwareIds.hpp \
+		   include/hardware/HardwareInterface.hpp \
+		   include/hardware/PortalType.hpp \
+		   include/hardware/HardwareInterface.hpp \
+		   include/hardware/WinHidUsbInterface.hpp
 SOURCES += source/Constants.cpp \
 		   source/debug.cpp \
 		   source/kTfbSpyroTag_HatType.cpp \
@@ -67,4 +75,6 @@ SOURCES += source/Constants.cpp \
 		   source/3rd_party/md5.cpp \
 		   source/3rd_party/rijndael.cpp \
 		   source/FigureTabWidget.cpp \
-		   source/RunesMainWidget.cpp
+		   source/RunesMainWidget.cpp \
+		   source/hardware/HardwareInterface.cpp \
+		   source/hardware/WinHidUsbInterface.cpp
