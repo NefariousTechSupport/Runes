@@ -32,6 +32,7 @@ POST_TARGETDEPS += copyfiles
 # Input
 HEADERS += include/Constants.hpp \
 		   include/debug.hpp \
+		   include/RunesDebug.hpp \
 		   include/ESkylandersGame.hpp \
 		   include/kTfbSpyroTag_DecoID.hpp \
 		   include/kTfbSpyroTag_HatType.hpp \
