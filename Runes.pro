@@ -58,6 +58,7 @@ HEADERS += include/Constants.hpp \
 		   include/RfidTag.hpp \
 		   include/FigureTabWidget.hpp \
 		   include/RunesMainWidget.hpp \
+		   include/PortalDebuggerWidget.hpp \
 		   include/hardware/HardwareIds.hpp \
 		   include/hardware/HardwareInterface.hpp \
 		   include/hardware/PortalType.hpp \
@@ -76,5 +77,6 @@ SOURCES += source/Constants.cpp \
 		   source/3rd_party/rijndael.cpp \
 		   source/FigureTabWidget.cpp \
 		   source/RunesMainWidget.cpp \
+		   source/PortalDebuggerWidget.cpp \
 		   source/hardware/HardwareInterface.cpp \
 		   source/hardware/WinHidUsbInterface.cpp

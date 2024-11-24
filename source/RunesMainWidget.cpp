@@ -7,8 +7,9 @@
 #include <QFileDialog>
 
 #include "FigureTabWidget.hpp"
+#include "PortalDebuggerWidget.hpp"
 
-RunesMainWidget::RunesMainWidget(Runes::PortalTag* tag, const char* fileName, QWidget* parent) : QWidget(parent)
+RunesMainWidget::RunesMainWidget(Runes::PortalTag* /*tag*/, const char* /*fileName*/, QWidget* parent) : QWidget(parent)
 {
 	QVBoxLayout* root = new QVBoxLayout(this);
 
@@ -41,6 +42,18 @@ RunesMainWidget::RunesMainWidget(Runes::PortalTag* tag, const char* fileName, QW
 	menuFile->addAction(actSave);
 	_menuBar->addMenu(menuFile);
 
+	QMenu* menuDev = new QMenu(tr("&Developer"), this);
+	QAction* actPortal = new QAction(tr("&Portal"), this);
+	actPortal->setStatusTip(tr("Portal Debugger"));
+	connect(actPortal, &QAction::triggered, [=]()
+	{
+		PortalDebuggerWidget* portalWindow = new PortalDebuggerWidget();
+		portalWindow->show();
+		portalWindow->raise();
+		portalWindow->activateWindow();
+	});
+	menuDev->addAction(actPortal);
+	_menuBar->addMenu(menuDev);
 
 	setLayout(root);
 	layout()->setMenuBar(_menuBar);
