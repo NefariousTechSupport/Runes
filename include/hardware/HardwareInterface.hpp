@@ -33,6 +33,8 @@ namespace Runes::Portal
 		HardwareInterface();
 		virtual ~HardwareInterface();
 
+		bool connected() const;
+
 		virtual HardwareErrorCode connect(PortalType type) = 0;
 		virtual void disconnect() = 0;
 		virtual HardwareErrorCode writeOut(uint8_t buffer[], size_t len) = 0;
