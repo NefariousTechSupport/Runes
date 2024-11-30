@@ -27,12 +27,14 @@ namespace Runes::Portal
 		virtual ~WinHidUsbInterface() final;
 
 		virtual HardwareErrorCode connect(PortalType type) final;
-		virtual int32_t writeOut(uint8_t buffer[], size_t len) final;
-		virtual int32_t writeOutEp1(uint8_t buffer[], size_t len) final;
-		virtual int32_t readIn(uint8_t buffer[], size_t len) final;
+		virtual void disconnect() final;
+		virtual HardwareErrorCode writeOut(uint8_t buffer[], size_t len) final;
+		virtual HardwareErrorCode writeOutEp1(uint8_t buffer[], size_t len) final;
+		virtual HardwareErrorCode readIn(uint8_t buffer[], size_t len) final;
 
 	private:
-		HANDLE _deviceHandle;
+		HANDLE                         _deviceHandle;
+		OVERLAPPED                     _overlapped;
 	};
 }
 

@@ -17,11 +17,14 @@ namespace Runes::Portal
 {
 	enum HardwareErrorCode
 	{
-		kHWErrNoError,	
-		kHWErrInvalidPortalType,	
-		kHWErrUnimplementedPortalType,	
-		kHWErrNoPortalFound,	
-		kHWErrUnknownError,	
+		kHWErrNoError,
+		kHWErrInvalidPortalType,
+		kHWErrUnimplementedPortalType,
+		kHWErrNoPortalFound,
+		kHWErrLostConnection,
+		kHWErrReadTimedOut,
+		kHWErrGenericReadError,
+		kHWErrUnknownError,
 	};
 
 	class HardwareInterface
@@ -31,9 +34,10 @@ namespace Runes::Portal
 		virtual ~HardwareInterface();
 
 		virtual HardwareErrorCode connect(PortalType type) = 0;
-		virtual int32_t writeOut(uint8_t buffer[], size_t len) = 0;
-		virtual int32_t writeOutEp1(uint8_t buffer[], size_t len) = 0;
-		virtual int32_t readIn(uint8_t buffer[], size_t len) = 0;
+		virtual void disconnect() = 0;
+		virtual HardwareErrorCode writeOut(uint8_t buffer[], size_t len) = 0;
+		virtual HardwareErrorCode writeOutEp1(uint8_t buffer[], size_t len) = 0;
+		virtual HardwareErrorCode readIn(uint8_t buffer[], size_t len) = 0;
 
 	protected:
 		enum State
@@ -42,9 +46,11 @@ namespace Runes::Portal
 			kStateConnected,
 			kStateErrored
 		};
-		static constexpr size_t EP0WriteSize = 0x20;
 
-		State _state;
+		static constexpr size_t EP0WriteSize = 0x20;
+		static constexpr size_t EP0ReadSize  = 0x20;
+
+		State                          _state;
 	};
 }
 
