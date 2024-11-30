@@ -153,7 +153,6 @@ HardwareErrorCode PortalDriver::ProcessRead()
 	if (error != kHWErrNoError)
 	{
 		return error;
-		return error;
 	}
 	_timeoutCounter = 0;
 }

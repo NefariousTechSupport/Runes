@@ -38,7 +38,7 @@ namespace Runes::Portal
 	private:
 		void                           PortalThread();
 
-		void                           ProcessRead();
+		HardwareErrorCode              ProcessRead();
 
 		HardwareErrorCode              ProcessColour();
 
