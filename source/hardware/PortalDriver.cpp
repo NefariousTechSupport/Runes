@@ -103,8 +103,7 @@ void PortalDriver::PortalThread()
 
 		HardwareErrorCode error;
 
-		uint8_t readBuffer[0x20];
-		error = _interface->readIn(readBuffer, sizeof(readBuffer));
+		error = ProcessRead();
 		if (error != kHWErrNoError)
 		{
 			if (error == kHWErrReadTimedOut)
@@ -119,16 +118,7 @@ void PortalDriver::PortalThread()
 		}
 		_timeoutCounter = 0;
 
-		uint8_t writeBuffer[0x20]{};
-
-		// Handle colours
-		PortalLEDColour colour = _colour.load();
-		writeBuffer[0] = 'C';
-		writeBuffer[1] = colour._red;
-		writeBuffer[2] = colour._green;
-		writeBuffer[3] = colour._blue;
-
-		error = _interface->writeOut(writeBuffer, sizeof(writeBuffer));
+		error = ProcessColour();
 		if (error != kHWErrNoError)
 		{
 			continue;
@@ -149,4 +139,39 @@ void PortalDriver::PortalThread()
 
 	delete _interface;
 	_interface = nullptr;
+}
+
+
+
+//=============================================================================
+// ProcessRead: Handle reads from the portal
+//=============================================================================
+HardwareErrorCode PortalDriver::ProcessRead()
+{
+	uint8_t readBuffer[0x20];
+	HardwareErrorCode error = _interface->readIn(readBuffer, sizeof(readBuffer));
+	if (error != kHWErrNoError)
+	{
+		return error;
+		return error;
+	}
+	_timeoutCounter = 0;
+}
+
+
+
+//=============================================================================
+// ProcessColour: Write out the current colour
+//=============================================================================
+HardwareErrorCode PortalDriver::ProcessColour()
+{
+	PortalLEDColour colour = _colour.load();
+
+	uint8_t writeBuffer[0x20]{};
+	writeBuffer[0] = 'C';
+	writeBuffer[1] = colour._red;
+	writeBuffer[2] = colour._green;
+	writeBuffer[3] = colour._blue;
+
+	return _interface->writeOut(writeBuffer, sizeof(writeBuffer));
 }

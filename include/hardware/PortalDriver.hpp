@@ -38,6 +38,10 @@ namespace Runes::Portal
 	private:
 		void                           PortalThread();
 
+		void                           ProcessRead();
+
+		HardwareErrorCode              ProcessColour();
+
 		// Do NOT expose this at all, this must belong to the portal thread,
 		// The only time the main thread can interact with it is to set up
 		// the connection.
