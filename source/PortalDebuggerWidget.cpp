@@ -8,7 +8,8 @@
 
 #include "PortalDebuggerWidget.hpp"
 
-#include "hardware/WinHidUsbInterface.hpp"
+#include "hardware/HardwareInterface.hpp"
+#include "hardware/PortalDriver.hpp"
 
 #include "RunesDebug.hpp"
 
@@ -17,16 +18,17 @@
 
 PortalDebuggerWidget::PortalDebuggerWidget(QWidget* parent /* = nullptr */)
 : QWidget(parent)
-, _usbDevice(nullptr)
+, _driver(nullptr)
 {
+	_driver = new Runes::Portal::PortalDriver();
+
 	setLayout(new QVBoxLayout);
 
 	QPushButton* btnConnect = new QPushButton(this);
 	btnConnect->setText(tr("Connect"));
 	connect(btnConnect, &QPushButton::pressed, [this]()
 	{
-		_usbDevice = new Runes::Portal::WinHidUsbInterface();
-		auto error = _usbDevice->connect(PORTAL_TYPE_DEFAULT);
+		auto error = _driver->Connect();
 		RUNES_ASSERT(error == Runes::Portal::HardwareErrorCode::kHWErrNoError, "Errored!!!");
 	});
 	layout()->addWidget(btnConnect);
@@ -35,8 +37,16 @@ PortalDebuggerWidget::PortalDebuggerWidget(QWidget* parent /* = nullptr */)
 	btnRed->setText(tr("Colour"));
 	connect(btnRed, &QPushButton::pressed, [this]()
 	{
-		uint8_t colour[4] = { 'C', 0xFF, 0x00, 0x00 };
-		_usbDevice->writeOut(colour, sizeof(colour));
+		static Runes::Portal::PortalLEDColour colours[] = {
+			{ 0xFF, 0x00, 0x00 },
+			{ 0x00, 0xFF, 0x00 },
+			{ 0x00, 0x00, 0xFF },
+			{ 0x00, 0x00, 0x00 },
+		};
+		static int counter = 0;
+
+		_driver->QueueColour(colours[counter]);
+		counter = (counter + 1) % 4;
 	});
 	layout()->addWidget(btnConnect);
 
@@ -46,8 +56,5 @@ PortalDebuggerWidget::PortalDebuggerWidget(QWidget* parent /* = nullptr */)
 
 PortalDebuggerWidget::~PortalDebuggerWidget()
 {
-	if (_usbDevice)
-	{
-		delete _usbDevice;
-	}
+	delete _driver;
 }

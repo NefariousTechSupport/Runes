@@ -13,7 +13,7 @@
 
 namespace Runes::Portal
 {
-	class HardwareInterface;
+	class PortalDriver;
 }
 
 class QPushButton;
@@ -26,7 +26,7 @@ public:
 	virtual ~PortalDebuggerWidget();
 
 private:
-	Runes::Portal::HardwareInterface*  _usbDevice;
+	Runes::Portal::PortalDriver*       _driver;
 };
 
 #endif // RUNES_PORTAL_DEBUGGER_WIDGET_HPP

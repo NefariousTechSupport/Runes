@@ -6,7 +6,7 @@ TEMPLATE = app
 TARGET = Runes
 INCLUDEPATH += ./include
 QT += widgets gui
-LIBS += -l:libyaml-cpp.a
+LIBS += -l:libyaml-cpp.a -latomic
 DEFINES += YAML_CPP_STATIC_DEFINE
 
 CONFIG(debug, debug|release) {
@@ -59,6 +59,7 @@ HEADERS += include/Constants.hpp \
 		   include/FigureTabWidget.hpp \
 		   include/RunesMainWidget.hpp \
 		   include/PortalDebuggerWidget.hpp \
+		   include/hardware/PortalDriver.hpp \
 		   include/hardware/HardwareIds.hpp \
 		   include/hardware/HardwareInterface.hpp \
 		   include/hardware/PortalType.hpp \
@@ -78,5 +79,6 @@ SOURCES += source/Constants.cpp \
 		   source/FigureTabWidget.cpp \
 		   source/RunesMainWidget.cpp \
 		   source/PortalDebuggerWidget.cpp \
+		   source/hardware/PortalDriver.cpp \
 		   source/hardware/HardwareInterface.cpp \
 		   source/hardware/WinHidUsbInterface.cpp
