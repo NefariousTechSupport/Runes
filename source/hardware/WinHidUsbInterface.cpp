@@ -109,7 +109,7 @@ HardwareErrorCode WinHidUsbInterface::connect(PortalType type)
 			                            FILE_SHARE_READ | FILE_SHARE_WRITE,
 			                            NULL,
 			                            CREATE_ALWAYS | CREATE_NEW,
-			                            0,
+			                            FILE_FLAG_OVERLAPPED,
 			                            NULL);
 
 			HIDD_ATTRIBUTES attributes;
@@ -162,6 +162,8 @@ void WinHidUsbInterface::disconnect()
 
 		_state = kStateUninitialised;
 
+		CancelIo(_deviceHandle);
+
 		CloseHandle(_deviceHandle);
 		_deviceHandle = INVALID_HANDLE_VALUE;
 
@@ -188,6 +190,7 @@ HardwareErrorCode WinHidUsbInterface::writeOut(uint8_t buffer[], size_t len)
 	bool success = HidD_SetOutputReport(_deviceHandle, writeBuffer, sizeof(writeBuffer));
 	if (!success)
 	{
+		RUNES_LOG_FATAL("Failed to write data to portal, error code %d", GetLastError());
 		disconnect();
 	}
 	//RUNES_ASSERT(success, "failed to send control transfer! error code %ld", GetLastError());
@@ -219,6 +222,7 @@ HardwareErrorCode WinHidUsbInterface::readIn(uint8_t buffer[], size_t len)
 {
 	RUNES_ASSERT(_state == kStateConnected, "Invalid state for writing data out");
 	RUNES_ASSERT(_deviceHandle != INVALID_HANDLE_VALUE, "No device handle exists");
+	RUNES_ASSERT(len <= EP0ReadSize, "Invalid read size!!");
 
 	HardwareErrorCode error = kHWErrNoError;
 
@@ -235,22 +239,31 @@ HardwareErrorCode WinHidUsbInterface::readIn(uint8_t buffer[], size_t len)
 			disconnect();
 			error = kHWErrLostConnection;
 		}
-
-		int res = WaitForSingleObject(_overlapped.hEvent, 100);
-		if (res != WAIT_OBJECT_0)
+		else
 		{
-			RUNES_LOG_WARN("Waiting for read returned %d, error %ld", res, GetLastError());
-			error = kHWErrReadTimedOut;
+			DWORD res = WaitForSingleObject(_overlapped.hEvent, 20);
+			switch(res)
+			{
+				case WAIT_OBJECT_0:
+					success = GetOverlappedResult(_deviceHandle, &_overlapped, &bytesRead, false);
+					break;
+				case WAIT_TIMEOUT:
+					RUNES_LOG_WARN("Waiting for read timed out");
+					error = kHWErrReadTimedOut;
+					break;
+				case WAIT_FAILED:
+					RUNES_LOG_WARN("Waiting for read failed with error {}!!", GetLastError());
+					error = kHWErrGenericReadError;
+					break;
+			}
 		}
-
-		success = GetOverlappedResult(_deviceHandle, &_overlapped, &bytesRead, false);
 	}
 
 	if (success && bytesRead > 0)
 	{
-		memcpy(buffer, readBuffer, bytesRead);
+		memcpy(buffer, readBuffer+1, len);
 	}
-	else
+	else if (error == kHWErrNoError)
 	{
 		error = kHWErrGenericReadError;
 	}
