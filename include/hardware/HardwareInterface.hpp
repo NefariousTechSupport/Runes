@@ -21,6 +21,7 @@ namespace Runes::Portal
 		kHWErrInvalidPortalType,
 		kHWErrUnimplementedPortalType,
 		kHWErrNoPortalFound,
+		kHWErrAlreadyConnected,
 		kHWErrLostConnection,
 		kHWErrReadTimedOut,
 		kHWErrGenericReadError,

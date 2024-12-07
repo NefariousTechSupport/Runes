@@ -36,6 +36,16 @@ namespace Runes::Portal
 		void QueueColour(uint8_t r, uint8_t g, uint8_t b);
 
 	private:
+		enum DriverState
+		{
+			kDriverStateNotConnected,
+			kDriverStateReadyBegin,
+			kDriverStateReadyPending,
+			kDriverStateActivationBegin,
+			kDriverStateActivationPending,
+			kDriverStateIdle,
+		};
+
 		void                           PortalThread();
 
 		HardwareErrorCode              ProcessRead();
@@ -46,6 +56,7 @@ namespace Runes::Portal
 		// The only time the main thread can interact with it is to set up
 		// the connection.
 		HardwareInterface*             _interface;
+		std::atomic<DriverState>       _state;
 
 		// MUST rely on atomics here, no mutexes, mutexes only serve to slow
 		// things down by their very nature.
@@ -54,6 +65,8 @@ namespace Runes::Portal
 		// Ensure this is after _interface, as this ensures it's destroyed before _interface
 		std::thread                    _thread;
 		uint8_t                        _timeoutCounter;
+
+		uint8_t                        _version[4];
 	};
 }
 
