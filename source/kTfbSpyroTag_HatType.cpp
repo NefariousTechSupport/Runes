@@ -196,7 +196,7 @@ const char* hatNames_en[kTfbSpyroTag_Hat_MAX + 1] = {
 	"Crazy Light Bulb Hat",
 	"Rubber Glove Hat",		//Hat 190: RubberGlove
 	"Rugby Hat",
-	"Metal Fin Hat"
+	"Metal Fin Hat",
 	"Sleuth Hat",
 	"Shower Cap",
 	"Bobby",

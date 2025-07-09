@@ -53,7 +53,7 @@ void RedirectIOToConsole() {
 
 void assertHatIds()
 {
-	assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Sunday], "Fancy Hat") == 0);
+	assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Sunday], "Fancy Hat (Monday)") == 0);
 	assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Carmen], "Tropical Turban") == 0);
 	assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Mercury], "Winged Hat") == 0);
 	assert(strcmp(hatNames_en[kTfbSpyroTag_Hat_Pumpkin], "Pumpkin Hat") == 0);
