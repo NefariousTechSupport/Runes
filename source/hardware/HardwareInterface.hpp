@@ -11,7 +11,7 @@
 
 #include <stdint.h>
 
-#include "hardware/PortalType.hpp"
+#include "PortalType.hpp"
 
 namespace Runes::Portal
 {

@@ -8,10 +8,10 @@ const char* hatNames_en[kTfbSpyroTag_Hat_MAX + 1] = {
 	"Miner Hat",
 	"General's Hat",
 	"Pirate Hat",
-	"Propellor Cap",
-	"Coonskin Cap",
+	"Propeller Cap",
+	"Coonskin Cap",			//Also called Coonskin Hat
 	"Straw Hat",
-	"Fancy Hat",			//Hat 10: Sunday
+	"Fancy Hat (Monday)",			//Hat 10: Sunday
 	"Top Hat",
 	"Viking Helmet",
 	"Spiked Hat",
@@ -26,7 +26,7 @@ const char* hatNames_en[kTfbSpyroTag_Hat_MAX + 1] = {
 	"Cowboy Hat",
 	"Rocker Hair",
 	"Royal Crown",
-	"Lil Devil",
+	"Lil' Devil",
 	"Eye Hat",
 	"Fez",
 	"Crown of Light",
@@ -48,7 +48,7 @@ const char* hatNames_en[kTfbSpyroTag_Hat_MAX + 1] = {
 	"Balloon Hat",
 	"Happy Birthday!",
 	//2012 Start
-	"Vintage Baseball Cap",
+	"Vintage Baseball Cap",	//Also called Baseball Cap
 	"Hat 47",				//They skipped this one
 	"Bowling Pin Hat",
 	"Officer Cap",
@@ -57,7 +57,7 @@ const char* hatNames_en[kTfbSpyroTag_Hat_MAX + 1] = {
 	"Lampshade Hat",
 	"Mariachi Hat",
 	"Hat 54",				//They skipped this one
-	"Paper Fast Food Hat",
+	"Paper Fast Food Hat",	//Also called Fast Food Hat
 	"Pilgrim Hat",
 	"Police Siren Hat",
 	"Purple Fedora",
@@ -85,7 +85,7 @@ const char* hatNames_en[kTfbSpyroTag_Hat_MAX + 1] = {
 	"Trucker Hat",			//Hat 80: Trucker
 	"Umbrella Hat",
 	"Showtime Hat",
-	"Ceasar Hat",
+	"Caesar Hat",
 	"Flower Fairy Hat",
 	"Funnel Hat",
 	"Scrumshanks Hat",
@@ -95,7 +95,7 @@ const char* hatNames_en[kTfbSpyroTag_Hat_MAX + 1] = {
 	"Rasta Hat",			//Hat 90: Rasta
 	"Kufi Hat",
 	"Knight Helm",
-	"Dangling Carrot Hat",
+	"Dangling Carrot Hat",	//Also called Dangling Carrot
 	"Bronze Top Hat",
 	"Silver Top Hat",
 	"Gold Top Hat",
@@ -111,10 +111,10 @@ const char* hatNames_en[kTfbSpyroTag_Hat_MAX + 1] = {
 	"Sawblade Hat",
 	"Zombeanie Hat",
 	"Gaucho Hat",
-	"Roundlet Hat",
+	"Roundlet Hat",			//Also called Roundlet
 	"Capuchon",
 	"Tricorn Hat",			//Hat 110: Tricorn
-	"Feathered Headdress",	//Double check the name
+	"Feathered Headdress (Peacock Hat)",
 	"Bearskin Cap",
 	"Fishbone Hat",
 	"Ski Cap",
@@ -131,7 +131,7 @@ const char* hatNames_en[kTfbSpyroTag_Hat_MAX + 1] = {
 	"Deely Boppers",
 	"Beanie",
 	"Leprechaun Hat",
-	"Shark Hat",
+	"Shark Hat (Sharkfin Hat)",
 	"Life Preserver Hat",
 	"Glittering Tiara",		//Hat 130: GlitteringTiara
 	"Great Helm",
@@ -144,7 +144,7 @@ const char* hatNames_en[kTfbSpyroTag_Hat_MAX + 1] = {
 	"Runic Headband",
 	"Clockwork Hat",
 	"Cactus Hat",			//Hat 140: CactusHat
-	"Skullhelm",
+	"Skullhelm (Skyll)",
 	"Gloop Hat",
 	"Puma Hat",
 	"Elephant Hat",
@@ -166,15 +166,15 @@ const char* hatNames_en[kTfbSpyroTag_Hat_MAX + 1] = {
 	"Desert Crown",
 	"Ceiling Fan Hat",		//Hat 160: Fan
 	"Imperial Hat",
-	"Clown Classic Hat",
-	"Clown Bowler Hat",
+	"Clown Classic Hat",	//Also called Clown Hat
+	"Clown Bowler Hat",		//Also called Clown Bowler
 	"Colander Hat",
 	"Kepi Hat",
 	"Cornucopia Hat",
 	"Cubano Hat",
 	"Cycling Hat",
 	"Daisy Crown",
-	"Dragon Skull",			//Hat 170: Skull
+	"Dragon Skull",			//Hat 170: Skull, also called Dragon Skull Hat
 	"Outback Hat",
 	"Lil' Elf Hat",
 	"Generalissimo",
@@ -196,7 +196,7 @@ const char* hatNames_en[kTfbSpyroTag_Hat_MAX + 1] = {
 	"Crazy Light Bulb Hat",
 	"Rubber Glove Hat",		//Hat 190: RubberGlove
 	"Rugby Hat",
-	"Sharkfin Hat (Shark Hat)",
+	"Metal Fin Hat"
 	"Sleuth Hat",
 	"Shower Cap",
 	"Bobby",

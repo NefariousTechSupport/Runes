@@ -4,9 +4,8 @@
 
 TEMPLATE = app
 TARGET = Runes
-INCLUDEPATH += ./include
 QT += widgets gui
-LIBS += -l:libyaml-cpp.a -latomic
+LIBS += -l:libyaml-cpp.a -static -latomic
 DEFINES += YAML_CPP_STATIC_DEFINE
 
 CONFIG(debug, debug|release) {
@@ -33,52 +32,53 @@ POST_TARGETDEPS += copyfiles
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 # Input
-HEADERS += include/Constants.hpp \
-		   include/debug.hpp \
-		   include/RunesDebug.hpp \
-		   include/ESkylandersGame.hpp \
-		   include/kTfbSpyroTag_DecoID.hpp \
-		   include/kTfbSpyroTag_HatType.hpp \
-		   include/kTfbSpyroTag_ToyType.hpp \
-		   include/kTfbSpyroTag_VillainType.hpp \
-		   include/PortalAlgos.hpp \
-		   include/PortalTag.hpp \
-		   include/RfidTag.hpp \
-		   include/toydata.hpp \
-		   include/3rd_party/crc.h \
-		   include/3rd_party/md5.h \
-		   include/3rd_party/rijndael.h \
-		   include/PortalAlgos.hpp \
-		   include/3rd_party/md5.h \
-		   include/3rd_party/rijndael.h \
-		   include/PortalTag.hpp \
-		   include/toydata.hpp \
-		   include/Constants.hpp \
-		   include/3rd_party/crc.h \
-		   include/RfidTag.hpp \
-		   include/FigureTabWidget.hpp \
-		   include/RunesMainWidget.hpp \
-		   include/PortalDebuggerWidget.hpp \
-		   include/hardware/PortalDriver.hpp \
-		   include/hardware/HardwareIds.hpp \
-		   include/hardware/HardwareInterface.hpp \
-		   include/hardware/PortalType.hpp \
-		   include/hardware/HardwareInterface.hpp \
-		   include/hardware/WinHidUsbInterface.hpp
-SOURCES += source/Constants.cpp \
-		   source/debug.cpp \
-		   source/kTfbSpyroTag_HatType.cpp \
-		   source/main.cpp \
-		   source/PortalAlgos.cpp \
-		   source/PortalTag.cpp \
-		   source/RfidTag.cpp \
-		   source/toydata.cpp \
-		   source/3rd_party/crc.cpp \
-		   source/3rd_party/md5.cpp \
-		   source/3rd_party/rijndael.cpp \
-		   source/FigureTabWidget.cpp \
-		   source/RunesMainWidget.cpp \
-		   source/PortalDebuggerWidget.cpp \
-		   source/hardware/PortalDriver.cpp \
-		   source/hardware/HardwareInterface.cpp \
-		   source/hardware/WinHidUsbInterface.cpp
+INCLUDEPATH += source                                                           \
+            += source/hardware                                                  \
+            += source/3rd_party
+
+HEADERS += source/3rd_party/crc.h                                               \
+           source/3rd_party/md5.h                                               \
+           source/3rd_party/rijndael.h                                          \
+           source/Constants.hpp                                                 \
+           source/debug.hpp                                                     \
+           source/ESkylandersGame.hpp                                           \
+           source/FigureTabWidget.hpp                                           \
+           source/HeroicsNames.hpp                                              \
+           source/hardware/HardwareIds.hpp                                      \
+           source/hardware/HardwareInterface.hpp                                \
+           source/hardware/PortalDriver.hpp                                     \
+           source/hardware/PortalType.hpp                                       \
+           source/hardware/WinHidUsbInterface.hpp                               \
+           source/kTfbSpyroTag_DecoID.hpp                                       \
+           source/kTfbSpyroTag_HatType.hpp                                      \
+           source/kTfbSpyroTag_ToyType.hpp                                      \
+           source/kTfbSpyroTag_TrinketType.hpp                                  \
+           source/kTfbSpyroTag_VillainType.hpp                                  \
+           source/PortalAlgos.hpp                                               \
+           source/PortalDebuggerWidget.hpp                                      \
+           source/PortalTag.hpp                                                 \
+           source/RfidTag.hpp                                                   \
+           source/RunesDebug.hpp                                                \
+           source/RunesMainWidget.hpp                                           \
+           source/toydata.hpp
+
+
+SOURCES += source/3rd_party/crc.cpp                                             \
+           source/3rd_party/md5.cpp                                             \
+           source/3rd_party/rijndael.cpp                                        \
+           source/Constants.cpp                                                 \
+           source/debug.cpp                                                     \
+           source/FigureTabWidget.cpp                                           \
+           source/hardware/HardwareInterface.cpp                                \
+           source/hardware/PortalDriver.cpp                                     \
+           source/hardware/WinHidUsbInterface.cpp                               \
+           source/HeroicsNames.cpp                                              \
+           source/kTfbSpyroTag_HatType.cpp                                      \
+           source/kTfbSpyroTag_TrinketType.cpp                                  \
+           source/main.cpp                                                      \
+           source/PortalAlgos.cpp                                               \
+           source/PortalDebuggerWidget.cpp                                      \
+           source/PortalTag.cpp                                                 \
+           source/RfidTag.cpp                                                   \
+           source/RunesMainWidget.cpp                                           \
+           source/toydata.cpp

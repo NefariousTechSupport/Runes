@@ -5,15 +5,28 @@
 #include <QVBoxLayout>
 #include <QMenuBar>
 #include <QFileDialog>
+#include <QMessageBox>
+#include <QApplication>
 
 #include "FigureTabWidget.hpp"
 #include "PortalDebuggerWidget.hpp"
+#include "PortalAlgos.hpp"
 
-RunesMainWidget::RunesMainWidget(Runes::PortalTag* /*tag*/, const char* /*fileName*/, QWidget* parent) : QWidget(parent)
+RunesMainWidget::RunesMainWidget(QWidget* parent) : QWidget(parent)
 {
 	QVBoxLayout* root = new QVBoxLayout(this);
 
 	_tabs = new QTabWidget(this);
+	_tabs->setTabsClosable(true);
+	connect(_tabs, &QTabWidget::tabCloseRequested, [this](int index)
+	{
+		QWidget* widget = _tabs->widget(index);
+		_tabs->removeTab(index);
+		if (widget)
+		{
+			delete widget;
+		}
+	});
 	root->addWidget(_tabs);
 
 	_menuBar = new QMenuBar(this);
@@ -25,10 +38,14 @@ RunesMainWidget::RunesMainWidget(Runes::PortalTag* /*tag*/, const char* /*fileNa
 	{
 		QString sourceFile = QFileDialog::getOpenFileName(this, tr("Open Dump File"), "", tr("All Files (*.*)"));
 
-		Runes::PortalTag* tag = new Runes::PortalTag();
-		tag->_rfidTag = new Runes::RfidTag();
-		tag->ReadFromFile(sourceFile.toLocal8Bit());
-		this->_tabs->addTab(new FigureTabWidget(tag, sourceFile.toLocal8Bit(), this), tr("Figure File"));
+		if (!sourceFile.isEmpty())
+		{
+			Runes::PortalTag* tag = new Runes::PortalTag();
+			tag->_rfidTag = new Runes::RfidTag();
+			tag->ReadFromFile(sourceFile.toLocal8Bit());
+			int tabIndex = this->_tabs->addTab(new FigureTabWidget(tag, sourceFile.toLocal8Bit(), _tabs), tr("Figure File"));
+			this->_tabs->setCurrentIndex(tabIndex);
+		}
 	});
 	menuFile->addAction(actOpen);
 	QAction* actSave = new QAction(tr("&Save"), this);
@@ -57,5 +74,5 @@ RunesMainWidget::RunesMainWidget(Runes::PortalTag* /*tag*/, const char* /*fileNa
 
 	setLayout(root);
 	layout()->setMenuBar(_menuBar);
-	setWindowTitle(tr("Runes Tabs"));
+	setWindowTitle(tr("Runes"));
 }

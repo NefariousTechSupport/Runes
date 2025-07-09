@@ -12,7 +12,7 @@ class RunesMainWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit RunesMainWidget(Runes::PortalTag* tag, const char* fileName, QWidget* parent = nullptr);
+	explicit RunesMainWidget(QWidget* parent = nullptr);
 	QTabWidget* _tabs;
 	QVBoxLayout* _root;
 	QMenuBar* _menuBar;

@@ -1,6 +1,6 @@
 #define FULL_UNROLL
 
-#include "3rd_party/rijndael.h"
+#include "rijndael.h"
 
 typedef unsigned long u32;
 typedef unsigned char u8;

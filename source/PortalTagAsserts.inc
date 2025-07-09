@@ -56,6 +56,7 @@ assert_offset(Runes::PortalTagData, 0x75, _hat2012);
 assert_offset(Runes::PortalTagData, 0x76, _flags2);
 assert_offset(Runes::PortalTagData, 0x78, _experience2013);
 assert_offset(Runes::PortalTagData, 0x7C, _hat2013);
+assert_offset(Runes::PortalTagData, 0x7D, _trinketType);
 assert_offset(Runes::PortalTagData, 0x7E, _hat2015);
 assert_offset(Runes::PortalTagData, 0x80, _battlegroundsFlags);
 assert_offset(Runes::PortalTagData, 0x84, _heroics2012_low);

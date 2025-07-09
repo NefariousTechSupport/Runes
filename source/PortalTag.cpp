@@ -24,6 +24,18 @@
 
 
 //=============================================================================
+// ~PortalTag: Destructor.
+//=============================================================================
+Runes::PortalTag::~PortalTag()
+{
+	if (_rfidTag)
+	{
+		delete _rfidTag;
+	}
+}
+
+
+//=============================================================================
 // DecodeSubtype: Takes an input variant ID and decomposes it into its
 // individual parts.
 //=============================================================================
@@ -157,6 +169,8 @@ void Runes::PortalTag::StoreMagicMoment()
 	else if(this->_tagData._hat2015 > 0) this->_hatType = (kTfbSpyroTag_HatType)(this->_tagData._hat2015 + kTfbSpyroTag_Hat_OFFSET_2015);
 	else                                 this->_hatType = kTfbSpyroTag_Hat_NONE;
 
+	this->_trinketType = static_cast<kTfbSpyroTag_TrinketType>(this->_tagData._trinketType);
+
 	uint32_t flags1 = to24(this->_tagData._flags1_low, this->_tagData._flags1_high);
 	this->_upgrades = ((this->_tagData._flags2 & 0xF) << 10) | (flags1 & 0x3FF);
 	this->_elementCollectionCounts[0] = (flags1 >> 10) & 3;
@@ -178,7 +192,7 @@ void Runes::PortalTag::StoreRemainingData()
 {
 	this->_firstUsed = this->_tagData._firstUsed;
 	this->_recentlyUsed = this->_tagData._recentlyUsed;
-	this->_heroics = ((uint64_t)to24(this->_tagData._heroics2012_low, this->_tagData._heroics2012_high) << 32) | this->_tagData._heroics2011;
+	this->_heroics = (static_cast<uint64_t>(to24(this->_tagData._heroics2012_low, this->_tagData._heroics2012_high)) << 32) | this->_tagData._heroics2011;
 	this->_ownerCount = this->_tagData._ownerCount;
 	this->_heroPoints = this->_tagData._heroPoints;
 	StoreQuestsGiants();
@@ -253,7 +267,12 @@ void Runes::PortalTag::FillQuestsGiants()
 void Runes::PortalTag::getQuestsGiantsElementalBits(uint8_t* bits)
 {
 	FigureToyData* figure = ToyDataManager::getInstance()->LookupCharacter(this->_toyType);
-	switch(figure->_element)
+	if (!figure)
+	{
+		return;
+	}
+
+	switch (figure->_element)
 	{
 		case eET_Earth:
 			bits[0] = kQuestGiantsEarthWreckerBits;
@@ -374,7 +393,14 @@ void Runes::PortalTag::FillOutputFromStoredData()
 	//Set hero points
 	tagData->_heroPoints = this->_heroPoints;
 	//Set owner count
-	tagData->_ownerCount = this->_ownerCount;
+	tagData->_ownerCount       = this->_ownerCount;
+	//Set heroics
+	tagData->_heroics2011      =  this->_heroics & 0xFFFFFFFF;
+	tagData->_heroics2012_low  = (this->_heroics >> 32) & 0xFFFF;
+	tagData->_heroics2012_high = (this->_heroics >> 40) & 0xFF;
+	//Set portal placed times
+	tagData->_recentlyUsed     = this->_recentlyUsed;
+	tagData->_firstUsed        = this->_firstUsed;
 
 	//Set hat type
 	this->_tagData._hat2011 = kTfbSpyroTag_Hat_NONE;
@@ -385,6 +411,13 @@ void Runes::PortalTag::FillOutputFromStoredData()
 	else if(this->_hatType >= kTfbSpyroTag_Hat_MIN_2013)    this->_tagData._hat2013 = this->_hatType;
 	else if(this->_hatType >= kTfbSpyroTag_Hat_MIN_2012)    this->_tagData._hat2012 = this->_hatType;
 	else                                                    this->_tagData._hat2011 = this->_hatType;
+
+	// Set trinket type
+	this->_tagData._trinketType = this->_trinketType;
+
+	// Upgrades
+	this->_tagData._flags1_low = (this->_tagData._flags1_low & ~0x3FF) | (this->_upgrades & 0x3FF);
+	this->_tagData._flags2 = (this->_tagData._flags2 & ~0xF) | ((this->_upgrades >> 10) & 0xF);
 
 	this->FillQuestsGiants();
 	this->FillQuestsSwapForce();
@@ -615,4 +648,77 @@ bool Runes::PortalTag::isVehicle()
 	return (this->_toyType >= kTfbSpyroTag_ToyType_VEHICLE_2015 && this->_toyType <= kTfbSpyroTag_ToyType_VEHICLE_2015_MAX)
 		|| this->_toyType == kTfbSpyroTag_ToyType_Vehicle_Template || this->_toyType == kTfbSpyroTag_ToyType_Vehicle_TemplateLand
 		|| this->_toyType == kTfbSpyroTag_ToyType_Vehicle_TemplateAir || this->_toyType == kTfbSpyroTag_ToyType_Vehicle_TemplateSea;
+}
+
+
+
+//=============================================================================
+// GetUpgrade: Gets a property of the upgrades, either 0 or 1
+//=============================================================================
+uint8_t Runes::PortalTag::GetUpgrade(Upgrade upgrade) const
+{
+	uint8_t bitIndex = DecodeUpgradeEnum(upgrade);
+	return (_upgrades >> bitIndex) & 1;
+}
+
+
+
+//=============================================================================
+// SetUpgrade: Sets a property of the upgrades, value must be 0 or 1
+//=============================================================================
+void Runes::PortalTag::SetUpgrade(Upgrade upgrade, uint8_t value)
+{
+	// Don't pass something other than 0 or 1 :P
+	value = value & 1;
+
+	uint8_t bitIndex = DecodeUpgradeEnum(upgrade);
+	_upgrades = (_upgrades & ~(1 << bitIndex)) | (value << bitIndex);
+}
+
+
+
+//=============================================================================
+// DecodeUpgradeEnum: Decodes the upgrade enum and gets the exact bit index for it
+//=============================================================================
+uint8_t Runes::PortalTag::DecodeUpgradeEnum(Upgrade upgrade) const
+{
+	uint8_t bitIndex = static_cast<uint8_t>(upgrade) & 0xF;
+
+	if (upgrade & kUpgradeSpecificPath)
+	{
+		// Yes it recurses, cry about it
+		UpgradePath selected  = static_cast<UpgradePath>(GetUpgrade(kUpgradeSelectedPath));
+		UpgradePath requested = static_cast<UpgradePath>((upgrade >> kUpgradeSpecificPathShift) & 1);
+
+		if (selected == requested)
+		{
+			bitIndex += kUpgradeActivePathStart;
+		}
+		else
+		{
+			bitIndex += kUpgradeAltPathStart;
+		}
+	}
+
+	return bitIndex;
+}
+
+
+
+//=============================================================================
+// GetHeroic: Gets the heroic with the specified index
+//=============================================================================
+bool Runes::PortalTag::GetHeroic(uint8_t heroic) const
+{
+	return (_heroics >> heroic) & 1;
+}
+
+
+
+//=============================================================================
+// SetHeroic: Sets the heroic with the specified index
+//=============================================================================
+void Runes::PortalTag::SetHeroic(uint8_t heroic, bool value)
+{
+	_heroics = static_cast<uint64_t>(static_cast<uint64_t>(_heroics & ~static_cast<uint64_t>(1ul << heroic)) | (static_cast<uint64_t>(static_cast<uint64_t>(value ? 1ul : 0ul) << heroic)));
 }

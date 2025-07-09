@@ -35,6 +35,7 @@ namespace Runes
 			uint8_t DetermineActiveDataRegion0();
 			uint8_t DetermineActiveDataRegion1();
 		private:
+			uint8_t DetermineActiveDataRegionInternal(uint8_t block0, uint8_t block1, uint8_t offset);
 			uint8_t _tag[1024];
 	};
 }

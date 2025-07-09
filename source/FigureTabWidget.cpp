@@ -13,15 +13,19 @@
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QLabel>
+#include <QListWidget>
 #include <QMenuBar>
 #include <QMenu>
 #include <QAction>
 #include <QFileDialog>
 #include <QComboBox>
 #include <QTextEdit>
+#include <QMessageBox>
 
 #include "kTfbSpyroTag_HatType.hpp"
+#include "kTfbSpyroTag_TrinketType.hpp"
 #include "Constants.hpp"
+#include "HeroicsNames.hpp"
 #include "toydata.hpp"
 
 #define intToChecked(value) ((value) == 1 ? Qt::Checked : Qt::Unchecked)
@@ -35,6 +39,28 @@ FigureTabWidget::FigureTabWidget(Runes::PortalTag* tag, const char* fileName, QW
 {
 	this->_tag = tag;
 	this->_sourceFile = QString(fileName);
+
+	ESkylandersGame game;
+	bool fullAltDeco;
+	bool repose;
+	bool lightcore;
+	kTfbSpyroTag_DecoID decoId;
+	tag->DecodeSubtype(&game, &fullAltDeco, &repose, &lightcore, &decoId);
+	if (game >= eSG_Skylanders2016)
+	{
+		// Throw a warning to let the user know that this may irreversably destroy their figure.
+
+		QMessageBox::warning(
+			this,
+			"Imaginators Figure Detected!",
+			"<h1>Warning!</h1>\n\n"
+			"Imaginators figures are digitally signed in such a way that we are not able to regenerate.\n"
+			"it's possible that Runes will overwrite this signature, <b>permanently</b> corrupting the figure if you don't have a backup.\n"
+			"<h1>Proceed with caution and keep plenty of backups!!!!</h1>\n"
+			"I, NefariousTechSupport, am not responsible for any figures that are broken",
+			QMessageBox::StandardButton::Ok,
+			QMessageBox::StandardButton::NoButton);
+	}
 
 	QGridLayout* root = new QGridLayout(this);
 
@@ -58,7 +84,7 @@ FigureTabWidget::FigureTabWidget(Runes::PortalTag* tag, const char* fileName, QW
 	connect(this->_spinExp, &QSpinBox::valueChanged, [=](int newExp)
 	{
 		this->_tag->_exp = newExp;
-		//TODO: update level number
+		this->updateLevelNumber();
 	});
 	root->addWidget(new QLabel(tr("Experience"), this), basicRow + 1, 0);
 	root->addWidget(this->_spinExp, basicRow + 1, 1);
@@ -75,25 +101,37 @@ FigureTabWidget::FigureTabWidget(Runes::PortalTag* tag, const char* fileName, QW
 	root->addWidget(new QLabel(tr("Hat"), this), basicRow + 2, 0);
 	root->addWidget(this->_cmbHat, basicRow + 2, 1);
 
+	this->_cmbTrinket = new QComboBox(this);
+	for(int i = 0; i <= kTfbSpyroTag_Trinket_MAX; i++)
+	{
+		this->_cmbTrinket->addItem(tr(trinketNames_en[i]));
+	}
+	connect(this->_cmbTrinket, &QComboBox::currentIndexChanged, [=](int newIndex)
+	{
+		this->_tag->_trinketType = static_cast<kTfbSpyroTag_TrinketType>(newIndex);
+	});
+	root->addWidget(new QLabel(tr("Trinket"), this), basicRow + 3, 0);
+	root->addWidget(this->_cmbTrinket, basicRow + 3, 1);
+
 	this->_spinHeroPoints = new QSpinBox(this);
 	this->_spinHeroPoints->setRange(0, 100);
 	connect(this->_spinHeroPoints, &QSpinBox::valueChanged, [=](int newHeroPoints)
 	{
 		this->_tag->_heroPoints = newHeroPoints;
-
-		printf("%d, %d\n", this->size().width(), this->size().height());
 	});
-	root->addWidget(new QLabel(tr("Hero Points"), this), basicRow + 3, 0);
-	root->addWidget(this->_spinHeroPoints, basicRow + 3, 1);
+	root->addWidget(new QLabel(tr("Hero Points"), this), basicRow + 4, 0);
+	root->addWidget(this->_spinHeroPoints, basicRow + 4, 1);
 
 	this->_lblTimePlayed = new QLabel(tr("Time Played: N/A"), this);
 	this->_lblLevel = new QLabel(tr("Level: N/A"), this);
 	this->_lblFirstTouched = new QLabel(tr("First Touched: N/A"), this);
 	this->_lblRecentlyTouched = new QLabel(tr("Last Touched: N/A"), this);
+	this->_lblWebcode = new QLabel(tr("Webcode: N/A"), this);
 	root->addWidget(_lblTimePlayed, basicRow + 0, 2);
 	root->addWidget(_lblLevel, basicRow + 1, 2);
 	root->addWidget(_lblFirstTouched, basicRow + 2, 2);
 	root->addWidget(_lblRecentlyTouched, basicRow + 3, 2);
+	root->addWidget(_lblWebcode, basicRow + 4, 2);
 
 	//Quests
 
@@ -108,15 +146,54 @@ FigureTabWidget::FigureTabWidget(Runes::PortalTag* tag, const char* fileName, QW
 	root->addWidget(new QLabel(tr("<h3>Giants Quests</h3>")), questStart, 0, Qt::AlignLeft | Qt::AlignBottom);
 	root->addLayout(_subGiantsQuests, questStart + 1, 0);
 
+	initUpgrades();
+	root->addWidget(new QLabel(tr("<h3>Upgrades</h3>")), questStart, 1, Qt::AlignLeft | Qt::AlignBottom);
+	root->addLayout(_subUpgrades, questStart + 1, 1);
+
 	initSwapForceQuests();
 	root->addWidget(new QLabel(tr("<h3>Swap Force Quests</h3>")), questStart, 2, Qt::AlignLeft | Qt::AlignBottom);
 	root->addLayout(_subSwapForceQuests, questStart + 1, 2);
+
+	this->_lstHeroics = new QListWidget(this);
+	for (uint i = 0; i < heroicsNames.size(); i++)
+	{
+		this->_lstHeroics->addItem(heroicsNames[i]);
+		QListWidgetItem* item = this->_lstHeroics->item(this->_lstHeroics->count() - 1);
+		item->setData(Qt::UserRole, i);
+		item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+		item->setCheckState(Qt::Unchecked);
+	}
+	connect(this->_lstHeroics, &QListWidget::itemChanged, [=](QListWidgetItem* item)
+	{
+		int32_t index = item->data(Qt::UserRole).toInt();
+		this->_tag->SetHeroic(index, item->checkState() == Qt::Checked);
+	});
+	root->addWidget(new QLabel(tr("<h3>Heroics</h3>"), this), questStart, 3);
+	root->addWidget(this->_lstHeroics, questStart + 1, 3, 1, std::max<int32_t>(std::max<int32_t>(this->_subUpgrades->count(), this->_subSwapForceQuests->count()), this->_subGiantsQuests->count()));
+
+	// Hardcoded cos cry
+	root->setColumnMinimumWidth(0, 224);
+	root->setColumnMinimumWidth(1, 224);
+	root->setColumnMinimumWidth(2, 224);
+	root->setColumnMinimumWidth(3, 128);
 
 	setLayout(root);
 	
 	setWindowTitle(tr("Runes"));
 
 	updateFields();
+}
+
+
+//=============================================================================
+// ~FigureTabWidget: Destructor for the FigureTabWidget.
+//=============================================================================
+FigureTabWidget::~FigureTabWidget()
+{
+	if (_tag)
+	{
+		delete _tag;
+	}
 }
 
 
@@ -179,9 +256,7 @@ void FigureTabWidget::updateFields()
 
 		// Update the level number
 
-		this->_lblLevel->setText(QString("Level: %1").arg(
-			QString::number(this->_tag->ComputeLevel()).rightJustified(2, '0')
-		));
+		updateLevelNumber();
 
 		// Update the first used time
 
@@ -201,6 +276,12 @@ void FigureTabWidget::updateFields()
 			QString::number(this->_tag->_recentlyUsed._day).rightJustified(2, '0'),
 			QString::number(this->_tag->_recentlyUsed._hour).rightJustified(2, '0'),
 			QString::number(this->_tag->_recentlyUsed._minute).rightJustified(2, '0')
+		));
+
+		// Update webcode
+
+		this->_lblWebcode->setText(QString("Webcode: %1").arg(
+			tr(this->_tag->_webCode)
 		));
 
 		// Update which elemental quest input to use
@@ -285,6 +366,14 @@ void FigureTabWidget::updateFields()
 		this->_wdGiantsElementalQuest1->setVisible(true);
 		this->_wdGiantsElementalQuest2->setVisible(true);
 	}
+	else
+	{
+		this->_lblToyName->setText(
+			QString("<h2>Character ID %1, Var ID %2</h2>")
+			.arg(static_cast<uint16_t>(this->_tag->_toyType))
+			.arg(static_cast<uint16_t>(this->_tag->_subType))
+		);
+	}
 
 	// Basic inputs
 
@@ -292,6 +381,7 @@ void FigureTabWidget::updateFields()
 	this->_spinMoney->setValue(this->_tag->_coins);
 	this->_spinHeroPoints->setValue(this->_tag->_heroPoints);
 	this->_cmbHat->setCurrentIndex(this->_tag->_hatType);
+	this->_cmbTrinket->setCurrentIndex(this->_tag->_trinketType);
 
 	// Update the quest fields for giants
 
@@ -312,6 +402,46 @@ void FigureTabWidget::updateFields()
 	this->_chkSwapForceTotallyMaxedOut->setCheckState(intToChecked(this->_tag->_giantsQuests[4]));
 	this->_spinSwapForceElementalist->setValue(this->_tag->_swapforceQuests[5]);
 	this->_spinSwapForceIndividual->setValue(this->_tag->_swapforceQuests[8]);
+
+	// Update the upgrade fields
+
+	bool choiceMade = _tag->GetUpgrade(Runes::kUpgradePathChoiceMade);
+	Runes::UpgradePath selectedPath = static_cast<Runes::UpgradePath>(_tag->GetUpgrade(Runes::kUpgradeSelectedPath));
+	_cmbUG_Path->setCurrentIndex(choiceMade ? (selectedPath + 1) : 0);
+
+	_chkUG_B1->setCheckState(intToChecked(_tag->GetUpgrade(Runes::kUpgradeBase1)));
+	_chkUG_B2->setCheckState(intToChecked(_tag->GetUpgrade(Runes::kUpgradeBase2)));
+	_chkUG_B3->setCheckState(intToChecked(_tag->GetUpgrade(Runes::kUpgradeBase3)));
+	_chkUG_B4->setCheckState(intToChecked(_tag->GetUpgrade(Runes::kUpgradeBase4)));
+
+	_chkUG_P1U1->setCheckState(intToChecked(_tag->GetUpgrade(Runes::kUpgradePath1Upgrade1)));
+	_chkUG_P1U2->setCheckState(intToChecked(_tag->GetUpgrade(Runes::kUpgradePath1Upgrade2)));
+	_chkUG_P1U3->setCheckState(intToChecked(_tag->GetUpgrade(Runes::kUpgradePath1Upgrade3)));
+	_chkUG_P2U1->setCheckState(intToChecked(_tag->GetUpgrade(Runes::kUpgradePath2Upgrade1)));
+	_chkUG_P2U2->setCheckState(intToChecked(_tag->GetUpgrade(Runes::kUpgradePath2Upgrade2)));
+	_chkUG_P2U3->setCheckState(intToChecked(_tag->GetUpgrade(Runes::kUpgradePath2Upgrade3)));
+
+	_chkUG_Soulgem->setCheckState(intToChecked(_tag->GetUpgrade(Runes::kUpgradeSoulgem)));
+	 _chkUG_WowPow->setCheckState(intToChecked(_tag->GetUpgrade(Runes::kUpgradeWowPow)));
+
+	// Update heroic challenges
+
+	for (int32_t i = 0; i < _lstHeroics->count(); i++)
+	{
+		QListWidgetItem* item = _lstHeroics->item(i);
+		item->setCheckState(_tag->GetHeroic(i) ? Qt::Checked : Qt::Unchecked);
+	}
+}
+
+
+//=============================================================================
+// updateLevelNumber: Set level number on UI
+//=============================================================================
+void FigureTabWidget::updateLevelNumber()
+{
+	this->_lblLevel->setText(QString("Level: %1").arg(
+		QString::number(this->_tag->ComputeLevel()).rightJustified(2, '0')
+	));
 }
 
 
@@ -382,4 +512,94 @@ void FigureTabWidget::initSwapForceQuests()
 	_subSwapForceQuests->addRow(tr("Elemental Quest 1"), this->_ssfInvalidElement1);
 	_subSwapForceQuests->addRow(tr("Elemental Quest 2"), this->_ssfInvalidElement2);
 	_subSwapForceQuests->addRow(tr("Individual Quest"), this->_spinSwapForceIndividual);
+}
+
+
+//=============================================================================
+// macros for defining upgrade checkboxes.
+//=============================================================================
+#define defineCheckUpgrade(field, upgrade) \
+	do \
+	{ \
+		this->field = new QCheckBox(); \
+		connect(this->field, &QCheckBox::stateChanged, [=](int newState) \
+		{ \
+			this->_tag->SetUpgrade(upgrade, newState == Qt::Checked); \
+		}); \
+	} while (false)
+
+
+//=============================================================================
+// initUpgrades: Initialize the ui widgets for upgrades.
+//=============================================================================
+void FigureTabWidget::initUpgrades()
+{
+	_subUpgrades = new QFormLayout();
+
+	defineCheckUpgrade(_chkUG_B1,      Runes::kUpgradeBase1);
+	defineCheckUpgrade(_chkUG_B2,      Runes::kUpgradeBase2);
+	defineCheckUpgrade(_chkUG_B3,      Runes::kUpgradeBase3);
+	defineCheckUpgrade(_chkUG_B4,      Runes::kUpgradeBase4);
+	defineCheckUpgrade(_chkUG_P1U1,    Runes::kUpgradePath1Upgrade1);
+	defineCheckUpgrade(_chkUG_P1U2,    Runes::kUpgradePath1Upgrade2);
+	defineCheckUpgrade(_chkUG_P1U3,    Runes::kUpgradePath1Upgrade3);
+	defineCheckUpgrade(_chkUG_P2U1,    Runes::kUpgradePath2Upgrade1);
+	defineCheckUpgrade(_chkUG_P2U2,    Runes::kUpgradePath2Upgrade2);
+	defineCheckUpgrade(_chkUG_P2U3,    Runes::kUpgradePath2Upgrade3);
+	defineCheckUpgrade(_chkUG_Soulgem, Runes::kUpgradeSoulgem);
+	defineCheckUpgrade(_chkUG_WowPow,  Runes::kUpgradeWowPow);
+
+	_cmbUG_Path = new QComboBox(this);
+	_cmbUG_Path->addItem(tr("None"));
+	_cmbUG_Path->addItem(tr("Primary"));
+	_cmbUG_Path->addItem(tr("Secondary"));
+	
+	connect(_cmbUG_Path, &QComboBox::currentIndexChanged, [=](int newIndex)
+	{
+		uint8_t choiceMade = newIndex != 0;
+		uint8_t oldPath = this->_tag->GetUpgrade(Runes::kUpgradeSelectedPath);
+		uint8_t newPath = newIndex > 0 ? newIndex - 1 : oldPath;
+
+		if (newPath != oldPath && choiceMade)
+		{
+			// Swap upgrades between paths
+			uint8_t active[3] =
+			{
+				this->_tag->GetUpgrade(Runes::kUpgradeActivePathUpgrade1),
+				this->_tag->GetUpgrade(Runes::kUpgradeActivePathUpgrade2),
+				this->_tag->GetUpgrade(Runes::kUpgradeActivePathUpgrade3)
+			};
+
+			uint8_t inactive[3] =
+			{
+				this->_tag->GetUpgrade(Runes::kUpgradeAltPathUpgrade1),
+				this->_tag->GetUpgrade(Runes::kUpgradeAltPathUpgrade2),
+				this->_tag->GetUpgrade(Runes::kUpgradeAltPathUpgrade3)
+			};
+
+			this->_tag->SetUpgrade(Runes::kUpgradeAltPathUpgrade1, active[0]);
+			this->_tag->SetUpgrade(Runes::kUpgradeAltPathUpgrade2, active[1]);
+			this->_tag->SetUpgrade(Runes::kUpgradeAltPathUpgrade3, active[2]);
+			this->_tag->SetUpgrade(Runes::kUpgradeActivePathUpgrade1, inactive[0]);
+			this->_tag->SetUpgrade(Runes::kUpgradeActivePathUpgrade2, inactive[1]);
+			this->_tag->SetUpgrade(Runes::kUpgradeActivePathUpgrade3, inactive[2]);
+		}
+
+		this->_tag->SetUpgrade(Runes::kUpgradePathChoiceMade, choiceMade);
+		this->_tag->SetUpgrade(Runes::kUpgradeSelectedPath,   newPath);
+	});
+
+	_subUpgrades->addRow(tr("Base 1"),           this->_chkUG_B1);
+	_subUpgrades->addRow(tr("Base 2"),           this->_chkUG_B2);
+	_subUpgrades->addRow(tr("Base 3"),           this->_chkUG_B3);
+	_subUpgrades->addRow(tr("Base 4"),           this->_chkUG_B4);
+	_subUpgrades->addRow(tr("Path"),             this->_cmbUG_Path);
+	_subUpgrades->addRow(tr("Path 1 Upgrade 1"), this->_chkUG_P1U1);
+	_subUpgrades->addRow(tr("Path 1 Upgrade 2"), this->_chkUG_P1U2);
+	_subUpgrades->addRow(tr("Path 1 Upgrade 3"), this->_chkUG_P1U3);
+	_subUpgrades->addRow(tr("Path 2 Upgrade 1"), this->_chkUG_P2U1);
+	_subUpgrades->addRow(tr("Path 2 Upgrade 2"), this->_chkUG_P2U2);
+	_subUpgrades->addRow(tr("Path 2 Upgrade 3"), this->_chkUG_P2U3);
+	_subUpgrades->addRow(tr("Soulgem"),          this->_chkUG_Soulgem);
+	_subUpgrades->addRow(tr("Wow Pow"),          this->_chkUG_WowPow);
 }

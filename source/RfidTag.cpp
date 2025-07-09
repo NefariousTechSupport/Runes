@@ -136,7 +136,7 @@ bool Runes::RfidTag::CopyBlocks(void* dst, uint8_t blockId, uint8_t numBlocks)
 //=============================================================================
 bool Runes::RfidTag::AllZero(uint8_t* block)
 {
-	return (*(uint64_t*)block + *((uint64_t*)(block + 8))) == 0;
+	return (*reinterpret_cast<uint64_t*>(block) | *reinterpret_cast<uint64_t*>(block + 8)) == 0;
 }
 
 
@@ -176,15 +176,7 @@ bool Runes::RfidTag::SaveBlocks(void* src, uint8_t blockId, uint8_t numBlocks)
 //=============================================================================
 uint8_t Runes::RfidTag::DetermineActiveDataRegion0()
 {
-	uint8_t areaSequences[2];
-	uint8_t areaHeader[16];
-	CopyBlocks(areaHeader, 0x08, 1);
-	areaSequences[0] = areaHeader[9];
-	CopyBlocks(areaHeader, 0x24, 1);
-	areaSequences[1] = areaHeader[9];
-	if((areaSequences[0] + 1) == areaSequences[1]) return 1;	//Use area 1
-	if((areaSequences[1] + 1) == areaSequences[0]) return 0;	//Use area 0
-	return -1;
+	return DetermineActiveDataRegionInternal(0x08, 0x24, 0x09);
 }
 
 
@@ -193,13 +185,62 @@ uint8_t Runes::RfidTag::DetermineActiveDataRegion0()
 //=============================================================================
 uint8_t Runes::RfidTag::DetermineActiveDataRegion1()
 {
+	return DetermineActiveDataRegionInternal(0x11, 0x2D, 0x02);
+}
+
+
+//=============================================================================
+// DetermineActiveDataRegionInternal: Get the active data region
+//=============================================================================
+uint8_t Runes::RfidTag::DetermineActiveDataRegionInternal(uint8_t block0, uint8_t block1, uint8_t offset)
+{
 	uint8_t areaSequences[2];
 	uint8_t areaHeader[16];
-	CopyBlocks(areaHeader, 0x11, 1);
-	areaSequences[0] = areaHeader[2];
-	CopyBlocks(areaHeader, 0x2D, 1);
-	areaSequences[1] = areaHeader[2];
-	if((areaSequences[0] + 1) == areaSequences[1]) return 1;	//Use area 1
-	if((areaSequences[1] + 1) == areaSequences[0]) return 0;	//Use area 0
-	return -1;
+	bool    areaPopulated[2];
+
+	// Default to 0
+	uint8_t activeRegion = 0;
+
+
+	CopyBlocks(areaHeader, block0, 1);
+	areaSequences[0] = areaHeader[offset];
+	areaPopulated[0]  = !AllZero(areaHeader);
+
+	CopyBlocks(areaHeader, block1, 1);
+	areaSequences[1] = areaHeader[offset];
+	areaPopulated[1]  = !AllZero(areaHeader);
+
+
+	if (areaPopulated[0] && areaPopulated[1])
+	{
+		// If both areas are populated
+
+		// Default to region 0 if we can't reason about it, ideally
+		// we'd prompt the user, however the codebase should be redesigned
+		// a bit to allow for user intervention.
+		activeRegion = 0;
+
+		// Prioritise the one with the higher area sequence, we need to
+		// be a bit careful and handle overflows hence we're adding 1
+		     if ((areaSequences[0] + 1) == areaSequences[1]) activeRegion = 1;
+		else if ((areaSequences[1] + 1) == areaSequences[0]) activeRegion = 0;
+	}
+	else if (areaPopulated[0] && !areaPopulated[1])
+	{
+		// If area 0 is populated but not area 1
+		activeRegion = 0;
+	}
+	else if (!areaPopulated[0] && areaPopulated[1])
+	{
+		// If area 1 is populated but not area 0
+		activeRegion = 1;
+	}
+	else if (!areaPopulated[0] && !areaPopulated[1])
+	{
+		// If neither area is populated
+		activeRegion = 0;
+	}
+
+
+	return activeRegion;
 }

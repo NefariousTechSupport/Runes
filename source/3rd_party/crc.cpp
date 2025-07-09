@@ -1,4 +1,4 @@
-#include "3rd_party/crc.h"
+#include "crc.h"
 
 uint16_t crc16(char* pData, int length)
 {

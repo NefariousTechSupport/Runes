@@ -2,8 +2,10 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QApplication>
+#include <QString>
+
 #include "RunesMainWidget.hpp"
-#include "PortalTag.hpp"
+#include "PortalAlgos.hpp"
 #include "debug.hpp"
 
 int main(int argc, char *argv[])
@@ -12,12 +14,24 @@ int main(int argc, char *argv[])
 
 	QApplication a(argc, argv);
 
-	Runes::PortalTag tag;
-	tag._rfidTag = new Runes::RfidTag();
-	tag.ReadFromFile(argv[1]);
+	std::optional<std::string> result = Runes::readSalt();
+	if (result.has_value())
+	{
+		QMessageBox::critical(
+			nullptr,
+			QString("salt.txt error"),
+			QString(result.value().c_str()),
+			QMessageBox::StandardButton::Abort,
+			QMessageBox::StandardButton::NoButton);
 
-	RunesMainWidget rw = RunesMainWidget(&tag, argv[1], nullptr);
-	rw.show();
+		a.exit(1);
+		return 1;
+	}
+	else
+	{
+		RunesMainWidget rw = RunesMainWidget(nullptr);
+		rw.show();
 
-	return a.exec();
+		return a.exec();
+	}
 }
