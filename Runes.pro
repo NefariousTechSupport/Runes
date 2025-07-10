@@ -5,8 +5,8 @@
 TEMPLATE = app
 TARGET = Runes
 QT += widgets gui
-LIBS += -l:libyaml-cpp.a -static -latomic
-DEFINES += YAML_CPP_STATIC_DEFINE
+LIBS += -l:libyaml-cpp.a -static -latomic -lhidapi
+DEFINES += YAML_CPP_STATIC_DEFINE HID_API_NO_EXPORT_DEFINE
 
 CONFIG(debug, debug|release) {
 	DEFINES += DEBUG
@@ -18,7 +18,7 @@ CONFIG(release, debug|release) {
 }
 
 win32 {
-	LIBS += -lHid -lSetupapi
+	LIBS += -lHid
 }
 
 QMAKE_EXTRA_TARGETS += copyfiles
@@ -48,7 +48,7 @@ HEADERS += source/3rd_party/crc.h                                               
            source/hardware/HardwareInterface.hpp                                \
            source/hardware/PortalDriver.hpp                                     \
            source/hardware/PortalType.hpp                                       \
-           source/hardware/WinHidUsbInterface.hpp                               \
+           source/hardware/HidUsbInterface.hpp                                  \
            source/kTfbSpyroTag_DecoID.hpp                                       \
            source/kTfbSpyroTag_HatType.hpp                                      \
            source/kTfbSpyroTag_ToyType.hpp                                      \
@@ -71,7 +71,7 @@ SOURCES += source/3rd_party/crc.cpp                                             
            source/FigureTabWidget.cpp                                           \
            source/hardware/HardwareInterface.cpp                                \
            source/hardware/PortalDriver.cpp                                     \
-           source/hardware/WinHidUsbInterface.cpp                               \
+           source/hardware/HidUsbInterface.cpp                                  \
            source/HeroicsNames.cpp                                              \
            source/kTfbSpyroTag_HatType.cpp                                      \
            source/kTfbSpyroTag_TrinketType.cpp                                  \

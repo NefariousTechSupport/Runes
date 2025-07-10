@@ -10,7 +10,7 @@
 
 #include "RunesDebug.hpp"
 #include "HardwareInterface.hpp"
-#include "WinHidUsbInterface.hpp"
+#include "HidUsbInterface.hpp"
 
 #include <chrono>
 #include <unistd.h>
@@ -65,7 +65,7 @@ HardwareErrorCode PortalDriver::Connect()
 		return kHWErrAlreadyConnected;
 	}
 
-	_interface = new WinHidUsbInterface();
+	_interface = new HidUsbInterface();
 	HardwareErrorCode error = _interface->connect(PortalType::PORTAL_TYPE_DEFAULT);
 
 	if (error == kHWErrNoError)
