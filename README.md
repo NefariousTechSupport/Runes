@@ -8,11 +8,12 @@ It is not yet ready for public use.
 
 ## Windows
 
-Requires MSYS2, use MINGW64 and not UCRT64.
+Requires MSYS2, use UCRT64 and not MINGW64.
 
 Dependencies:
-* Qt 6.7.0
+* Qt 6.7.0, can be installed with `pacman -S mingw-w64-ucrt-x86_64-qt6-base=6.7.0-2 mingw-w64-ucrt-x86_64-qt6-tools=6.7.0-1`
 * yaml-cpp, can be installed with `pacman -S mingw-w64-x86_64-yaml-cpp`
+* hidapi, can be installed with `pacman -S mingw-w64-ucrt-x86_64-hidapi`
 
 Compiling:
 * Run `qmake "CONFIG+=debug"` (`qmake` for release) and `make` to compile
