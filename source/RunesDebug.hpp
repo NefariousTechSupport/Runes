@@ -1,12 +1,15 @@
 #pragma once
 
-#include <stdio.h>
+#include <fmt/format.h>
+#include <fmt/xchar.h>
+#include <string>
 
-#define RUNES_LOG(message, ...) \
-	do \
-	{ \
-		printf(message "\n", ## __VA_ARGS__); \
-	} while(false)
+#define RUNES_LOG(message, ...)                                                           \
+    do                                                                                    \
+    {                                                                                     \
+        std::wstring _runes_message = fmt::format(L##message, ## __VA_ARGS__);            \
+        printf("%S\n", _runes_message.c_str());                                           \
+    } while(false)
 
 #define RUNES_LOG_INFO(message, ...) RUNES_LOG("[INFO]  " message, ## __VA_ARGS__)
 

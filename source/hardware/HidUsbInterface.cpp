@@ -113,7 +113,7 @@ HardwareErrorCode HidUsbInterface::connect(PortalType type)
 	else
 	{
 		const wchar_t* errorMessage = hid_error(NULL);
-		RUNES_LOG_WARN("hid_open failed with: %S", errorMessage);
+		RUNES_LOG_WARN("hid_open failed with: {}", errorMessage);
 	}
 
 	return _deviceHandle == nullptr ? kHWErrNoPortalFound : kHWErrNoError;
@@ -165,7 +165,7 @@ HardwareErrorCode HidUsbInterface::writeOut(uint8_t buffer[], size_t len)
 	success = HidD_SetOutputReport(_windowsHandle, writeBuffer, sizeof(writeBuffer));
 	if (!success)
 	{
-		RUNES_LOG_FATAL("HidD_SetOutputReport failed with: %d", GetLastError());
+		RUNES_LOG_FATAL("HidD_SetOutputReport failed with: {}", GetLastError());
 	}
 #endif // _WIN32
 
@@ -211,7 +211,7 @@ HardwareErrorCode HidUsbInterface::readIn(uint8_t buffer[], size_t len)
 	else
 	{
 		error = kHWErrGenericReadError;
-		RUNES_LOG_FATAL("hid_read failed with: %S", hid_error(_deviceHandle));
+		RUNES_LOG_FATAL("hid_read failed with: {}", hid_error(_deviceHandle));
 	}
 
 	return error;

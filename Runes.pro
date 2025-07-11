@@ -5,7 +5,7 @@
 TEMPLATE = app
 TARGET = Runes
 QT += widgets gui
-LIBS += -l:libyaml-cpp.a -static -latomic -lhidapi
+LIBS += -static -lfmt -l:libyaml-cpp.a -static -latomic -lhidapi
 DEFINES += YAML_CPP_STATIC_DEFINE HID_API_NO_EXPORT_DEFINE
 
 CONFIG(debug, debug|release) {

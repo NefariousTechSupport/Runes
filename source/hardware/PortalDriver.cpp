@@ -148,7 +148,7 @@ void PortalDriver::PortalThread()
 		}
 		else
 		{
-			RUNES_LOG_WARN("Portal thread took %ld microseconds longer than expected!!", delta.count() - TickPeriod);
+			RUNES_LOG_WARN("Portal thread took {} microseconds longer than expected!!", delta.count() - TickPeriod);
 		}
 	}
 
@@ -174,11 +174,11 @@ HardwareErrorCode PortalDriver::ProcessRead()
 	}
 	_timeoutCounter = 0;
 
-	RUNES_PORTAL_LOG("Received read of %02X %02X %02X %02X %02X %02X", readBuffer[0], readBuffer[1], readBuffer[2], readBuffer[3], readBuffer[4], readBuffer[5]);
+	RUNES_PORTAL_LOG("Received read of {:02X} {:02X} {:02X} {:02X} {:02X} {:02X}", readBuffer[0], readBuffer[1], readBuffer[2], readBuffer[3], readBuffer[4], readBuffer[5]);
 
 	uint8_t writeBuffer[0x20] {};
 
-	RUNES_PORTAL_LOG("Processing state %d", _state.load());
+	RUNES_PORTAL_LOG("Processing state {}", static_cast<int32_t>(_state.load()));
 
 	switch (_state.load())
 	{
@@ -242,7 +242,7 @@ HardwareErrorCode PortalDriver::ProcessRead()
 		case kDriverStateIdle:
 			if (readBuffer[0] == 'S')
 			{
-				RUNES_PORTAL_LOG("Received status report of %02X %02X %02X %02X %02X", readBuffer[1], readBuffer[2], readBuffer[3], readBuffer[4], readBuffer[5]);
+				RUNES_PORTAL_LOG("Received status report of {:02X} {:02X} {:02X} {:02X} {:02X}", readBuffer[1], readBuffer[2], readBuffer[3], readBuffer[4], readBuffer[5]);
 			}
 			break;
 	}
