@@ -193,6 +193,12 @@ HardwareErrorCode PortalDriver::ProcessRead()
 			break;
 
 		case kDriverStateReadyPending:
+			if (readBuffer[0] == 'S')
+			{
+				// Sometimes it just starts out with status
+				_state.store(kDriverStateIdle);
+				break;
+			}
 			if (readBuffer[0] != 'R')
 			{
 				// revert back
@@ -214,6 +220,12 @@ HardwareErrorCode PortalDriver::ProcessRead()
 			break;
 
 		case kDriverStateActivationPending:
+			if (readBuffer[0] == 'S')
+			{
+				// Sometimes it just starts out with status
+				_state.store(kDriverStateIdle);
+				break;
+			}
 			if (readBuffer[0] != 'A')
 			{
 				// revert back
@@ -230,7 +242,7 @@ HardwareErrorCode PortalDriver::ProcessRead()
 		case kDriverStateIdle:
 			if (readBuffer[0] == 'S')
 			{
-				RUNES_PORTAL_LOG("Received status report of %02X %02X %02X %02X %02X", readBuffer[1], readBuffer[2], readBuffer[3], readBuffer[4]);
+				RUNES_PORTAL_LOG("Received status report of %02X %02X %02X %02X %02X", readBuffer[1], readBuffer[2], readBuffer[3], readBuffer[4], readBuffer[5]);
 			}
 			break;
 	}
