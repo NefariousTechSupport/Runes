@@ -33,13 +33,13 @@ private:
 	QSpinBox* _spinExp;
 	QSpinBox* _spinMoney;
 	QSpinBox* _spinHeroPoints;
+	QComboBox* _cmbLevelNumber;
 	QComboBox* _cmbHat;
 	QComboBox* _cmbTrinket;
 	QTextEdit* _txtNickname;
 
 	QLabel* _lblToyName;
 	QLabel* _lblTimePlayed;
-	QLabel* _lblLevel;
 	QLabel* _lblFirstTouched;
 	QLabel* _lblRecentlyTouched;
 	QLabel* _lblWebcode;

@@ -222,8 +222,8 @@ uint8_t Runes::RfidTag::DetermineActiveDataRegionInternal(uint8_t block0, uint8_
 
 		// Prioritise the one with the higher area sequence, we need to
 		// be a bit careful and handle overflows hence we're adding 1
-		     if ((areaSequences[0] + 1) == areaSequences[1]) activeRegion = 1;
-		else if ((areaSequences[1] + 1) == areaSequences[0]) activeRegion = 0;
+		     if (static_cast<uint8_t>(areaSequences[0] + 1) == areaSequences[1]) activeRegion = 1;
+		else if (static_cast<uint8_t>(areaSequences[1] + 1) == areaSequences[0]) activeRegion = 0;
 	}
 	else if (areaPopulated[0] && !areaPopulated[1])
 	{
@@ -237,8 +237,9 @@ uint8_t Runes::RfidTag::DetermineActiveDataRegionInternal(uint8_t block0, uint8_
 	}
 	else if (!areaPopulated[0] && !areaPopulated[1])
 	{
-		// If neither area is populated
-		activeRegion = 0;
+		// If neither area is populated, set it to 1 so that
+		// we write region 0
+		activeRegion = 1;
 	}
 
 

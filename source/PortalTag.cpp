@@ -402,6 +402,9 @@ void Runes::PortalTag::FillOutputFromStoredData()
 	tagData->_recentlyUsed     = this->_recentlyUsed;
 	tagData->_firstUsed        = this->_firstUsed;
 
+	// set region count
+	tagData->_regionCountCoded = 1;
+
 	//Set hat type
 	this->_tagData._hat2011 = kTfbSpyroTag_Hat_NONE;
 	this->_tagData._hat2012 = kTfbSpyroTag_Hat_NONE;

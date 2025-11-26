@@ -53,8 +53,11 @@ RunesMainWidget::RunesMainWidget(QWidget* parent) : QWidget(parent)
 	actSave->setStatusTip(tr("Save a Dump"));
 	connect(actSave, &QAction::triggered, [=]()
 	{
-		FigureTabWidget* figureWidget = (FigureTabWidget*)this->_tabs->currentWidget();
-		figureWidget->_tag->SaveToFile(QFileDialog::getSaveFileName(this, tr("Save Dump File"), "", tr("All Files (*.*)")).toLocal8Bit());
+		FigureTabWidget* figureWidget = static_cast<FigureTabWidget*>(this->_tabs->currentWidget());
+		if (figureWidget != nullptr)
+		{
+			figureWidget->_tag->SaveToFile(QFileDialog::getSaveFileName(this, tr("Save Dump File"), "", tr("All Files (*.*)")).toLocal8Bit());
+		}
 	});
 	menuFile->addAction(actSave);
 	_menuBar->addMenu(menuFile);

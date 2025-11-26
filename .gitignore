@@ -6,12 +6,8 @@ Resources/salt.txt
 .vs
 
 # build files
-Makefile
-Makefile.Debug
-Makefile.Release
-.qmake.stash
-debug
-release
+build
+publish
 
 # figure dumps
 *.dmp
