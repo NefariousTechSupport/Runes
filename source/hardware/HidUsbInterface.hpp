@@ -9,7 +9,7 @@
 #ifndef RUNES_HID_USB_INTERFACE_HPP
 #define RUNES_HID_USB_INTERFACE_HPP
 
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 
 #include "HardwareInterface.hpp"
 

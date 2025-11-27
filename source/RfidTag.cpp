@@ -10,8 +10,22 @@
 #include "RfidTag.hpp"
 
 #include <iostream>
+#include <chrono>
 
 #include "PortalAlgos.hpp"
+#include "RunesDebug.hpp"
+
+
+
+//=============================================================================
+// RfidTag::RfidTag: Constructor
+//=============================================================================
+Runes::RfidTag::RfidTag()
+: _tag()
+, _blocksRead(-1)
+, _blocksRequested(-1)
+{
+}
 
 
 
@@ -168,6 +182,102 @@ bool Runes::RfidTag::SaveBlocks(void* src, uint8_t blockId, uint8_t numBlocks)
 		blocksWritten++;
 	}
 	return blocksWritten == numBlocks;
+}
+
+
+//=============================================================================
+// PortalPrepareRead: Set up the rfid tag to start reading from the portal
+//=============================================================================
+void Runes::RfidTag::PortalPrepareRead()
+{
+	_blocksRead = 0x0;
+	_blocksRequested = 0x0;
+}
+
+
+//=============================================================================
+// PortalFinishRead: has this rfid tag finished reading?
+//=============================================================================
+bool Runes::RfidTag::PortalFinishedRead()
+{
+	return _blocksRead == NUM_BLOCKS;
+}
+
+
+//=============================================================================
+// PortalClearData: stores the raw content of a block
+//=============================================================================
+void Runes::RfidTag::PortalClearData()
+{
+	_blocksRead = -1;
+	_blocksRequested = -1;
+}
+
+
+//=============================================================================
+// PortalFillBlock: stores the raw content of a block
+//=============================================================================
+void Runes::RfidTag::PortalFillBlock(void* src)
+{
+	RUNES_ASSERT(_blocksRead < NUM_BLOCKS, "number of blocks isn't valid");
+
+	memcpy(&_tag[_blocksRead * BLOCK_SIZE], src, BLOCK_SIZE);
+	RUNES_LOG_INFO("Filling block {}", _blocksRead.load());
+	_blocksRead++;
+}
+
+
+//=============================================================================
+// PortalMarkBlockRequested: Marks a block as requested
+//=============================================================================
+void Runes::RfidTag::PortalMarkBlockRequested(uint8_t blockId)
+{
+	if (blockId == _blocksRead)
+	{
+		_blocksRequested = blockId + 1;
+		_queryTimestamp = std::chrono::steady_clock::now();
+		RUNES_LOG_INFO("Marking block requested is now {}", _blocksRequested.load());
+	}
+}
+
+
+//=============================================================================
+// PortalCancelBlockRequest: Cancels a requested block
+//=============================================================================
+void Runes::RfidTag::PortalCancelBlockRequest(uint8_t blockId)
+{
+	if (blockId == _blocksRead)
+	{
+		_blocksRequested.store(_blocksRead.load());
+		RUNES_LOG_INFO("Cancelling block requested is now {}", _blocksRequested.load());
+	}
+}
+
+
+//=============================================================================
+// PortalBlocksFilled: Returns the number of blocks read
+//=============================================================================
+uint8_t Runes::RfidTag::PortalBlocksFilled()
+{
+	return _blocksRead;
+}
+
+
+//=============================================================================
+// PortalBlocksFilled: Returns the number of blocks read
+//=============================================================================
+uint8_t Runes::RfidTag::PortalBlocksRequested()
+{
+	return _blocksRequested;
+}
+
+
+//=============================================================================
+// PortalGetQueriedTimestamp: Gets the last timestamp that was queried
+//=============================================================================
+uint32_t Runes::RfidTag::PortalTimeSinceQuery()
+{
+	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _queryTimestamp).count();
 }
 
 

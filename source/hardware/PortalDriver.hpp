@@ -12,8 +12,10 @@
 #include <cstdint>
 #include <thread>
 #include <atomic>
+#include <array>
 
 #include "HardwareInterface.hpp"
+#include "PortalTag.hpp"
 
 namespace Runes::Portal
 {
@@ -48,9 +50,9 @@ namespace Runes::Portal
 
 		void                           PortalThread();
 
-		HardwareErrorCode              ProcessRead();
+		HardwareErrorCode              ProcessRead(uint8_t writeBuffer[0x20], uint8_t* writeBufferLen);
 
-		HardwareErrorCode              ProcessColour();
+		HardwareErrorCode              ProcessColour(uint8_t writeBuffer[0x20], uint8_t* writeBufferLen);
 
 		// Do NOT expose this at all, this must belong to the portal thread,
 		// The only time the main thread can interact with it is to set up
@@ -67,6 +69,9 @@ namespace Runes::Portal
 		uint8_t                        _timeoutCounter;
 
 		uint8_t                        _version[4];
+
+		uint8_t                        _lastStatusId;
+		std::array<Runes::PortalTag, 16> _tags;
 	};
 }
 

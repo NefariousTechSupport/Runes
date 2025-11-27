@@ -17,10 +17,15 @@
 
 #define RUNES_LOG_FATAL(message, ...) RUNES_LOG("[FATAL] " message, ## __VA_ARGS__)
 
+#if _MSC_VER
+#define RUNES_BREAK() \
+	__debugbreak
+#else
 #define RUNES_BREAK() \
 	/* int3 is the x86 instruction to break, nop is there so the debugger */ \
 	/* actually knows to stop on this line and not the next               */ \
 	__asm volatile("int3\nnop")
+#endif // _MSC_VER
 
 #define RUNES_CRASH() \
 	*(uint8_t*)0 = 0

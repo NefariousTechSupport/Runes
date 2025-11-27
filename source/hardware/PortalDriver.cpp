@@ -13,7 +13,6 @@
 #include "HidUsbInterface.hpp"
 
 #include <chrono>
-#include <unistd.h>
 
 using namespace Runes::Portal;
 
@@ -33,11 +32,17 @@ static constexpr uint32_t TickPeriod = 20000u;
 PortalDriver::PortalDriver()
 : _interface(nullptr)
 , _state(kDriverStateNotConnected)
-, _colour({0, 0, 0})
+, _colour()
 , _thread()
 , _timeoutCounter(0)
-, _version({0, 0, 0, 0})
+, _version()
+, _lastStatusId(0)
+, _tags()
 {
+	for (uint8_t t = 0; t < _tags.size(); t++)
+	{
+		_tags[t]._rfidTag = new RfidTag();
+	}
 }
 
 
@@ -72,7 +77,7 @@ HardwareErrorCode PortalDriver::Connect()
 	{
 		_state.store(kDriverStateReadyBegin);
 		// Kick off the thread
-		_thread = std::thread(PortalThread, this);
+		_thread = std::thread(&PortalDriver::PortalThread, this);
 	}
 	else
 	{
@@ -115,10 +120,12 @@ void PortalDriver::PortalThread()
 	while(_interface->connected())
 	{
 		const auto start = std::chrono::steady_clock::now();
+		uint8_t writeBuffer[0x20];
+		uint8_t writeBufferLen = 0;
 
 		HardwareErrorCode error;
 
-		error = ProcessRead();
+		error = ProcessRead(writeBuffer, &writeBufferLen);
 		if (error != kHWErrNoError)
 		{
 			if (error == kHWErrReadTimedOut)
@@ -133,10 +140,18 @@ void PortalDriver::PortalThread()
 		}
 		_timeoutCounter = 0;
 
-		error = ProcessColour();
-		if (error != kHWErrNoError)
+		if (writeBufferLen == 0)
 		{
-			continue;
+			error = ProcessColour(writeBuffer, &writeBufferLen);
+			if (error != kHWErrNoError)
+			{
+				continue;
+			}
+		}
+
+		if (writeBufferLen != 0)
+		{
+			_interface->writeOut(writeBuffer, writeBufferLen);
 		}
 
 		const auto end = std::chrono::steady_clock::now();
@@ -144,7 +159,7 @@ void PortalDriver::PortalThread()
 		const std::chrono::microseconds delta = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 		if (delta.count() < TickPeriod)
 		{
-			usleep(TickPeriod - delta.count());
+			std::this_thread::sleep_for(std::chrono::microseconds(TickPeriod - delta.count()));
 		}
 		else
 		{
@@ -164,7 +179,7 @@ void PortalDriver::PortalThread()
 //=============================================================================
 // ProcessRead: Handle reads from the portal
 //=============================================================================
-HardwareErrorCode PortalDriver::ProcessRead()
+HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* writeBufferLen)
 {
 	uint8_t readBuffer[0x20];
 	HardwareErrorCode error = _interface->readIn(readBuffer, sizeof(readBuffer));
@@ -172,13 +187,9 @@ HardwareErrorCode PortalDriver::ProcessRead()
 	{
 		return error;
 	}
-	_timeoutCounter = 0;
-
+	if (readBuffer[0] == 'Q')
 	RUNES_PORTAL_LOG("Received read of {:02X} {:02X} {:02X} {:02X} {:02X} {:02X}", readBuffer[0], readBuffer[1], readBuffer[2], readBuffer[3], readBuffer[4], readBuffer[5]);
-
-	uint8_t writeBuffer[0x20] {};
-
-	RUNES_PORTAL_LOG("Processing state {}", static_cast<int32_t>(_state.load()));
+	_timeoutCounter = 0;
 
 	switch (_state.load())
 	{
@@ -188,17 +199,11 @@ HardwareErrorCode PortalDriver::ProcessRead()
 
 		case kDriverStateReadyBegin:
 			writeBuffer[0] = 'R';
-			error = _interface->writeOut(writeBuffer, 0x1);
+			*writeBufferLen = 1;
 			_state.store(kDriverStateReadyPending);
 			break;
 
 		case kDriverStateReadyPending:
-			if (readBuffer[0] == 'S')
-			{
-				// Sometimes it just starts out with status
-				_state.store(kDriverStateIdle);
-				break;
-			}
 			if (readBuffer[0] != 'R')
 			{
 				// revert back
@@ -215,34 +220,74 @@ HardwareErrorCode PortalDriver::ProcessRead()
 		case kDriverStateActivationBegin:
 			writeBuffer[0] = 'A';
 			writeBuffer[1] = 0x01;
-			error = _interface->writeOut(writeBuffer, 0x2);
+			*writeBufferLen = 2;
 			_state.store(kDriverStateActivationPending);
 			break;
 
 		case kDriverStateActivationPending:
-			if (readBuffer[0] == 'S')
-			{
-				// Sometimes it just starts out with status
-				_state.store(kDriverStateIdle);
-				break;
-			}
 			if (readBuffer[0] != 'A')
 			{
 				// revert back
 				_state.store(kDriverStateActivationBegin);
 				break;
 			}
-			_version[0] = readBuffer[1];
-			_version[1] = readBuffer[2];
-			_version[2] = readBuffer[3];
-			_version[3] = readBuffer[4];
+			// idk how this response data is structured
 			_state.store(kDriverStateIdle);
 			break;
 
 		case kDriverStateIdle:
-			if (readBuffer[0] == 'S')
+			if (readBuffer[0] == 'Q')
 			{
-				RUNES_PORTAL_LOG("Received status report of {:02X} {:02X} {:02X} {:02X} {:02X}", readBuffer[1], readBuffer[2], readBuffer[3], readBuffer[4], readBuffer[5]);
+				uint8_t requestedFigure = readBuffer[1] & 0xF;
+				bool readFigure = readBuffer[1] & 0x10;
+				uint8_t requestedBlock  = readBuffer[2];
+				RfidTag* rfidTag = _tags[requestedFigure]._rfidTag;
+				if (readFigure && requestedBlock == rfidTag->PortalBlocksFilled())
+				{
+					rfidTag->PortalFillBlock(&readBuffer[3]);
+				}
+				else if (!readFigure)
+				{
+					rfidTag->PortalCancelBlockRequest(requestedBlock);
+				}
+			}
+			else if (readBuffer[0] == 'S')
+			{
+				uint32_t status = (readBuffer[4] << 24) | (readBuffer[3] << 16) | (readBuffer[2] << 8) | (readBuffer[1]);
+				_lastStatusId = readBuffer[5];
+
+				for (uint8_t s = 0; s < _tags.size(); s++)
+				{
+					uint8_t statusItem = (status >> s) & 0b11;
+					switch(statusItem)
+					{
+						case 0b00:
+							break;
+						case 0b01:
+							{
+								Runes::RfidTag* rfidTag = _tags[s]._rfidTag;
+								uint8_t blockToRead = rfidTag->PortalBlocksFilled();
+								bool shouldRequest = rfidTag->PortalBlocksRequested() == rfidTag->PortalBlocksFilled() + 1;
+								if (!rfidTag->PortalFinishedRead()
+								 && shouldRequest)
+								{
+									RUNES_LOG_INFO("block to read is {}; blocks requested is {}; blocks filled is {}", blockToRead, rfidTag->PortalBlocksRequested(), rfidTag->PortalBlocksFilled());
+									rfidTag->PortalMarkBlockRequested(blockToRead);
+									writeBuffer[0] = 'Q';
+									writeBuffer[1] = s;
+									writeBuffer[2] = blockToRead;
+									*writeBufferLen = 3;
+								}
+							}
+							break;
+						case 0b10:
+							_tags[s]._rfidTag->PortalClearData();
+							break;
+						case 0b11:
+							_tags[s]._rfidTag->PortalPrepareRead();
+							break;
+					}
+				}
 			}
 			break;
 	}
@@ -255,15 +300,15 @@ HardwareErrorCode PortalDriver::ProcessRead()
 //=============================================================================
 // ProcessColour: Write out the current colour
 //=============================================================================
-HardwareErrorCode PortalDriver::ProcessColour()
+HardwareErrorCode PortalDriver::ProcessColour(uint8_t writeBuffer[0x20], uint8_t* writeBufferLen)
 {
 	PortalLEDColour colour = _colour.load();
 
-	uint8_t writeBuffer[0x20]{};
 	writeBuffer[0] = 'C';
 	writeBuffer[1] = colour._red;
 	writeBuffer[2] = colour._green;
 	writeBuffer[3] = colour._blue;
+	*writeBufferLen = 4;
 
-	return _interface->writeOut(writeBuffer, sizeof(writeBuffer));
+	return kHWErrNoError;
 }

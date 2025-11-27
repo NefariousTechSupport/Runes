@@ -22,7 +22,7 @@
 
 using namespace Runes::Portal;
 
-
+#undef min
 
 
 
@@ -156,7 +156,7 @@ HardwareErrorCode HidUsbInterface::writeOut(uint8_t buffer[], size_t len)
 	RUNES_ASSERT(_deviceHandle != nullptr, "No device handle exists");
 	RUNES_ASSERT(len <= EP0WriteSize, "Write buffer is too large!!");
 
-	uint8_t writeBuffer[EP0WriteSize+1];
+	uint8_t writeBuffer[EP0WriteSize+1] = {};
 	writeBuffer[0] = 0;
 	memcpy(&writeBuffer[1], buffer, std::min(EP0WriteSize, len));
 
