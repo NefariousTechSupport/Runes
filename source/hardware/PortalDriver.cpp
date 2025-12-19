@@ -267,7 +267,8 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 							{
 								Runes::RfidTag* rfidTag = _tags[s]._rfidTag;
 								uint8_t blockToRead = rfidTag->PortalBlocksFilled();
-								bool shouldRequest = rfidTag->PortalBlocksRequested() == rfidTag->PortalBlocksFilled() + 1;
+								bool shouldRequest = rfidTag->PortalBlocksRequested() == blockToRead;
+
 								if (!rfidTag->PortalFinishedRead()
 								 && shouldRequest)
 								{
