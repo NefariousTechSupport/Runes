@@ -258,7 +258,7 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 
 				for (uint8_t s = 0; s < _tags.size(); s++)
 				{
-					uint8_t statusItem = (status >> s) & 0b11;
+					uint8_t statusItem = (status >> (s * 2)) & 0b11;
 					switch(statusItem)
 					{
 						case 0b00:
