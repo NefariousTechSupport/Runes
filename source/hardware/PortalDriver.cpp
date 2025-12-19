@@ -22,8 +22,6 @@ using namespace Runes::Portal;
 #define RUNES_PORTAL_LOG(fmt, ...)
 #endif
 
-// How often the portal should tick in microseconds
-static constexpr uint32_t TickPeriod = 20000u;
 
 
 //=============================================================================
@@ -119,7 +117,6 @@ void PortalDriver::PortalThread()
 
 	while(_interface->connected())
 	{
-		const auto start = std::chrono::steady_clock::now();
 		uint8_t writeBuffer[0x20];
 		uint8_t writeBufferLen = 0;
 
@@ -151,19 +148,8 @@ void PortalDriver::PortalThread()
 
 		if (writeBufferLen != 0)
 		{
+			RUNES_LOG_INFO("writing {:02X} command", writeBuffer[0]);
 			_interface->writeOut(writeBuffer, writeBufferLen);
-		}
-
-		const auto end = std::chrono::steady_clock::now();
-
-		const std::chrono::microseconds delta = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-		if (delta.count() < TickPeriod)
-		{
-			std::this_thread::sleep_for(std::chrono::microseconds(TickPeriod - delta.count()));
-		}
-		else
-		{
-			RUNES_LOG_WARN("Portal thread took {} microseconds longer than expected!!", delta.count() - TickPeriod);
 		}
 	}
 
