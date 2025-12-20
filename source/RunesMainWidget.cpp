@@ -113,7 +113,7 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 
 	QTimer* driverTimer = new QTimer(this);
 	connect(driverTimer, SIGNAL(timeout()), this, SLOT(PumpDriver()));
-	driverTimer->start(100);
+	driverTimer->start(50);
 }
 
 void RunesMainWidget::PumpDriver()
