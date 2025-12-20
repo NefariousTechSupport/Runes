@@ -89,6 +89,63 @@ HardwareErrorCode PortalDriver::Connect()
 
 
 //=============================================================================
+// Pump: Manage state and dispatch events on the correct thread
+//=============================================================================
+void PortalDriver::Pump()
+{
+	std::queue<QueuedEvent*> queueCopy;
+
+	_eventQueueMutex.lock();
+	if (!_eventQueue.empty())
+	{
+		queueCopy = _eventQueue;
+		// Clear the queue
+		_eventQueue = std::queue<QueuedEvent*>();
+	}
+	_eventQueueMutex.unlock();
+
+	// process the copy
+	while (!queueCopy.empty())
+	{
+		QueuedEvent* event = queueCopy.front();
+		queueCopy.pop();
+
+		switch(event->_type)
+		{
+			case kEventTypeNone:
+				break;
+			case kEventTypeFigurePlaced:
+			{
+				QueuedEventFigurePlaced* fpEvent = static_cast<QueuedEventFigurePlaced*>(event);
+				_tagPlacedEvent.Invoke(fpEvent->_data);
+				delete fpEvent;
+				break;
+			}
+			case kEventTypeFigureReadComplete:
+			{
+				QueuedEventFigureReadComplete* frcEvent = static_cast<QueuedEventFigureReadComplete*>(event);
+				PortalTag& tag = _tags[frcEvent->_data];
+				tag.StoreHeader();
+				tag.StoreMagicMoment();
+				tag.StoreRemainingData();
+				_tagReadFinishedEvent.Invoke(frcEvent->_data, tag);
+				delete frcEvent;
+				break;
+			}
+			case kEventTypeFigureRemoved:
+			{
+				QueuedEventFigureRemoved* frEvent = static_cast<QueuedEventFigureRemoved*>(event);
+				_tagRemovedEvent.Invoke(frEvent->_data);
+				delete frEvent;
+				break;
+			}
+		}
+	}
+}
+
+
+
+//=============================================================================
 // QueueColour: Queues a colour to be sent to the portal
 //=============================================================================
 void PortalDriver::QueueColour(PortalLEDColour colour)
@@ -236,6 +293,11 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 				{
 					rfidTag->PortalCancelBlockRequest(requestedBlock);
 				}
+
+				if (rfidTag->PortalFinishedRead())
+				{
+					QueueEvent(new QueuedEventFigureReadComplete(requestedFigure));
+				}
 			}
 			else if (readBuffer[0] == 'S')
 			{
@@ -269,9 +331,11 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 							break;
 						case 0b10:
 							_tags[s]._rfidTag->PortalClearData();
+							QueueEvent(new QueuedEventFigureRemoved(s));
 							break;
 						case 0b11:
 							_tags[s]._rfidTag->PortalPrepareRead();
+							QueueEvent(new QueuedEventFigurePlaced(s));
 							break;
 					}
 				}
@@ -298,4 +362,13 @@ HardwareErrorCode PortalDriver::ProcessColour(uint8_t writeBuffer[0x20], uint8_t
 	*writeBufferLen = 4;
 
 	return kHWErrNoError;
+}
+
+
+
+void PortalDriver::QueueEvent(QueuedEvent* event)
+{
+	_eventQueueMutex.lock();
+	_eventQueue.push(event);
+	_eventQueueMutex.unlock();
 }
