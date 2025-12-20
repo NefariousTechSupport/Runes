@@ -7,12 +7,24 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QApplication>
+#include <QTimer>
+
+#include "Hardware/PortalDriver.hpp"
 
 #include "FigureTabWidget.hpp"
 #include "PortalDebuggerWidget.hpp"
 #include "PortalAlgos.hpp"
+#include "RunesDebug.hpp"
 
-RunesMainWidget::RunesMainWidget(QWidget* parent) : QWidget(parent)
+RunesMainWidget::RunesMainWidget(QWidget* parent)
+: QWidget(parent)
+, _tabs(nullptr)
+, _realFigures()
+, _root(nullptr)
+, _menuBar(nullptr)
+, _driver(nullptr)
+, _readTagEventId(Runes::kInvalidEventListenerID)
+, _removeTagEventId(Runes::kInvalidEventListenerID)
 {
 	QVBoxLayout* root = new QVBoxLayout(this);
 
@@ -43,7 +55,7 @@ RunesMainWidget::RunesMainWidget(QWidget* parent) : QWidget(parent)
 			Runes::PortalTag* tag = new Runes::PortalTag();
 			tag->_rfidTag = new Runes::RfidTag();
 			tag->ReadFromFile(sourceFile.toLocal8Bit());
-			int tabIndex = this->_tabs->addTab(new FigureTabWidget(tag, sourceFile.toLocal8Bit(), _tabs), tr("Figure File"));
+			int tabIndex = this->_tabs->addTab(new FigureTabWidget(tag, _tabs), tr("Figure File"));
 			this->_tabs->setCurrentIndex(tabIndex);
 		}
 	});
@@ -78,4 +90,33 @@ RunesMainWidget::RunesMainWidget(QWidget* parent) : QWidget(parent)
 	setLayout(root);
 	layout()->setMenuBar(_menuBar);
 	setWindowTitle(tr("Runes"));
+
+	_driver = new Runes::Portal::PortalDriver();
+	Runes::Portal::HardwareErrorCode errorCode = _driver->Connect();
+	if (errorCode == Runes::Portal::kHWErrNoError)
+	{
+		_readTagEventId = _driver->GetTagReadFinishedEvent().AddListener([=](uint8_t index, Runes::PortalTag& newTag)
+		{
+			FigureTabWidget* widget = new FigureTabWidget(&newTag, _tabs);
+			_realFigures[index] = widget;
+			int tabIndex = this->_tabs->addTab(widget, QString("Real Figure %1").arg(index));
+			this->_tabs->setCurrentIndex(tabIndex);
+		});
+
+		_removeTagEventId = _driver->GetTagRemovedEvent().AddListener([=](uint8_t index)
+		{
+			FigureTabWidget* widget = _realFigures[index];
+
+			this->_tabs->removeTab(this->_tabs->indexOf(widget));
+		});
+	}
+
+	QTimer* driverTimer = new QTimer(this);
+	connect(driverTimer, SIGNAL(timeout()), this, SLOT(PumpDriver()));
+	driverTimer->start(100);
+}
+
+void RunesMainWidget::PumpDriver()
+{
+	_driver->Pump();
 }
