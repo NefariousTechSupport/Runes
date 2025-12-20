@@ -52,11 +52,17 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 
 		if (!sourceFile.isEmpty())
 		{
+			FigureTabWidget* widget = new FigureTabWidget(_tabs);
+			int tabIndex = this->_tabs->addTab(widget, tr("Figure File"));
+
 			Runes::PortalTag* tag = new Runes::PortalTag();
 			tag->_rfidTag = new Runes::RfidTag();
 			tag->ReadFromFile(sourceFile.toLocal8Bit());
-			int tabIndex = this->_tabs->addTab(new FigureTabWidget(tag, _tabs), tr("Figure File"));
+
+			widget->Initialize(tag);
+
 			this->_tabs->setCurrentIndex(tabIndex);
+
 		}
 	});
 	menuFile->addAction(actOpen);
@@ -95,12 +101,19 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 	Runes::Portal::HardwareErrorCode errorCode = _driver->Connect();
 	if (errorCode == Runes::Portal::kHWErrNoError)
 	{
-		_readTagEventId = _driver->GetTagReadFinishedEvent().AddListener([=](uint8_t index, Runes::PortalTag& newTag)
+		_readTagEventId = _driver->GetTagPlacedEvent().AddListener([=](uint8_t index)
 		{
-			FigureTabWidget* widget = new FigureTabWidget(&newTag, _tabs);
+			FigureTabWidget* widget = new FigureTabWidget(_tabs);
 			_realFigures[index] = widget;
 			int tabIndex = this->_tabs->addTab(widget, QString("Real Figure %1").arg(index));
 			this->_tabs->setCurrentIndex(tabIndex);
+		});
+
+		_readTagEventId = _driver->GetTagReadFinishedEvent().AddListener([=](uint8_t index, Runes::PortalTag& newTag)
+		{
+			FigureTabWidget* widget = _realFigures[index];
+
+			widget->Initialize(&newTag);
 		});
 
 		_removeTagEventId = _driver->GetTagRemovedEvent().AddListener([=](uint8_t index)

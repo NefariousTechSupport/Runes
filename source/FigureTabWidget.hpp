@@ -17,8 +17,9 @@ class FigureTabWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit FigureTabWidget(Runes::PortalTag* tag, QWidget* parent = nullptr);
+	explicit FigureTabWidget(QWidget* parent = nullptr);
 	virtual ~FigureTabWidget();
+	void Initialize(Runes::PortalTag* tag);
 	Runes::PortalTag* _tag;
 
 private:
@@ -85,4 +86,6 @@ private:
 	QCheckBox*   _chkUG_WowPow;
 
 	QListWidget* _lstHeroics;
+
+	QLabel* _lblLoading;
 };

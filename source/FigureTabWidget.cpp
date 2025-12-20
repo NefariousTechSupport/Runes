@@ -25,6 +25,7 @@
 #include "kTfbSpyroTag_HatType.hpp"
 #include "kTfbSpyroTag_TrinketType.hpp"
 #include "Constants.hpp"
+#include "RunesDebug.hpp"
 #include "HeroicsNames.hpp"
 #include "toydata.hpp"
 
@@ -35,7 +36,7 @@
 //=============================================================================
 // FigureTabWidget: Constructor for the FigureTabWidget.
 //=============================================================================
-FigureTabWidget::FigureTabWidget(Runes::PortalTag* tag, QWidget* parent)
+FigureTabWidget::FigureTabWidget(QWidget* parent)
 : QWidget(parent)
 , _tag(nullptr)
 , _spinExp(nullptr)
@@ -90,31 +91,37 @@ FigureTabWidget::FigureTabWidget(Runes::PortalTag* tag, QWidget* parent)
 , _chkUG_WowPow(nullptr)
 , _lstHeroics(nullptr)
 {
-	this->_tag = tag;
-
-	ESkylandersGame game;
-	bool fullAltDeco;
-	bool repose;
-	bool lightcore;
-	kTfbSpyroTag_DecoID decoId;
-	tag->DecodeSubtype(&game, &fullAltDeco, &repose, &lightcore, &decoId);
-	if (game >= eSG_Skylanders2016)
-	{
-		// Throw a warning to let the user know that this may irreversably destroy their figure.
-
-		QMessageBox::warning(
-			this,
-			"Imaginators Figure Detected!",
-			"<h1>Warning!</h1>\n\n"
-			"Imaginators figures are digitally signed in such a way that we are not able to regenerate.\n"
-			"it's possible that Runes will overwrite this signature, <b>permanently</b> corrupting the figure if you don't have a backup.\n"
-			"<h1>Proceed with caution and keep plenty of backups!!!!</h1>\n"
-			"I, NefariousTechSupport, am not responsible for any figures that are broken",
-			QMessageBox::StandardButton::Ok,
-			QMessageBox::StandardButton::NoButton);
-	}
-
 	QGridLayout* root = new QGridLayout(this);
+
+	_lblLoading = new QLabel(this);
+	_lblLoading->setText(tr("<b>Reading...</b>"));
+
+	root->addWidget(_lblLoading);
+
+	setLayout(root);
+}
+
+
+//=============================================================================
+// ~FigureTabWidget: Destructor for the FigureTabWidget.
+//=============================================================================
+FigureTabWidget::~FigureTabWidget()
+{
+	if (_tag)
+	{
+		delete _tag;
+	}
+}
+
+
+void FigureTabWidget::Initialize(Runes::PortalTag* tag)
+{
+	_tag = tag;
+
+	QGridLayout* root = dynamic_cast<QGridLayout*>(layout());
+	RUNES_ASSERT(root != nullptr, "FigureTabWidget layout changed and wasn't updated in Initialize");
+	// Hide loading text
+	_lblLoading->setText(QString());
 
 	this->_lblToyName = new QLabel(this);
 	this->_lblToyName->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
@@ -241,23 +248,7 @@ FigureTabWidget::FigureTabWidget(Runes::PortalTag* tag, QWidget* parent)
 	root->setColumnMinimumWidth(2, 224);
 	root->setColumnMinimumWidth(3, 128);
 
-	setLayout(root);
-	
-	setWindowTitle(tr("Runes"));
-
 	updateFields();
-}
-
-
-//=============================================================================
-// ~FigureTabWidget: Destructor for the FigureTabWidget.
-//=============================================================================
-FigureTabWidget::~FigureTabWidget()
-{
-	if (_tag)
-	{
-		delete _tag;
-	}
 }
 
 
