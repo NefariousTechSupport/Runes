@@ -186,7 +186,6 @@ FigureTabWidget::FigureTabWidget(Runes::PortalTag* tag, QWidget* parent)
 		this->_spinExp->setValue(this->_tag->_exp);
 		this->_spinExp->blockSignals(false);
 	});
-	root->addWidget(new QLabel(tr("Level"), this), basicRow + 3, 0);
 
 	this->_lblTimePlayed = new QLabel(tr("Time Played: N/A"), this);
 	this->_lblFirstTouched = new QLabel(tr("First Touched: N/A"), this);
