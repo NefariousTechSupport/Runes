@@ -17,13 +17,11 @@ class FigureTabWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit FigureTabWidget(Runes::PortalTag* tag, const char* fileName, QWidget* parent = nullptr);
+	explicit FigureTabWidget(Runes::PortalTag* tag, QWidget* parent = nullptr);
 	virtual ~FigureTabWidget();
 	Runes::PortalTag* _tag;
 
 private:
-	QString _sourceFile;
-
 	void updateFields();
 	void updateLevelNumber();
 	void initGiantsQuests();

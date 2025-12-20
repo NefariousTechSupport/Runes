@@ -35,10 +35,9 @@
 //=============================================================================
 // FigureTabWidget: Constructor for the FigureTabWidget.
 //=============================================================================
-FigureTabWidget::FigureTabWidget(Runes::PortalTag* tag, const char* fileName, QWidget* parent) : QWidget(parent)
+FigureTabWidget::FigureTabWidget(Runes::PortalTag* tag, QWidget* parent) : QWidget(parent)
 {
 	this->_tag = tag;
-	this->_sourceFile = QString(fileName);
 
 	ESkylandersGame game;
 	bool fullAltDeco;
