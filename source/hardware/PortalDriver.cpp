@@ -16,12 +16,6 @@
 
 using namespace Runes::Portal;
 
-#if 1
-#define RUNES_PORTAL_LOG(fmt, ...) RUNES_LOG_INFO(fmt, ## __VA_ARGS__)
-#else
-#define RUNES_PORTAL_LOG(fmt, ...)
-#endif
-
 
 
 //=============================================================================
@@ -205,7 +199,6 @@ void PortalDriver::PortalThread()
 
 		if (writeBufferLen != 0)
 		{
-			RUNES_LOG_INFO("writing {:02X} command", writeBuffer[0]);
 			_interface->writeOut(writeBuffer, writeBufferLen);
 		}
 	}
@@ -230,8 +223,6 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 	{
 		return error;
 	}
-	if (readBuffer[0] == 'Q')
-	RUNES_PORTAL_LOG("Received read of {:02X} {:02X} {:02X} {:02X} {:02X} {:02X}", readBuffer[0], readBuffer[1], readBuffer[2], readBuffer[3], readBuffer[4], readBuffer[5]);
 	_timeoutCounter = 0;
 
 	switch (_state.load())
@@ -320,7 +311,6 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 								if (!rfidTag->PortalFinishedRead()
 								 && shouldRequest)
 								{
-									RUNES_LOG_INFO("block to read is {}; blocks requested is {}; blocks filled is {}", blockToRead, rfidTag->PortalBlocksRequested(), rfidTag->PortalBlocksFilled());
 									rfidTag->PortalMarkBlockRequested(blockToRead);
 									writeBuffer[0] = 'Q';
 									writeBuffer[1] = s;

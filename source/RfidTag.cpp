@@ -222,7 +222,6 @@ void Runes::RfidTag::PortalFillBlock(void* src)
 	RUNES_ASSERT(_blocksRead < NUM_BLOCKS, "number of blocks isn't valid");
 
 	memcpy(&_tag[_blocksRead * BLOCK_SIZE], src, BLOCK_SIZE);
-	RUNES_LOG_INFO("Filling block {}", _blocksRead.load());
 	_blocksRead++;
 }
 
@@ -236,7 +235,6 @@ void Runes::RfidTag::PortalMarkBlockRequested(uint8_t blockId)
 	{
 		_blocksRequested = blockId + 1;
 		_queryTimestamp = std::chrono::steady_clock::now();
-		RUNES_LOG_INFO("Marking block requested is now {}", _blocksRequested.load());
 	}
 }
 
