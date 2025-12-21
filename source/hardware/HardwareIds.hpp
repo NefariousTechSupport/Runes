@@ -11,14 +11,10 @@
 
 #include <cstdint>
 
-#define kDefaultPortalVID 0x1430
+#define kPortalVID 0x1430
 #define kDefaultPortalPID 0x0150
-
-#define kXbox360PortalVID 0x1430
 #define kXbox360PortalPID 0x1F17
-
 // Unimplemented
-#define kXboxOnePortalVID 0x1430
 #define kXboxOnePortalPID 0xFFFF
 
 #define kBluetoothPortalShortServiceUUID "1530"

@@ -36,5 +36,5 @@ HardwareInterface::~HardwareInterface()
 //=============================================================================
 bool HardwareInterface::connected() const
 {
-	return _state == kStateConnected;
+	return _state.load() == kStateConnected;
 }

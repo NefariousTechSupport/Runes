@@ -36,8 +36,6 @@ namespace Runes::Portal
 		explicit PortalDriver();
 		~PortalDriver();
 
-		HardwareErrorCode Connect();
-
 		void Pump();
 
 		void QueueColour(PortalLEDColour colour);
@@ -87,6 +85,8 @@ namespace Runes::Portal
 		typedef QueuedEventDataByte<kEventTypeFigureReadComplete> QueuedEventFigureReadComplete;
 		typedef QueuedEventDataByte<kEventTypeFigureRemoved>      QueuedEventFigureRemoved;
 
+		void                           MainThreadPollDevices();
+		void                           MainThreadPumpQueue();
 
 		void                           PortalThread();
 
@@ -108,7 +108,7 @@ namespace Runes::Portal
 
 		// Ensure this is after _interface, as this ensures it's destroyed before _interface
 		std::thread                    _thread;
-		uint8_t                        _timeoutCounter;
+		uint8_t                        _errorCounter;
 
 		uint8_t                        _version[4];
 

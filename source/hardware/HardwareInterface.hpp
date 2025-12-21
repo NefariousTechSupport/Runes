@@ -9,6 +9,7 @@
 #ifndef RUNES_HARDWARE_INTERFACE_HPP
 #define RUNES_HARDWARE_INTERFACE_HPP
 
+#include <atomic>
 #include <stdint.h>
 
 #include "PortalType.hpp"
@@ -36,7 +37,6 @@ namespace Runes::Portal
 
 		bool connected() const;
 
-		virtual HardwareErrorCode connect(PortalType type) = 0;
 		virtual void disconnect() = 0;
 		virtual HardwareErrorCode writeOut(uint8_t buffer[], size_t len) = 0;
 		virtual HardwareErrorCode writeOutEp1(uint8_t buffer[], size_t len) = 0;
@@ -53,7 +53,7 @@ namespace Runes::Portal
 		static constexpr size_t EP0WriteSize = 0x20;
 		static constexpr size_t EP0ReadSize  = 0x20;
 
-		State                          _state;
+		std::atomic<State>              _state;
 	};
 }
 

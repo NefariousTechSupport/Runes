@@ -21,11 +21,13 @@ namespace Runes::Portal
 		HidUsbInterface();
 		virtual ~HidUsbInterface() final;
 
-		virtual HardwareErrorCode connect(PortalType type) final;
+		HardwareErrorCode connect(hid_device_info* deviceInfo);
 		virtual void disconnect() final;
 		virtual HardwareErrorCode writeOut(uint8_t buffer[], size_t len) final;
 		virtual HardwareErrorCode writeOutEp1(uint8_t buffer[], size_t len) final;
 		virtual HardwareErrorCode readIn(uint8_t buffer[], size_t len) final;
+
+		static HidUsbInterface* poll();
 
 	private:
 		hid_device*                    _deviceHandle;

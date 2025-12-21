@@ -26,11 +26,6 @@ PortalDebuggerWidget::PortalDebuggerWidget(QWidget* parent /* = nullptr */)
 
 	QPushButton* btnConnect = new QPushButton(this);
 	btnConnect->setText(tr("Connect"));
-	connect(btnConnect, &QPushButton::pressed, [this]()
-	{
-		auto error = _driver->Connect();
-		RUNES_ASSERT(error == Runes::Portal::HardwareErrorCode::kHWErrNoError, "Errored!!!");
-	});
 	layout()->addWidget(btnConnect);
 
 	QPushButton* btnRed = new QPushButton(this);

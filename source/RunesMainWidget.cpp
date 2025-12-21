@@ -98,38 +98,35 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 	setWindowTitle(tr("Runes"));
 
 	_driver = new Runes::Portal::PortalDriver();
-	Runes::Portal::HardwareErrorCode errorCode = _driver->Connect();
-	if (errorCode == Runes::Portal::kHWErrNoError)
+
+	_readTagEventId = _driver->GetTagPlacedEvent().AddListener([=](uint8_t index)
 	{
-		_readTagEventId = _driver->GetTagPlacedEvent().AddListener([=](uint8_t index)
-		{
-			FigureTabWidget* widget = new FigureTabWidget(_tabs);
-			_realFigures[index] = widget;
+		FigureTabWidget* widget = new FigureTabWidget(_tabs);
+		_realFigures[index] = widget;
 
-			// start disabled
-			widget->setDisabled(true);
+		// start disabled
+		widget->setDisabled(true);
 
-			int tabIndex = this->_tabs->addTab(widget, QString("Real Figure %1").arg(index));
-			this->_tabs->setCurrentIndex(tabIndex);
-		});
+		int tabIndex = this->_tabs->addTab(widget, QString("Real Figure %1").arg(index));
+		this->_tabs->setCurrentIndex(tabIndex);
+	});
 
-		_readTagEventId = _driver->GetTagReadFinishedEvent().AddListener([=](uint8_t index, Runes::PortalTag& newTag)
-		{
-			FigureTabWidget* widget = _realFigures[index];
+	_readTagEventId = _driver->GetTagReadFinishedEvent().AddListener([=](uint8_t index, Runes::PortalTag& newTag)
+	{
+		FigureTabWidget* widget = _realFigures[index];
 
-			// enable now that the figure's been read
-			widget->setDisabled(false);
+		// enable now that the figure's been read
+		widget->setDisabled(false);
 
-			widget->Initialize(&newTag);
-		});
+		widget->Initialize(&newTag);
+	});
 
-		_removeTagEventId = _driver->GetTagRemovedEvent().AddListener([=](uint8_t index)
-		{
-			FigureTabWidget* widget = _realFigures[index];
+	_removeTagEventId = _driver->GetTagRemovedEvent().AddListener([=](uint8_t index)
+	{
+		FigureTabWidget* widget = _realFigures[index];
 
-			this->_tabs->removeTab(this->_tabs->indexOf(widget));
-		});
-	}
+		this->_tabs->removeTab(this->_tabs->indexOf(widget));
+	});
 
 	QTimer* driverTimer = new QTimer(this);
 	connect(driverTimer, SIGNAL(timeout()), this, SLOT(PumpDriver()));

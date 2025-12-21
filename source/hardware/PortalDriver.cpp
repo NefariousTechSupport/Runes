@@ -26,7 +26,7 @@ PortalDriver::PortalDriver()
 , _state(kDriverStateNotConnected)
 , _colour()
 , _thread()
-, _timeoutCounter(0)
+, _errorCounter(0)
 , _version()
 , _lastStatusId(0)
 , _tags()
@@ -53,39 +53,58 @@ PortalDriver::~PortalDriver()
 
 
 //=============================================================================
-// Connect: Connects to a portal
+// Pump: Main Thread pumping
 //=============================================================================
-HardwareErrorCode PortalDriver::Connect()
+void PortalDriver::Pump()
 {
-	if (_state.load() != kDriverStateNotConnected)
-	{
-		return kHWErrAlreadyConnected;
-	}
-
-	_interface = new HidUsbInterface();
-	HardwareErrorCode error = _interface->connect(PortalType::PORTAL_TYPE_DEFAULT);
-
-	if (error == kHWErrNoError)
-	{
-		_state.store(kDriverStateReadyBegin);
-		// Kick off the thread
-		_thread = std::thread(&PortalDriver::PortalThread, this);
-	}
-	else
-	{
-		delete _interface;
-		_interface = nullptr;
-	}
-
-	return error;
+	MainThreadPollDevices();
+	MainThreadPumpQueue();
 }
 
 
 
 //=============================================================================
-// Pump: Manage state and dispatch events on the correct thread
+// MainThreadPollDevices: Poll for new devices
 //=============================================================================
-void PortalDriver::Pump()
+void PortalDriver::MainThreadPollDevices()
+{
+	if (_interface && _interface->connected())
+	{
+		// No need to poll if we're connected
+		return;
+	}
+
+	if (_interface)
+	{
+		// Send tag removed events
+		for (int i = 0; i < _tags.size(); i++)
+		{
+			if (_tags[i]._rfidTag->PortalBlocksFilled() != -1)
+			{
+				_tagRemovedEvent.Invoke(i);
+			}
+		}
+
+		delete _interface;
+		_interface = nullptr;
+	}
+
+	_interface = HidUsbInterface::poll();
+
+	if (_interface)
+	{
+		_state.store(kDriverStateReadyBegin);
+		// Kick off the thread
+		_thread = std::thread(&PortalDriver::PortalThread, this);
+	}
+}
+
+
+
+//=============================================================================
+// MainThreadPumpQueue: dispatch events on the main thread
+//=============================================================================
+void PortalDriver::MainThreadPumpQueue()
 {
 	std::queue<QueuedEvent*> queueCopy;
 
@@ -164,7 +183,7 @@ void PortalDriver::QueueColour(uint8_t r, uint8_t g, uint8_t b)
 //=============================================================================
 void PortalDriver::PortalThread()
 {
-	_timeoutCounter = 0;
+	_errorCounter = 0;
 
 	while(_interface->connected())
 	{
@@ -176,17 +195,14 @@ void PortalDriver::PortalThread()
 		error = ProcessRead(writeBuffer, &writeBufferLen);
 		if (error != kHWErrNoError)
 		{
-			if (error == kHWErrReadTimedOut)
+			_errorCounter++;
+			if (_errorCounter == 3)
 			{
-				_timeoutCounter++;
-				if (_timeoutCounter == 3)
-				{
-					_interface->disconnect();
-				}
+				_interface->disconnect();
 			}
 			continue;
 		}
-		_timeoutCounter = 0;
+		_errorCounter = 0;
 
 		if (writeBufferLen == 0)
 		{
@@ -205,9 +221,6 @@ void PortalDriver::PortalThread()
 
 	_thread.detach();
 	_state.store(kDriverStateNotConnected);
-
-	delete _interface;
-	_interface = nullptr;
 }
 
 
@@ -223,7 +236,7 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 	{
 		return error;
 	}
-	_timeoutCounter = 0;
+	_errorCounter = 0;
 
 	switch (_state.load())
 	{

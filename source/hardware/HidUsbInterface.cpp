@@ -59,40 +59,12 @@ HidUsbInterface::~HidUsbInterface()
 //=============================================================================
 // connect: Attempts to connect to a portal, returning 0 on success.
 //=============================================================================
-HardwareErrorCode HidUsbInterface::connect(PortalType type)
+HardwareErrorCode HidUsbInterface::connect(hid_device_info* deviceInfo)
 {
-	uint16_t pid;
-	uint16_t vid;
-
-	// Figure out which Pid and Vid to use
-
-	switch(type)
-	{
-		case PORTAL_TYPE_DEFAULT:
-			pid = kDefaultPortalPID;
-			vid = kDefaultPortalVID;
-			break;
-
-		case PORTAL_TYPE_XBOX360:
-			pid = kXbox360PortalPID;
-			vid = kXbox360PortalVID;
-			return kHWErrUnimplementedPortalType;
-
-		case PORTAL_TYPE_XBOXONE:
-			pid = kXboxOnePortalPID;
-			vid = kXboxOnePortalVID;
-			return kHWErrUnimplementedPortalType;
-
-		default:
-			return kHWErrInvalidPortalType;
-	}
-
-	hid_device_info* devInfo = hid_enumerate(vid, pid);
-
 #if _WIN32
 	_platformHandle = malloc(sizeof(HANDLE*));
 	_windowsHandle = CreateFileA(
-		devInfo->path,
+		deviceInfo->path,
 		FILE_READ_DATA  | FILE_WRITE_DATA,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
 		NULL,
@@ -102,13 +74,11 @@ HardwareErrorCode HidUsbInterface::connect(PortalType type)
 	);
 #endif // _WIN32
 
-	_deviceHandle = hid_open_path(devInfo->path);
-
-	hid_free_enumeration(devInfo);
+	_deviceHandle = hid_open_path(deviceInfo->path);
 
 	if (_deviceHandle)
 	{
-		_state = kStateConnected;
+		_state.store(kStateConnected);
 	}
 	else
 	{
@@ -130,7 +100,7 @@ void HidUsbInterface::disconnect()
 	{
 		RUNES_LOG_INFO("Lost connection! cleaning up...");
 
-		_state = kStateUninitialised;
+		_state.store(kStateUninitialised);
 
 		hid_close(_deviceHandle);
 		_deviceHandle = nullptr;
@@ -152,7 +122,7 @@ void HidUsbInterface::disconnect()
 //=============================================================================
 HardwareErrorCode HidUsbInterface::writeOut(uint8_t buffer[], size_t len)
 {
-	RUNES_ASSERT(_state == kStateConnected, "Invalid state for writing data out");
+	RUNES_ASSERT(_state.load() == kStateConnected, "Invalid state for writing data out");
 	RUNES_ASSERT(_deviceHandle != nullptr, "No device handle exists");
 	RUNES_ASSERT(len <= EP0WriteSize, "Write buffer is too large!!");
 
@@ -179,7 +149,7 @@ HardwareErrorCode HidUsbInterface::writeOut(uint8_t buffer[], size_t len)
 //=============================================================================
 HardwareErrorCode HidUsbInterface::writeOutEp1(uint8_t /*buffer*/[], size_t /*len*/)
 {
-	RUNES_ASSERT(_state == kStateConnected, "Invalid state for writing data out");
+	RUNES_ASSERT(_state.load() == kStateConnected, "Invalid state for writing data out");
 	RUNES_ASSERT(_deviceHandle != nullptr, "No device handle exists");
 
 	// Unimplemented
@@ -194,7 +164,7 @@ HardwareErrorCode HidUsbInterface::writeOutEp1(uint8_t /*buffer*/[], size_t /*le
 //=============================================================================
 HardwareErrorCode HidUsbInterface::readIn(uint8_t buffer[], size_t len)
 {
-	RUNES_ASSERT(_state == kStateConnected, "Invalid state for writing data out");
+	RUNES_ASSERT(_state.load() == kStateConnected, "Invalid state for writing data out");
 	RUNES_ASSERT(_deviceHandle != nullptr, "No device handle exists");
 	RUNES_ASSERT(len <= EP0ReadSize, "Invalid read size!!");
 
@@ -215,4 +185,39 @@ HardwareErrorCode HidUsbInterface::readIn(uint8_t buffer[], size_t len)
 	}
 
 	return error;
+}
+
+
+
+//=============================================================================
+// poll: poll for devices
+//=============================================================================
+HidUsbInterface* HidUsbInterface::poll()
+{
+	HidUsbInterface* device = nullptr;
+	HardwareErrorCode errorCode = kHWErrNoError;
+
+	hid_device_info* deviceInfo = hid_enumerate(kPortalVID, 0);
+	hid_device_info* start = deviceInfo;
+	while(deviceInfo && !device)
+	{
+		switch (deviceInfo->product_id)
+		{
+			case kDefaultPortalPID:
+				device = new HidUsbInterface();
+				errorCode = device->connect(deviceInfo);
+				break;
+		}
+
+		if (device && errorCode != kHWErrNoError)
+		{
+			delete device;
+			device = nullptr;
+		}
+
+		deviceInfo = start;
+	}
+	hid_free_enumeration(start);
+
+	return device;
 }
