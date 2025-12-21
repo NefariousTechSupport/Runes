@@ -93,45 +93,16 @@ FigureTabWidget::FigureTabWidget(QWidget* parent)
 {
 	QGridLayout* root = new QGridLayout(this);
 
-	_lblLoading = new QLabel(this);
-	_lblLoading->setText(tr("<b>Reading...</b>"));
-
-	root->addWidget(_lblLoading);
-
-	setLayout(root);
-}
-
-
-//=============================================================================
-// ~FigureTabWidget: Destructor for the FigureTabWidget.
-//=============================================================================
-FigureTabWidget::~FigureTabWidget()
-{
-	if (_tag)
-	{
-		delete _tag;
-	}
-}
-
-
-void FigureTabWidget::Initialize(Runes::PortalTag* tag)
-{
-	_tag = tag;
-
-	QGridLayout* root = dynamic_cast<QGridLayout*>(layout());
-	RUNES_ASSERT(root != nullptr, "FigureTabWidget layout changed and wasn't updated in Initialize");
-	// Hide loading text
-	_lblLoading->setText(QString());
-
 	this->_lblToyName = new QLabel(this);
 	this->_lblToyName->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+	this->_lblToyName->setText("<h2>Loading...</h2>");
 	root->addWidget(_lblToyName, 0, 0, 1, 3);
 
 	uint32_t basicRow = root->rowCount();
 
 	this->_spinMoney = new QSpinBox(this);
 	this->_spinMoney->setRange(0, kMoneyCap);
-	connect(this->_spinMoney, &QSpinBox::valueChanged, [=](int newMoney)
+	connect(this->_spinMoney, &QSpinBox::valueChanged, [this](int newMoney)
 	{
 		this->_tag->_coins = newMoney;
 	});
@@ -140,7 +111,7 @@ void FigureTabWidget::Initialize(Runes::PortalTag* tag)
 
 	this->_spinExp = new QSpinBox(this);
 	this->_spinExp->setRange(0, 197500);
-	connect(this->_spinExp, &QSpinBox::valueChanged, [=](int newExp)
+	connect(this->_spinExp, &QSpinBox::valueChanged, [this](int newExp)
 	{
 		this->_tag->_exp = newExp;
 		this->updateLevelNumber();
@@ -153,7 +124,7 @@ void FigureTabWidget::Initialize(Runes::PortalTag* tag)
 	{
 		this->_cmbHat->addItem(tr(hatNames_en[i]));
 	}
-	connect(this->_cmbHat, &QComboBox::currentIndexChanged, [=](int newIndex)
+	connect(this->_cmbHat, &QComboBox::currentIndexChanged, [this](int newIndex)
 	{
 		this->_tag->_hatType = (kTfbSpyroTag_HatType)newIndex;
 	});
@@ -165,7 +136,7 @@ void FigureTabWidget::Initialize(Runes::PortalTag* tag)
 	{
 		this->_cmbTrinket->addItem(tr(trinketNames_en[i]));
 	}
-	connect(this->_cmbTrinket, &QComboBox::currentIndexChanged, [=](int newIndex)
+	connect(this->_cmbTrinket, &QComboBox::currentIndexChanged, [this](int newIndex)
 	{
 		this->_tag->_trinketType = static_cast<kTfbSpyroTag_TrinketType>(newIndex);
 	});
@@ -174,7 +145,7 @@ void FigureTabWidget::Initialize(Runes::PortalTag* tag)
 
 	this->_spinHeroPoints = new QSpinBox(this);
 	this->_spinHeroPoints->setRange(0, 100);
-	connect(this->_spinHeroPoints, &QSpinBox::valueChanged, [=](int newHeroPoints)
+	connect(this->_spinHeroPoints, &QSpinBox::valueChanged, [this](int newHeroPoints)
 	{
 		this->_tag->_heroPoints = newHeroPoints;
 	});
@@ -186,7 +157,7 @@ void FigureTabWidget::Initialize(Runes::PortalTag* tag)
 	{
 		this->_cmbLevelNumber->addItem(QString("Level %1").arg(i+1));
 	}
-	connect(this->_cmbLevelNumber, &QComboBox::currentIndexChanged, [=](int newIndex)
+	connect(this->_cmbLevelNumber, &QComboBox::currentIndexChanged, [this](int newIndex)
 	{
 		this->_tag->_exp = experienceForLevelMap[newIndex];
 		this->_spinExp->blockSignals(true);
@@ -234,7 +205,7 @@ void FigureTabWidget::Initialize(Runes::PortalTag* tag)
 		item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
 		item->setCheckState(Qt::Unchecked);
 	}
-	connect(this->_lstHeroics, &QListWidget::itemChanged, [=](QListWidgetItem* item)
+	connect(this->_lstHeroics, &QListWidget::itemChanged, [this](QListWidgetItem* item)
 	{
 		int32_t index = item->data(Qt::UserRole).toInt();
 		this->_tag->SetHeroic(index, item->checkState() == Qt::Checked);
@@ -247,6 +218,25 @@ void FigureTabWidget::Initialize(Runes::PortalTag* tag)
 	root->setColumnMinimumWidth(1, 224);
 	root->setColumnMinimumWidth(2, 224);
 	root->setColumnMinimumWidth(3, 128);
+	setLayout(root);
+}
+
+
+//=============================================================================
+// ~FigureTabWidget: Destructor for the FigureTabWidget.
+//=============================================================================
+FigureTabWidget::~FigureTabWidget()
+{
+	if (_tag)
+	{
+		delete _tag;
+	}
+}
+
+
+void FigureTabWidget::Initialize(Runes::PortalTag* tag)
+{
+	_tag = tag;
 
 	updateFields();
 }
@@ -260,7 +250,7 @@ void FigureTabWidget::Initialize(Runes::PortalTag* tag)
 	this->generic = field; \
 	field->setRange(0, max); \
 	field->setValue(this->_tag->questGame[index]); \
-	connect(field, &QSpinBox::valueChanged, [=](int newValue) \
+	connect(field, &QSpinBox::valueChanged, [this](int newValue) \
 	{ \
 		this->_tag->questGame[index] = newValue; \
 	}); \
@@ -269,7 +259,7 @@ void FigureTabWidget::Initialize(Runes::PortalTag* tag)
 	QCheckBox* field = new QCheckBox(); \
 	this->generic = field; \
 	field->setChecked(intToChecked(this->_tag->questGame[index])); \
-	connect(field, &QCheckBox::stateChanged, [=](int newState) \
+	connect(field, &QCheckBox::stateChanged, [this](int newState) \
 	{ \
 		this->_tag->questGame[index] = newState == Qt::Checked ? 1 : 0; \
 	}); \
@@ -510,13 +500,13 @@ void FigureTabWidget::updateLevelNumber()
 #define defineSpinQuest(questGame, field, index, max) \
 	this->field = new QSpinBox(); \
 	this->field->setRange(0, max); \
-	connect(this->field, &QSpinBox::valueChanged, [=](int newValue) \
+	connect(this->field, &QSpinBox::valueChanged, [this](int newValue) \
 	{ \
 		this->_tag->questGame[index] = newValue; \
 	});
 #define defineCheckQuest(questGame, field, index) \
 	this->field = new QCheckBox(); \
-	connect(this->field, &QCheckBox::stateChanged, [=](int newState) \
+	connect(this->field, &QCheckBox::stateChanged, [this](int newState) \
 	{ \
 		this->_tag->questGame[index] = newState == Qt::Checked ? 1 : 0; \
 	});
@@ -581,7 +571,7 @@ void FigureTabWidget::initSwapForceQuests()
 	do \
 	{ \
 		this->field = new QCheckBox(); \
-		connect(this->field, &QCheckBox::stateChanged, [=](int newState) \
+		connect(this->field, &QCheckBox::stateChanged, [this](int newState) \
 		{ \
 			this->_tag->SetUpgrade(upgrade, newState == Qt::Checked); \
 		}); \
@@ -613,7 +603,7 @@ void FigureTabWidget::initUpgrades()
 	_cmbUG_Path->addItem(tr("Primary"));
 	_cmbUG_Path->addItem(tr("Secondary"));
 	
-	connect(_cmbUG_Path, &QComboBox::currentIndexChanged, [=](int newIndex)
+	connect(_cmbUG_Path, &QComboBox::currentIndexChanged, [this](int newIndex)
 	{
 		uint8_t choiceMade = newIndex != 0;
 		uint8_t oldPath = this->_tag->GetUpgrade(Runes::kUpgradeSelectedPath);

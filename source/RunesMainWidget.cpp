@@ -105,6 +105,10 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 		{
 			FigureTabWidget* widget = new FigureTabWidget(_tabs);
 			_realFigures[index] = widget;
+
+			// start disabled
+			widget->setDisabled(true);
+
 			int tabIndex = this->_tabs->addTab(widget, QString("Real Figure %1").arg(index));
 			this->_tabs->setCurrentIndex(tabIndex);
 		});
@@ -112,6 +116,9 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 		_readTagEventId = _driver->GetTagReadFinishedEvent().AddListener([=](uint8_t index, Runes::PortalTag& newTag)
 		{
 			FigureTabWidget* widget = _realFigures[index];
+
+			// enable now that the figure's been read
+			widget->setDisabled(false);
 
 			widget->Initialize(&newTag);
 		});

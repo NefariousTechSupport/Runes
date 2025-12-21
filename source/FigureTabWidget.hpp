@@ -86,6 +86,4 @@ private:
 	QCheckBox*   _chkUG_WowPow;
 
 	QListWidget* _lstHeroics;
-
-	QLabel* _lblLoading;
 };
