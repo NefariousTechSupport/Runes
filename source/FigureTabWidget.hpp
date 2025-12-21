@@ -28,6 +28,7 @@ private:
 	void initGiantsQuests();
 	void initSwapForceQuests();
 	void initUpgrades();
+	void backup();
 
 	QSpinBox* _spinExp;
 	QSpinBox* _spinMoney;

@@ -21,6 +21,7 @@
 #include <QComboBox>
 #include <QTextEdit>
 #include <QMessageBox>
+#include <QStandardPaths>
 
 #include "kTfbSpyroTag_HatType.hpp"
 #include "kTfbSpyroTag_TrinketType.hpp"
@@ -237,6 +238,8 @@ FigureTabWidget::~FigureTabWidget()
 void FigureTabWidget::Initialize(Runes::PortalTag* tag)
 {
 	_tag = tag;
+
+	backup();
 
 	updateFields();
 }
@@ -651,4 +654,19 @@ void FigureTabWidget::initUpgrades()
 	_subUpgrades->addRow(tr("Path 2 Upgrade 3"), this->_chkUG_P2U3);
 	_subUpgrades->addRow(tr("Soulgem"),          this->_chkUG_Soulgem);
 	_subUpgrades->addRow(tr("Wow Pow"),          this->_chkUG_WowPow);
+}
+
+
+//=============================================================================
+// backup: Backup the loaded figure
+//=============================================================================
+void FigureTabWidget::backup()
+{
+	QDir runesDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+	// Make dumps folder
+	runesDir.mkpath("dumps");
+
+	QString dumpFile = runesDir.absolutePath().append("/dumps/%1.dmp").arg(this->_tag->_serial, 1, 16);
+
+	this->_tag->_rfidTag->SaveToFile(dumpFile.toUtf8());
 }
