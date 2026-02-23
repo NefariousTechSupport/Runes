@@ -276,6 +276,12 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 			break;
 
 		case kDriverStateReadyPending:
+			if (readBuffer[0] == 'S')
+			{
+				RUNES_LOG_WARN("Expected R packet but got S packet, we'll keep waiting");
+				// Do nothing, it's okay, we'll wait
+				break;
+			}
 			if (readBuffer[0] != 'R')
 			{
 				// revert back
