@@ -11,6 +11,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindFmtLib.cmake)
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindHidApi.cmake)
+include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindLibUSB.cmake)
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindYamlCpp.cmake)
 
 qt_standard_project_setup()
@@ -35,6 +36,8 @@ qt_add_executable(Runes
 	source/hardware/HardwareInterface.hpp
 	source/hardware/HidUsbInterface.cpp
 	source/hardware/HidUsbInterface.hpp
+	source/hardware/LibUsbInterface.cpp
+	source/hardware/LibUsbInterface.hpp
 	source/hardware/PortalDriver.cpp
 	source/hardware/PortalDriver.hpp
 	source/hardware/PortalType.hpp
@@ -104,6 +107,7 @@ target_include_directories(Runes PRIVATE
 	source
 	source/3rd_party
 	source/hardware
+	${LIBUSB_INCLUDE_DIR}
 )
 
 # Link libraries
@@ -113,4 +117,5 @@ target_link_libraries(Runes PRIVATE
 	yaml-cpp::yaml-cpp
 	fmt::fmt
 	hidapi::hidapi
+	${LIBUSB_LIBRARY}
 )

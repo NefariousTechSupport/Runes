@@ -11,6 +11,7 @@
 #include "RunesDebug.hpp"
 #include "HardwareInterface.hpp"
 #include "HidUsbInterface.hpp"
+#include "LibUsbInterface.hpp"
 
 #include <chrono>
 
@@ -91,7 +92,14 @@ void PortalDriver::MainThreadPollDevices()
 		_interface = nullptr;
 	}
 
-	_interface = HidUsbInterface::poll();
+	if (!_interface)
+	{
+		_interface = HidUsbInterface::poll();
+	}
+	if (!_interface)
+	{
+		_interface = LibUsbInterface::poll();
+	}
 
 	if (_interface)
 	{
