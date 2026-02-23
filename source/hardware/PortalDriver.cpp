@@ -284,6 +284,7 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 			}
 			if (readBuffer[0] != 'R')
 			{
+				RUNES_LOG_WARN("Expected R packet but got {}, restarting the process", readBuffer[0]);
 				// revert back
 				_state.store(kDriverStateReadyBegin);
 				break;
@@ -304,6 +305,7 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 		case kDriverStateActivationPending:
 			if (readBuffer[0] != 'A')
 			{
+				RUNES_LOG_WARN("Expected A packet but got {}, restarting the process", readBuffer[0]);
 				// revert back
 				_state.store(kDriverStateActivationBegin);
 				break;
