@@ -9,33 +9,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 
-# Set up yaml-cpp
-FetchContent_Declare(
-  yaml-cpp
-  GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
-  GIT_TAG 0.8.0
-)
-FetchContent_MakeAvailable(yaml-cpp)
-
-# Set up fmtlib
-FetchContent_Declare(
-  fmt
-  GIT_REPOSITORY https://github.com/fmtlib/fmt
-  GIT_TAG        e69e5f977d458f2650bb346dadf2ad30c5320281) # 10.2.1
-FetchContent_MakeAvailable(fmt)
-
-# Set up hidapi
-FetchContent_Declare(hidapi
-    URL      https://github.com/libusb/hidapi/archive/d6b2a974608dec3b76fb1e36c189f22b9cf3650c.zip
-    URL_HASH SHA256=e72b71904604238de9e04e4b456acbb30cb2c65fe96797043e572aff39cb8939
-)
-FetchContent_GetProperties(hidapi)
-if(NOT hidapi_POPULATED)
-    FetchContent_Populate(hidapi)
-	set(HIDAPI_WITH_LIBUSB FALSE) # surely will be used only on Linux
-	set(BUILD_SHARED_LIBS FALSE)  # HIDAPI as static library on all platforms
-    add_subdirectory(${hidapi_SOURCE_DIR} ${hidapi_BINARY_DIR})
-endif()
+include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindFmtLib.cmake)
+include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindHidApi.cmake)
+include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindYamlCpp.cmake)
 
 qt_standard_project_setup()
 
