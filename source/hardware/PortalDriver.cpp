@@ -24,7 +24,9 @@ using namespace Runes::Portal;
 PortalDriver::PortalDriver()
 : _interface(nullptr)
 , _state(kDriverStateNotConnected)
+, _colourMutex()
 , _colour()
+, _colourDirty(true)
 , _thread()
 , _errorCounter(0)
 , _version()
@@ -163,7 +165,12 @@ void PortalDriver::MainThreadPumpQueue()
 //=============================================================================
 void PortalDriver::QueueColour(PortalLEDColour colour)
 {
-	_colour.store(colour);
+	_colourMutex.lock();
+
+	_colour = colour;
+	_colourDirty = true;
+
+	_colourMutex.unlock();
 }
 
 
@@ -173,7 +180,12 @@ void PortalDriver::QueueColour(PortalLEDColour colour)
 //=============================================================================
 void PortalDriver::QueueColour(uint8_t r, uint8_t g, uint8_t b)
 {
+	_colourMutex.lock();
+
 	_colour = { r, g, b };
+	_colourDirty = true;
+
+	_colourMutex.unlock();
 }
 
 
@@ -356,13 +368,21 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 //=============================================================================
 HardwareErrorCode PortalDriver::ProcessColour(uint8_t writeBuffer[0x20], uint8_t* writeBufferLen)
 {
-	PortalLEDColour colour = _colour.load();
+	_colourMutex.lock();
 
-	writeBuffer[0] = 'C';
-	writeBuffer[1] = colour._red;
-	writeBuffer[2] = colour._green;
-	writeBuffer[3] = colour._blue;
-	*writeBufferLen = 4;
+	PortalLEDColour colour = _colour;
+	bool wasDirty = std::exchange(_colourDirty, false);
+
+	_colourMutex.unlock();
+
+	if (wasDirty)
+	{
+		writeBuffer[0] = 'C';
+		writeBuffer[1] = colour._red | 0xFF;
+		writeBuffer[2] = colour._green;
+		writeBuffer[3] = colour._blue;
+		*writeBufferLen = 4;
+	}
 
 	return kHWErrNoError;
 }

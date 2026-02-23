@@ -104,7 +104,9 @@ namespace Runes::Portal
 
 		// MUST rely on atomics here, no mutexes, mutexes only serve to slow
 		// things down by their very nature.
-		std::atomic<PortalLEDColour>   _colour;
+		std::recursive_mutex           _colourMutex;
+		PortalLEDColour                _colour;
+		bool                           _colourDirty;
 
 		// Ensure this is after _interface, as this ensures it's destroyed before _interface
 		std::thread                    _thread;
