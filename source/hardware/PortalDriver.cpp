@@ -292,9 +292,8 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 			_version[1] = readBuffer[2];
 			_version[2] = readBuffer[3];
 			_version[3] = readBuffer[4];
-			_state.store(kDriverStateActivationBegin);
-			break;
 
+			[[fallthrough]];
 		case kDriverStateActivationBegin:
 			writeBuffer[0] = 'A';
 			writeBuffer[1] = 0x01;
