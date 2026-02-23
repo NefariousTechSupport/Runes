@@ -250,13 +250,18 @@ void PortalDriver::PortalThread()
 //=============================================================================
 HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* writeBufferLen)
 {
-	uint8_t readBuffer[0x20];
-	HardwareErrorCode error = _interface->readIn(readBuffer, sizeof(readBuffer));
-	if (error != kHWErrNoError)
+	uint8_t readBuffer[0x20] = {};
+	HardwareErrorCode error = kHWErrNoError;
+
+	if (_state.load() != kDriverStateReadyBegin)
 	{
-		return error;
+		error = _interface->readIn(readBuffer, sizeof(readBuffer));
+		if (error != kHWErrNoError)
+		{
+			return error;
+		}
+		_errorCounter = 0;
 	}
-	_errorCounter = 0;
 
 	switch (_state.load())
 	{
