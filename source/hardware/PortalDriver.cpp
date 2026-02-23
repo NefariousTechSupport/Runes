@@ -324,6 +324,19 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 				if (readFigure && requestedBlock == rfidTag->PortalBlocksFilled())
 				{
 					rfidTag->PortalFillBlock(&readBuffer[3]);
+
+					uint8_t blockToRead = rfidTag->PortalBlocksFilled();
+					bool shouldRequest = rfidTag->PortalBlocksRequested() == blockToRead;
+
+					if (!rfidTag->PortalFinishedRead()
+						&& shouldRequest)
+					{
+						rfidTag->PortalMarkBlockRequested(blockToRead);
+						writeBuffer[0] = 'Q';
+						writeBuffer[1] = requestedFigure;
+						writeBuffer[2] = blockToRead;
+						*writeBufferLen = 3;
+					}
 				}
 				else if (!readFigure)
 				{
@@ -348,29 +361,25 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 						case 0b00:
 							break;
 						case 0b01:
-							{
-								Runes::RfidTag* rfidTag = _tags[s]._rfidTag;
-								uint8_t blockToRead = rfidTag->PortalBlocksFilled();
-								bool shouldRequest = rfidTag->PortalBlocksRequested() == blockToRead;
-
-								if (!rfidTag->PortalFinishedRead()
-								 && shouldRequest)
-								{
-									rfidTag->PortalMarkBlockRequested(blockToRead);
-									writeBuffer[0] = 'Q';
-									writeBuffer[1] = s;
-									writeBuffer[2] = blockToRead;
-									*writeBufferLen = 3;
-								}
-							}
 							break;
 						case 0b10:
 							_tags[s]._rfidTag->PortalClearData();
 							QueueEvent(new QueuedEventFigureRemoved(s));
 							break;
 						case 0b11:
-							_tags[s]._rfidTag->PortalPrepareRead();
-							QueueEvent(new QueuedEventFigurePlaced(s));
+							{
+								_tags[s]._rfidTag->PortalPrepareRead();
+								QueueEvent(new QueuedEventFigurePlaced(s));
+
+								Runes::RfidTag* rfidTag = _tags[s]._rfidTag;
+								rfidTag->PortalMarkBlockRequested(0);
+
+								// Read block 0
+								writeBuffer[0] = 'Q';
+								writeBuffer[1] = s;
+								writeBuffer[2] = 0;
+								*writeBufferLen = 3;
+							}
 							break;
 					}
 				}
