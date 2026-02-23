@@ -68,7 +68,7 @@ void PortalDriver::Pump()
 //=============================================================================
 void PortalDriver::MainThreadPollDevices()
 {
-	if (_interface && _interface->connected())
+	if (_state.load() != kDriverStateNotConnected)
 	{
 		// No need to poll if we're connected
 		return;
