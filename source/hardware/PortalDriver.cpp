@@ -265,15 +265,12 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 	uint8_t readBuffer[0x20] = {};
 	HardwareErrorCode error = kHWErrNoError;
 
-	if (_state.load() != kDriverStateReadyBegin)
+	error = _interface->readIn(readBuffer, sizeof(readBuffer));
+	if (error != kHWErrNoError)
 	{
-		error = _interface->readIn(readBuffer, sizeof(readBuffer));
-		if (error != kHWErrNoError)
-		{
-			return error;
-		}
-		_errorCounter = 0;
+		return error;
 	}
+	_errorCounter = 0;
 
 	switch (_state.load())
 	{
@@ -281,6 +278,12 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 			error = kHWErrLostConnection;
 			break;
 
+		case kDriverStateActivationReset:
+			writeBuffer[0] = 'A';
+			writeBuffer[1] = 0x00;
+			*writeBufferLen = 2;
+			_state.store(kDriverStateReadyBegin);
+			break;
 		case kDriverStateReadyBegin:
 			writeBuffer[0] = 'R';
 			*writeBufferLen = 1;
@@ -291,7 +294,8 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 			if (readBuffer[0] == 'S')
 			{
 				RUNES_LOG_WARN("Expected R packet but got S packet, we'll keep waiting");
-				// Do nothing, it's okay, we'll wait
+				// Turn off that annoying antenna
+				_state.store(kDriverStateActivationReset);
 				break;
 			}
 			if (readBuffer[0] != 'R')
