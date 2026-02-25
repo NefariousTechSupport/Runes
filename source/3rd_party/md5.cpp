@@ -27,6 +27,10 @@ documentation and/or software.
 
 #include <memory.h>
 #include "md5.h"
+#include <cstdint>
+
+// From https://stackoverflow.com/questions/1583791/constexpr-and-endianness#27088447
+static constexpr bool kIsLittleEndian = '\x01\x02\x03\x04' == 0x04030201;
 
 void MD5Open(MD5 *md5)
 {
@@ -100,9 +104,11 @@ static void MD5Transform(UINT4 state[4], const unsigned char block[64])
 {
 	UINT4 a = state[0], b = state[1], c = state[2], d = state[3], x[16];
 	/* Move contents of block to x, putting bytes in little-endian order. */
-#ifdef LITTLE_ENDIAN
-	memcpy(x, block, 64);
-#else
+	if constexpr (kIsLittleEndian)
+	{
+		memcpy(x, block, 64);
+	}
+	else
 	{
 		unsigned int i, j;
 		for (i = j = 0; i < 16; i++, j+= 4)
@@ -111,7 +117,7 @@ static void MD5Transform(UINT4 state[4], const unsigned char block[64])
 				(UINT4) block[j+2] << 16 | (UINT4) block[j+3] << 24;
 		}
 	}
-#endif
+
 	/* Round 1 */
 	FF(a, b, c, d, x[ 0], S11, 0xd76aa478); /* 1 */
 	FF(d, a, b, c, x[ 1], S12, 0xe8c7b756); /* 2 */
@@ -217,11 +223,21 @@ void MD5Digest(MD5 *md5, const void *input, unsigned int inputLen)
 order.
 */
 
-#ifdef LITTLE_ENDIAN
-#define ENCODE(p,n) *(UINT4 *)(p) = n
-#else
-#define ENCODE(p,n) (p)[0]=n,(p)[1]=n>>8,(p)[2]=n>>16,(p)[3]=n>>24
-#endif
+#define ENCODE(p,n)                                                             \
+	do                                                                          \
+	{                                                                           \
+		if constexpr (kIsLittleEndian)                                          \
+		{                                                                       \
+			*reinterpret_cast<UINT4*>(p) = n;                                   \
+		}                                                                       \
+		else                                                                    \
+		{                                                                       \
+			(p)[0] = static_cast<unsigned char>(n);                             \
+			(p)[1] = static_cast<unsigned char>(n >> 8);                        \
+			(p)[2] = static_cast<unsigned char>(n >> 16);                       \
+			(p)[3] = static_cast<unsigned char>(n >> 24);                       \
+		}                                                                       \
+	} while(false)
 
 void MD5Close(MD5 *md5, unsigned char digest[16])
 {
