@@ -96,7 +96,7 @@ FigureTabWidget::FigureTabWidget(QWidget* parent)
 
 	this->_lblToyName = new QLabel(this);
 	this->_lblToyName->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
-	this->_lblToyName->setText("<h2>Loading...</h2>");
+	this->_lblToyName->setText("<h2>Loading... (0/64)</h2>");
 	root->addWidget(_lblToyName, 0, 0, 1, 3);
 
 	uint32_t basicRow = root->rowCount();
@@ -235,6 +235,9 @@ FigureTabWidget::~FigureTabWidget()
 }
 
 
+//=============================================================================
+// Initialize: Assigns the loaded tag to this figure and sets things up
+//=============================================================================
 void FigureTabWidget::Initialize(Runes::PortalTag* tag)
 {
 	_tag = tag;
@@ -242,6 +245,18 @@ void FigureTabWidget::Initialize(Runes::PortalTag* tag)
 	backup();
 
 	updateFields();
+}
+
+
+//=============================================================================
+// UpdateProgress: Updates the loading progress text
+//=============================================================================
+void FigureTabWidget::UpdateProgress(uint8_t progress)
+{
+	if (_tag == nullptr)
+	{
+		this->_lblToyName->setText(QString("<h2>Loading... (%1/64)</h2>").arg(progress));
+	}
 }
 
 

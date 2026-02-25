@@ -20,6 +20,7 @@ public:
 	explicit FigureTabWidget(QWidget* parent = nullptr);
 	virtual ~FigureTabWidget();
 	void Initialize(Runes::PortalTag* tag);
+	void UpdateProgress(uint8_t progress);
 	Runes::PortalTag* _tag;
 
 private:

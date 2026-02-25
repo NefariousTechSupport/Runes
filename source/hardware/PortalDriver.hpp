@@ -43,11 +43,13 @@ namespace Runes::Portal
 		Event<void, uint8_t>&                    GetTagPlacedEvent()       { return _tagPlacedEvent; }
 		Event<void, uint8_t>&                    GetTagRemovedEvent()      { return _tagRemovedEvent; }
 		Event<void, uint8_t, Runes::PortalTag&>& GetTagReadFinishedEvent() { return _tagReadFinishedEvent; }
+		Event<void, uint8_t, uint8_t>&           GetTagReadUpdateEvent()   { return _tagReadUpdateEvent; }
 
 	private:
 		enum DriverState
 		{
 			kDriverStateNotConnected,
+			kDriverStateActivationReset,
 			kDriverStateReadyBegin,
 			kDriverStateReadyPending,
 			kDriverStateActivationBegin,
@@ -60,7 +62,8 @@ namespace Runes::Portal
 			kEventTypeNone,
 			kEventTypeFigurePlaced,
 			kEventTypeFigureReadComplete,
-			kEventTypeFigureRemoved
+			kEventTypeFigureRemoved,
+			kEventTypeFigureReadUpdate,
 		};
 		struct QueuedEvent
 		{
@@ -84,6 +87,18 @@ namespace Runes::Portal
 		typedef QueuedEventDataByte<kEventTypeFigurePlaced>       QueuedEventFigurePlaced;
 		typedef QueuedEventDataByte<kEventTypeFigureReadComplete> QueuedEventFigureReadComplete;
 		typedef QueuedEventDataByte<kEventTypeFigureRemoved>      QueuedEventFigureRemoved;
+		struct QueuedEventFigureReadUpdate : public QueuedEvent
+		{
+			QueuedEventFigureReadUpdate(uint8_t figureId, uint8_t progress)
+			: QueuedEvent(kEventTypeFigureReadUpdate)
+			, _figureId(figureId)
+			, _progress(progress)
+			{
+			}
+
+			uint8_t _figureId;
+			uint8_t _progress;
+		};
 
 		void                           MainThreadPollDevices();
 		void                           MainThreadPumpQueue();
@@ -120,6 +135,7 @@ namespace Runes::Portal
 		Event<void, uint8_t>                    _tagPlacedEvent;
 		Event<void, uint8_t>                    _tagRemovedEvent;
 		Event<void, uint8_t, Runes::PortalTag&> _tagReadFinishedEvent;
+		Event<void, uint8_t, uint8_t>           _tagReadUpdateEvent;
 
 		std::mutex                      _eventQueueMutex;
 		std::queue<QueuedEvent*>        _eventQueue;

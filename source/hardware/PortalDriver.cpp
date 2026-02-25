@@ -33,6 +33,12 @@ PortalDriver::PortalDriver()
 , _version()
 , _lastStatusId(0)
 , _tags()
+, _tagPlacedEvent()
+, _tagRemovedEvent()
+, _tagReadFinishedEvent()
+, _tagReadUpdateEvent()
+, _eventQueueMutex()
+, _eventQueue()
 {
 	for (uint8_t t = 0; t < _tags.size(); t++)
 	{
@@ -161,6 +167,12 @@ void PortalDriver::MainThreadPumpQueue()
 				_tagRemovedEvent.Invoke(frEvent->_data);
 				delete frEvent;
 				break;
+			}
+			case kEventTypeFigureReadUpdate:
+			{
+				QueuedEventFigureReadUpdate* fruEvent = static_cast<QueuedEventFigureReadUpdate*>(event);
+				_tagReadUpdateEvent.Invoke(fruEvent->_figureId, fruEvent->_progress);
+				delete fruEvent;
 			}
 		}
 	}
@@ -324,6 +336,8 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* 
 				if (readFigure && requestedBlock == rfidTag->PortalBlocksFilled())
 				{
 					rfidTag->PortalFillBlock(&readBuffer[3]);
+
+					QueueEvent(new QueuedEventFigureReadUpdate(requestedFigure, rfidTag->PortalBlocksFilled()));
 
 					uint8_t blockToRead = rfidTag->PortalBlocksFilled();
 					bool shouldRequest = rfidTag->PortalBlocksRequested() == blockToRead;

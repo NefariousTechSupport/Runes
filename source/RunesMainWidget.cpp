@@ -128,6 +128,13 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 		this->_tabs->removeTab(this->_tabs->indexOf(widget));
 	});
 
+	_removeTagEventId = _driver->GetTagReadUpdateEvent().AddListener([=](uint8_t index, uint8_t progress)
+	{
+		FigureTabWidget* widget = _realFigures[index];
+
+		widget->UpdateProgress(progress);
+	});
+
 	QTimer* driverTimer = new QTimer(this);
 	connect(driverTimer, SIGNAL(timeout()), this, SLOT(PumpDriver()));
 	driverTimer->start(50);
