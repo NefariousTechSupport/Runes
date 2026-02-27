@@ -15,8 +15,9 @@ using namespace Runes::Portal;
 //=============================================================================
 // Constructor for HardwareInterface
 //=============================================================================
-HardwareInterface::HardwareInterface()
-: _state(kStateUninitialised)
+HardwareInterface::HardwareInterface(PortalType type)
+: _type(type)
+, _state(kStateUninitialised)
 {
 }
 

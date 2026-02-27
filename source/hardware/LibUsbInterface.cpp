@@ -30,8 +30,8 @@ libusb_context* LibUsbInterface::_libusbCtx = nullptr;
 //=============================================================================
 // Constructor for LibUsbInterface
 //=============================================================================
-LibUsbInterface::LibUsbInterface()
-: HardwareInterface()
+LibUsbInterface::LibUsbInterface(PortalType type)
+: HardwareInterface(type)
 , _deviceHandle(nullptr)
 , _interfaceClaimed(false)
 {
@@ -109,10 +109,18 @@ HardwareErrorCode LibUsbInterface::writeOut(uint8_t buffer[], size_t len)
 	RUNES_ASSERT(len <= EP0WriteSize, "Write buffer is too large!!");
 
 	uint8_t writeBuffer[EP0WriteSize] = {};
-	memcpy(writeBuffer, buffer, std::min(EP0WriteSize, len));
 
+	memcpy(writeBuffer, buffer, std::min(sizeof(writeBuffer), len));
 
-	int res = libusb_control_transfer(_deviceHandle, 0x21, 0x09, 0x0200, 0x00, writeBuffer, len, 20);
+	int res = -1;
+	if (getPortalType() == PORTAL_TYPE_XBOX360)
+	{
+		res = libusb_interrupt_transfer(_deviceHandle, 0x02, writeBuffer, len, nullptr, 20);
+	}
+	else
+	{
+		res = libusb_control_transfer(_deviceHandle, 0x21, 0x09, 0x0200, 0x00, writeBuffer, len, 20);
+	}
 
 	return res >= 0 ? kHWErrNoError : kHWErrLostConnection;
 }
@@ -145,7 +153,7 @@ HardwareErrorCode LibUsbInterface::readIn(uint8_t buffer[], size_t len)
 
 	HardwareErrorCode error = kHWErrNoError;
 
-	uint8_t readBuffer[EP0ReadSize];
+	uint8_t readBuffer[EP0ReadSize] = {};
 
 	int bytesRead = 0;
 	int res = libusb_bulk_transfer(_deviceHandle, 0x81, readBuffer, std::min(sizeof(readBuffer), len), &bytesRead, 5000);
@@ -176,11 +184,17 @@ LibUsbInterface* LibUsbInterface::poll()
 	}
 
 	libusb_device_handle* handle = libusb_open_device_with_vid_pid(_libusbCtx, kPortalVID, kDefaultPortalPID);
+	PortalType type = PORTAL_TYPE_DEFAULT;
+	if (!handle)
+	{
+		handle = libusb_open_device_with_vid_pid(_libusbCtx, kPortalVID, kXbox360PortalPID);
+		type = PORTAL_TYPE_XBOX360;
+	}
 
 	LibUsbInterface* device = nullptr;
 	if (handle)
 	{
-		device = new LibUsbInterface();
+		device = new LibUsbInterface(type);
 		device->connect(handle);
 	}
 

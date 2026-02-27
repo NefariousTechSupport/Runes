@@ -32,15 +32,20 @@ namespace Runes::Portal
 	class HardwareInterface
 	{
 	public:
-		HardwareInterface();
+		HardwareInterface(PortalType type);
 		virtual ~HardwareInterface();
 
 		bool connected() const;
+		inline PortalType getPortalType() const { return _type; }
 
 		virtual void disconnect() = 0;
 		virtual HardwareErrorCode writeOut(uint8_t buffer[], size_t len) = 0;
 		virtual HardwareErrorCode writeOutEp1(uint8_t buffer[], size_t len) = 0;
 		virtual HardwareErrorCode readIn(uint8_t buffer[], size_t len) = 0;
+
+		static constexpr size_t Xbox360BufferHeaderSize   = 2;
+		static constexpr size_t EP0WriteSize              = 0x20;
+		static constexpr size_t EP0ReadSize               = 0x20;
 
 	protected:
 		enum State
@@ -50,10 +55,10 @@ namespace Runes::Portal
 			kStateErrored
 		};
 
-		static constexpr size_t EP0WriteSize = 0x20;
-		static constexpr size_t EP0ReadSize  = 0x20;
-
 		std::atomic<State>              _state;
+
+	private:
+		PortalType                      _type;
 	};
 }
 

@@ -37,8 +37,8 @@ using namespace Runes::Portal;
 //=============================================================================
 // Constructor for HidUsbInterface
 //=============================================================================
-HidUsbInterface::HidUsbInterface()
-: HardwareInterface()
+HidUsbInterface::HidUsbInterface(PortalType type)
+: HardwareInterface(type)
 , _deviceHandle(nullptr)
 , _platformHandle(nullptr)
 {
@@ -204,7 +204,7 @@ HidUsbInterface* HidUsbInterface::poll()
 		switch (deviceInfo->product_id)
 		{
 			case kDefaultPortalPID:
-				device = new HidUsbInterface();
+				device = new HidUsbInterface(PORTAL_TYPE_DEFAULT);
 				errorCode = device->connect(deviceInfo);
 				break;
 		}

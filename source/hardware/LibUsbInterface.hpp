@@ -19,7 +19,7 @@ namespace Runes::Portal
 	class LibUsbInterface : public HardwareInterface
 	{
 	public:
-		LibUsbInterface();
+		LibUsbInterface(PortalType type);
 		virtual ~LibUsbInterface() final;
 
 		HardwareErrorCode connect(libusb_device_handle* handle);

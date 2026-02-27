@@ -18,7 +18,7 @@ namespace Runes::Portal
 	class HidUsbInterface : public HardwareInterface
 	{
 	public:
-		HidUsbInterface();
+		HidUsbInterface(PortalType type);
 		virtual ~HidUsbInterface() final;
 
 		HardwareErrorCode connect(hid_device_info* deviceInfo);

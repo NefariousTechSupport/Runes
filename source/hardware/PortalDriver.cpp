@@ -247,7 +247,20 @@ void PortalDriver::PortalThread()
 
 		if (writeBufferLen != 0)
 		{
-			_interface->writeOut(writeBuffer, writeBufferLen);
+			if (_interface->getPortalType() == PORTAL_TYPE_XBOX360)
+			{
+				uint8_t xbox360WriteBuffer[sizeof(writeBuffer)];
+				size_t realWriteBufferLen = std::min<size_t>(writeBufferLen + 2, sizeof(xbox360WriteBuffer) - HardwareInterface::Xbox360BufferHeaderSize);
+
+				xbox360WriteBuffer[0] = 0x0B;
+				xbox360WriteBuffer[1] = 0x14;
+				memcpy(&xbox360WriteBuffer[HardwareInterface::Xbox360BufferHeaderSize], writeBuffer, realWriteBufferLen);
+				_interface->writeOut(xbox360WriteBuffer, realWriteBufferLen);
+			}
+			else
+			{
+				_interface->writeOut(writeBuffer, writeBufferLen);
+			}
 		}
 	}
 
@@ -260,16 +273,41 @@ void PortalDriver::PortalThread()
 //=============================================================================
 // ProcessRead: Handle reads from the portal
 //=============================================================================
-HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[0x20], uint8_t* writeBufferLen)
+HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[HardwareInterface::EP0WriteSize], uint8_t* writeBufferLen)
 {
-	uint8_t readBuffer[0x20] = {};
+	uint8_t readBuffer[HardwareInterface::EP0ReadSize] = {};
 	HardwareErrorCode error = kHWErrNoError;
 
-	error = _interface->readIn(readBuffer, sizeof(readBuffer));
-	if (error != kHWErrNoError)
+	if (_interface->getPortalType() == PORTAL_TYPE_XBOX360)
 	{
-		return error;
+		uint8_t xbox360ReadBuffer[HardwareInterface::EP0ReadSize] = {};
+		error = _interface->readIn(xbox360ReadBuffer, sizeof(xbox360ReadBuffer));
+		if (error != kHWErrNoError)
+		{
+			return error;
+		}
+
+		if (xbox360ReadBuffer[0x00] == 0x0B
+		 && xbox360ReadBuffer[0x01] == 0x14)
+		{
+			memcpy(&readBuffer[0], &xbox360ReadBuffer[HardwareInterface::Xbox360BufferHeaderSize], sizeof(readBuffer));
+		}
+		else
+		{
+			// Not something we care about
+			return error;
+		}
 	}
+	else
+	{
+		error = _interface->readIn(readBuffer, sizeof(readBuffer));
+		if (error != kHWErrNoError)
+		{
+			return error;
+		}
+	}
+
+
 	_errorCounter = 0;
 
 	switch (_state.load())
