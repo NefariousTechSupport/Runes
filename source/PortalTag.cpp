@@ -469,7 +469,15 @@ void Runes::PortalTag::SaveToFile(const char* fileName)
 	this->_tagData._areaSequence0++;
 	this->_tagData._areaSequence1++;
 	this->FillOutputFromStoredData();
-	this->RecalculateTagDataChecksums();
+
+	// Rewrite checksums
+	this->ComputeTagDataChecksums(
+		this->_tagData._crcType6,
+		this->_tagData._crcType3,
+		this->_tagData._crcType2,
+		this->_tagData._crcType1
+	);
+
 	//We're writing to the other region hence the ternary operator looks like that
 	_rfidTag->SaveBlocks(((uint8_t*)&this->_tagData) + 0x00, this->_rfidTag->DetermineActiveDataRegion0() ? 0x08 : 0x24, 0x7);
 	_rfidTag->SaveBlocks(((uint8_t*)&this->_tagData) + 0x70, this->_rfidTag->DetermineActiveDataRegion1() ? 0x11 : 0x2D, 0x4);
@@ -480,32 +488,41 @@ void Runes::PortalTag::SaveToFile(const char* fileName)
 
 
 //=============================================================================
-// RecalculateTagDataChecksums: Recompute and assign the new checksums for
-// the data
+// ComputeTagDataChecksums: Compute the checksums for the data
 //=============================================================================
-void Runes::PortalTag::RecalculateTagDataChecksums()
+void Runes::PortalTag::ComputeTagDataChecksums(uint16_t& crc6, uint16_t& crc3, uint16_t& crc2, uint16_t& crc1) const
 {
-	char checksumBuffer[0x110];
-	memset(checksumBuffer, 0x00, 0x110);
+	// In case someone tries storing checksums directly into the tagdata
+	uint8_t tagDataCopy[sizeof(this->_tagData)];
+	memcpy(tagDataCopy, &this->_tagData, sizeof(this->_tagData));
+
+	char checksumBuffer[0x110] = {};
 
 	//Type 6
-	memcpy(checksumBuffer, ((uint8_t*)&this->_tagData) + 7 * BLOCK_SIZE, 4 * BLOCK_SIZE);
+	memcpy(checksumBuffer, &tagDataCopy[7 * BLOCK_SIZE], 4 * BLOCK_SIZE);
 	checksumBuffer[0] = 6;
 	checksumBuffer[1] = 1;
-	this->_tagData._crcType6 = crc16(checksumBuffer, 0x04 * BLOCK_SIZE);
+	crc6 = crc16(checksumBuffer, 0x04 * BLOCK_SIZE);
+	// Clear it since later checksums may use that space
+	memset(checksumBuffer, 0x00, 0x04 * BLOCK_SIZE);
 
 	//Type 3
-	memcpy(checksumBuffer, ((uint8_t*)&this->_tagData) + 4 * BLOCK_SIZE, 3 * BLOCK_SIZE);
-	this->_tagData._crcType3 = crc16(checksumBuffer, 0x11 * BLOCK_SIZE);
+	memcpy(checksumBuffer, &tagDataCopy[4 * BLOCK_SIZE], 3 * BLOCK_SIZE);
+	crc3 = crc16(checksumBuffer, 0x11 * BLOCK_SIZE);
 
 	//Type 2
-	memcpy(checksumBuffer, ((uint8_t*)&this->_tagData) + 1 * BLOCK_SIZE, 3 * BLOCK_SIZE);
-	this->_tagData._crcType2 = crc16(checksumBuffer, 0x03 * BLOCK_SIZE);
+	memcpy(checksumBuffer, &tagDataCopy[1 * BLOCK_SIZE], 3 * BLOCK_SIZE);
+	crc2 = crc16(checksumBuffer, 0x03 * BLOCK_SIZE);
 
 	//Type 1
-	this->_tagData._crcType1 = 5;
-	memcpy(checksumBuffer, ((uint8_t*)&this->_tagData), BLOCK_SIZE);
-	this->_tagData._crcType1 = crc16(checksumBuffer, 0x01 * BLOCK_SIZE);
+	memcpy(checksumBuffer, &tagDataCopy[0], BLOCK_SIZE);
+	checksumBuffer[offsetof(Runes::PortalTagData, _crcType1) + 0] = 0x05;
+	checksumBuffer[offsetof(Runes::PortalTagData, _crcType1) + 1] = 0x00;
+	checksumBuffer[offsetof(Runes::PortalTagData, _crcType2) + 0] = (crc2 >> 0) & 0xFF;
+	checksumBuffer[offsetof(Runes::PortalTagData, _crcType2) + 1] = (crc2 >> 8) & 0xFF;
+	checksumBuffer[offsetof(Runes::PortalTagData, _crcType3) + 0] = (crc3 >> 0) & 0xFF;
+	checksumBuffer[offsetof(Runes::PortalTagData, _crcType3) + 1] = (crc3 >> 8) & 0xFF;
+	crc1 = crc16(checksumBuffer, 0x01 * BLOCK_SIZE);
 }
 
 
@@ -724,4 +741,44 @@ bool Runes::PortalTag::GetHeroic(uint8_t heroic) const
 void Runes::PortalTag::SetHeroic(uint8_t heroic, bool value)
 {
 	_heroics = static_cast<uint64_t>(static_cast<uint64_t>(_heroics & ~static_cast<uint64_t>(1ul << heroic)) | (static_cast<uint64_t>(static_cast<uint64_t>(value ? 1ul : 0ul) << heroic)));
+}
+
+
+
+//=============================================================================
+// Verify: Ensures the figure isn't corrupt
+//=============================================================================
+Runes::VerifyStatus Runes::PortalTag::Verify() const
+{
+	uint16_t crc6 = 0;
+	uint16_t crc3 = 0;
+	uint16_t crc2 = 0;
+	uint16_t crc1 = 0;
+
+	ComputeTagDataChecksums(crc6, crc3, crc2, crc1);
+
+	VerifyStatus status = VerifyStatus::kSuccess;
+
+	if (crc6 != this->_tagData._crcType6
+	 && this->_tagData._regionCountCoded >= 1)
+	{
+		status |= VerifyStatus::kRegion0Area1;
+	}
+
+	if (crc3 != this->_tagData._crcType3)
+	{
+		status |= VerifyStatus::kRegion0RemainingData1;
+	}
+
+	if (crc2 != this->_tagData._crcType2)
+	{
+		status |= VerifyStatus::kRegion0MagicMoment1;
+	}
+
+	if (crc1 != this->_tagData._crcType1)
+	{
+		status |= VerifyStatus::kRegion0Header;
+	}
+
+	return status;
 }

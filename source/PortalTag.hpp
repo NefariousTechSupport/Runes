@@ -192,6 +192,33 @@ namespace Runes
 		kUpgradePathSecondary         = 1
 	};
 
+	enum class VerifyStatus : uint8_t
+	{
+		kSuccess               = 0,
+
+		kRegion0Flag           = 0,
+		kRegion1Flag           = 1 << 7,
+
+		kRegion0Header         = kRegion0Flag | (1 << 0),
+		kRegion0RemainingData1 = kRegion0Flag | (1 << 1),
+		kRegion0MagicMoment1   = kRegion0Flag | (1 << 2),
+		kRegion0Area1          = kRegion0Flag | (1 << 3),
+
+		kRegion1Header         = kRegion1Flag | (1 << 0),
+		kRegion1RemainingData1 = kRegion1Flag | (1 << 1),
+		kRegion1MagicMoment1   = kRegion1Flag | (1 << 2),
+		kRegion1Area1          = kRegion1Flag | (1 << 3)
+	};
+
+	inline VerifyStatus operator|=(VerifyStatus& a, const VerifyStatus& b)
+	{
+		return a = static_cast<VerifyStatus>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
+	}
+
+	inline VerifyStatus operator&(const VerifyStatus& a, const VerifyStatus& b)
+	{
+		return static_cast<VerifyStatus>(static_cast<uint8_t>(a) & static_cast<uint8_t>(b));
+	}
 
 	// This class serves as an abstraction, allowing one to edit various parts of the figures
 	// without needing to deal without needing to deal with the way it was coded and such.
@@ -237,7 +264,7 @@ namespace Runes
 			void FillOutputFromStoredData();
 			void ReadFromFile(const char* fileName);
 			void SaveToFile(const char* fileName);
-			void RecalculateTagDataChecksums();
+			void ComputeTagDataChecksums(uint16_t& crc6, uint16_t& crc3, uint16_t& crc2, uint16_t& crc1) const;
 			static void DecodeSubtype(uint16_t varId, ESkylandersGame* esg, bool* fullAltDeco, bool* reposeFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId);
 			void DecodeSubtype(ESkylandersGame* esg, bool* fullAltDeco, bool* reposeFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId);
 			void DebugPrintHeader();
@@ -248,6 +275,7 @@ namespace Runes
 			void SetUpgrade(Upgrade upgrade, uint8_t value);
 			bool GetHeroic(uint8_t heroic) const;
 			void SetHeroic(uint8_t heroic, bool value);
+			VerifyStatus Verify() const;
 
 		private:
 			bool _tagHeaderStored;
