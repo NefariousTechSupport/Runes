@@ -148,6 +148,9 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 	{
 		FigureTabWidget* widget = _realFigures[index];
 
+		// Prevent double free
+		widget->_tag = nullptr;
+
 		this->_tabs->removeTab(this->_tabs->indexOf(widget));
 	});
 
@@ -161,6 +164,18 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 	QTimer* driverTimer = new QTimer(this);
 	connect(driverTimer, SIGNAL(timeout()), this, SLOT(PumpDriver()));
 	driverTimer->start(50);
+}
+
+RunesMainWidget::~RunesMainWidget()
+{
+	for (int f = 0; f < _realFigures.size(); f++)
+	{
+		if (_realFigures[f])
+		{
+			// This tag doesn't belong to this figure tab widget so unset it before things go south
+			_realFigures[f]->_tag = nullptr;
+		}
+	}
 }
 
 void RunesMainWidget::PumpDriver()

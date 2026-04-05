@@ -20,6 +20,7 @@ class RunesMainWidget : public QWidget
 	Q_OBJECT
 public:
 	explicit RunesMainWidget(QWidget* parent = nullptr);
+	~RunesMainWidget();
 
 private Q_SLOTS:
 	void PumpDriver();
