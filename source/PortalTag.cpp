@@ -486,6 +486,11 @@ void Runes::PortalTag::ReadFromFile(const char* fileName)
 	this->_tagRemainingDataStored = false;
 	this->_tagDataStored = false;
 
+	if (!this->_rfidTag)
+	{
+		this->_rfidTag = new RfidTag(false);
+	}
+
 	this->_rfidTag->ReadFromFile(fileName);
 
 	this->StoreHeader();
