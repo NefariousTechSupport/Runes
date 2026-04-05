@@ -121,6 +121,9 @@ void Runes::RfidTag::decrypt()
 //=============================================================================
 bool Runes::RfidTag::CopyBlocks(void* dst, uint8_t blockId, uint8_t numBlocks)
 {
+	RUNES_ASSERT(blockId              < NUM_BLOCKS, "Trying to read from block {}, there are only {} blocks", blockId, NUM_BLOCKS);
+	RUNES_ASSERT(blockId + numBlocks <= NUM_BLOCKS, "Trying to read {} blocks from block {}, there are only {} blocks", numBlocks, blockId, NUM_BLOCKS);
+
 	uint8_t currentBlock = blockId;
 	uint8_t blocksRead = 0;
 	while(blocksRead < numBlocks && currentBlock < NUM_BLOCKS)
