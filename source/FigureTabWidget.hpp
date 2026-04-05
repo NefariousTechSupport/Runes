@@ -21,6 +21,7 @@ public:
 	virtual ~FigureTabWidget();
 	void Initialize(Runes::PortalTag* tag);
 	void UpdateProgress(uint8_t progress);
+	void StartSave(QString& path, bool& valid);
 	Runes::PortalTag* _tag;
 
 private:
@@ -29,7 +30,10 @@ private:
 	void initGiantsQuests();
 	void initSwapForceQuests();
 	void initUpgrades();
-	void backup();
+
+	static QString getFigurePath(uint32_t serial);
+	void backupFigure();
+	void saveFigure(QString& path, bool& valid);
 
 	QSpinBox* _spinExp;
 	QSpinBox* _spinMoney;

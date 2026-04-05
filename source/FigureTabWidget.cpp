@@ -28,6 +28,7 @@
 #include "Constants.hpp"
 #include "RunesDebug.hpp"
 #include "HeroicsNames.hpp"
+#include "RunesMainWidget.hpp"
 #include "toydata.hpp"
 
 #define intToChecked(value) ((value) == 1 ? Qt::Checked : Qt::Unchecked)
@@ -242,7 +243,10 @@ void FigureTabWidget::Initialize(Runes::PortalTag* tag)
 {
 	_tag = tag;
 
-	backup();
+	if (_tag->_rfidTag->fromFigure())
+	{
+		backupFigure();
+	}
 
 	updateFields();
 }
@@ -256,6 +260,26 @@ void FigureTabWidget::UpdateProgress(uint8_t progress)
 	if (_tag == nullptr)
 	{
 		this->_lblToyName->setText(QString("<h2>Loading... (%1/64)</h2>").arg(progress));
+	}
+}
+
+
+//=============================================================================
+// StartSave: Begin saving figure
+//=============================================================================
+void FigureTabWidget::StartSave(QString& path, bool& writeToFigure)
+{
+	writeToFigure = false;
+	if (!_tag)
+	{
+		return;
+	}
+
+	saveFigure(path, writeToFigure);
+
+	if (!_tag->_rfidTag->fromFigure())
+	{
+		writeToFigure = false;
 	}
 }
 
@@ -673,15 +697,50 @@ void FigureTabWidget::initUpgrades()
 
 
 //=============================================================================
-// backup: Backup the loaded figure
+// getFigurePath: Get the path for the local figure backup
 //=============================================================================
-void FigureTabWidget::backup()
+QString FigureTabWidget::getFigurePath(uint32_t serial)
 {
 	QDir runesDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 	// Make dumps folder
 	runesDir.mkpath("dumps");
 
-	QString dumpFile = runesDir.absolutePath().append("/dumps/%1.dmp").arg(this->_tag->_serial, 1, 16);
+	return runesDir.absolutePath().append("/dumps/%1.dmp").arg(serial, 1, 16);
+}
+
+
+//=============================================================================
+// backup: Backup the loaded figure
+//=============================================================================
+void FigureTabWidget::backupFigure()
+{
+	QString dumpFile = getFigurePath(this->_tag->_serial);
 
 	this->_tag->_rfidTag->SaveToFile(dumpFile.toUtf8());
+}
+
+
+//=============================================================================
+// save: Write the loaded figure
+//=============================================================================
+void FigureTabWidget::saveFigure(QString& path, bool& valid)
+{
+	valid = false;
+
+	path = getFigurePath(this->_tag->_serial);
+
+	Runes::VerifyStatus status = this->_tag->Verify();
+
+	if (status == Runes::VerifyStatus::kSuccess)
+	{
+		this->_tag->_rfidTag->SaveToFile(path.toUtf8());
+
+		Runes::PortalTag testTag = Runes::PortalTag();
+		testTag.ReadFromFile(path.toUtf8());
+		status = testTag.Verify();
+	}
+
+	valid = status == Runes::VerifyStatus::kSuccess;
+
+	// main window manages driver so writing is handled there
 }

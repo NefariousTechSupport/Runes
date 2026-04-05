@@ -72,9 +72,32 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 	connect(actSave, &QAction::triggered, [=]()
 	{
 		FigureTabWidget* figureWidget = static_cast<FigureTabWidget*>(this->_tabs->currentWidget());
-		if (figureWidget != nullptr)
+
+		bool writeToFigure = figureWidget->_tag->_rfidTag->fromFigure();
+		QString userPath;
+		if (!writeToFigure)
 		{
-			figureWidget->_tag->SaveToFile(QFileDialog::getSaveFileName(this, tr("Save Dump File"), "", tr("All Files (*.*)")).toLocal8Bit());
+			userPath = QFileDialog::getSaveFileName(this, tr("Save Dump File"), "", tr("All Files (*.*)"));
+		}
+
+		if (figureWidget != nullptr && (!userPath.isEmpty() || writeToFigure))
+		{
+			QString backupPath;
+			figureWidget->StartSave(backupPath, writeToFigure);
+
+			if (!userPath.isEmpty())
+			{
+				QFile backup = QFile(backupPath);
+				backup.copy(userPath);
+			}
+
+			if (writeToFigure)
+			{
+				auto iter = std::find(_realFigures.begin(), _realFigures.end(), figureWidget);
+				size_t index = std::distance(_realFigures.begin(), iter);
+				_driver->QueueWrite(index);
+			}
+			figureWidget->_tag->SaveToFile(userPath.toLocal8Bit());
 		}
 	});
 	menuFile->addAction(actSave);
