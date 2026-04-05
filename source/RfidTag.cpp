@@ -20,10 +20,11 @@
 //=============================================================================
 // RfidTag::RfidTag: Constructor
 //=============================================================================
-Runes::RfidTag::RfidTag()
+Runes::RfidTag::RfidTag(bool fromFigure)
 : _tag()
 , _blocksRead(-1)
 , _blocksRequested(-1)
+, _fromFigure(fromFigure)
 {
 }
 
@@ -182,6 +183,15 @@ bool Runes::RfidTag::SaveBlocks(void* src, uint8_t blockId, uint8_t numBlocks)
 		blocksWritten++;
 	}
 	return blocksWritten == numBlocks;
+}
+
+
+//=============================================================================
+// fromFigure: Gets whether or not this figure is from a portal figure
+//=============================================================================
+bool Runes::RfidTag::fromFigure() const
+{
+	return _fromFigure;
 }
 
 

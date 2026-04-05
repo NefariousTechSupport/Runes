@@ -56,7 +56,7 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 			int tabIndex = this->_tabs->addTab(widget, tr("Figure File"));
 
 			Runes::PortalTag* tag = new Runes::PortalTag();
-			tag->_rfidTag = new Runes::RfidTag();
+			tag->_rfidTag = new Runes::RfidTag(false);
 			tag->ReadFromFile(sourceFile.toLocal8Bit());
 
 			widget->Initialize(tag);

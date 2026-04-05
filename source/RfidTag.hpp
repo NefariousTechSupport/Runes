@@ -26,7 +26,7 @@ namespace Runes
 	class RfidTag
 	{
 		public:
-			RfidTag();
+			RfidTag(bool fromFigure);
 
 			static bool shouldEncrypt(uint8_t blockId);
 			static bool isAccessControlBlock(int blockId);
@@ -46,6 +46,8 @@ namespace Runes
 			uint8_t PortalBlocksRequested();
 			uint32_t PortalTimeSinceQuery();
 
+			bool fromFigure() const;
+
 			void decrypt();
 			uint8_t DetermineActiveDataRegion0();
 			uint8_t DetermineActiveDataRegion1();
@@ -57,6 +59,8 @@ namespace Runes
 			std::atomic<int8_t> _blocksRead;
 			std::atomic<int8_t> _blocksRequested;
 			std::chrono::steady_clock::time_point _queryTimestamp;
+
+			bool _fromFigure;
 	};
 }
 

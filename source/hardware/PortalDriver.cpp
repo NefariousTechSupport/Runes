@@ -42,7 +42,7 @@ PortalDriver::PortalDriver()
 {
 	for (uint8_t t = 0; t < _tags.size(); t++)
 	{
-		_tags[t]._rfidTag = new RfidTag();
+		_tags[t]._rfidTag = new RfidTag(true);
 	}
 }
 
