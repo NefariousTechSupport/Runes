@@ -24,6 +24,40 @@
 
 
 //=============================================================================
+// PortalTag: Constructor.
+//=============================================================================
+Runes::PortalTag::PortalTag()
+: _tagHeader({})
+, _tagData({})
+, _rfidTag(nullptr)
+, _serial(0)
+, _toyType(kTfbSpyroTag_ToyType_MIN)
+, _subType(0)
+, _exp(0)
+, _coins(0)
+, _cumulativeTime(0)
+, _platformUse(0)
+, _heroics(0)
+, _hatType(kTfbSpyroTag_Hat_NONE)
+, _trinketType(kTfbSpyroTag_Trinket_NONE)
+, _firstUsed({})
+, _recentlyUsed({})
+, _heroPoints(0)
+, _ownerCount(0)
+, _ownerId()
+, _giantsQuests()
+, _swapforceQuests()
+, _upgrades(0)
+, _elementCollectionCounts()
+, _elementCollection(0)
+, _accoladeRanks()
+, _webCode()
+, _nickname()
+{
+}
+
+
+//=============================================================================
 // ~PortalTag: Destructor.
 //=============================================================================
 Runes::PortalTag::~PortalTag()
