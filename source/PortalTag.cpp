@@ -650,6 +650,33 @@ void Runes::PortalTagData::setHat(kTfbSpyroTag_HatType hat)
 	printf("Invalid Hat ID");
 }
 
+
+
+//=============================================================================
+// isCore: Determines whether this skylander is a core or not
+//=============================================================================
+bool Runes::PortalTag::isCore()
+{
+	return (this->_toyType >= kTfbSpyroTag_ToyType_CHARACTER_2011 && this->_toyType <= kTfbSpyroTag_ToyType_CHARACTER_2011_MAX)
+	    || (this->_toyType >= kTfbSpyroTag_ToyType_Character_2012 && this->_toyType <= kTfbSpyroTag_ToyType_Character_2012_MAX)
+	    || (this->_toyType >= kTfbSpyroTag_ToyType_Character_2013 && this->_toyType <= kTfbSpyroTag_ToyType_Character_2013_MAX)
+	    || (this->_toyType >= kTfbSpyroTag_ToyType_Character_2014 && this->_toyType <= kTfbSpyroTag_ToyType_Character_2014_MAX)
+	    || (this->_toyType >= kTfbSpyroTag_ToyType_CHARACTER_2015 && this->_toyType <= kTfbSpyroTag_ToyType_CHARACTER_2015_MAX)
+	    || (this->_toyType >= kTfbSpyroTag_ToyType_CHARACTER_2016 && this->_toyType <= kTfbSpyroTag_ToyType_CHARACTER_2016_MAX)
+	    || (this->_toyType >= kTfbSpyroTag_ToyType_LEGENDARY      && this->_toyType <= kTfbSpyroTag_ToyType_PET_MAX)
+	    || (this->_toyType >= kTfbSpyroTag_ToyType_PET            && this->_toyType <= kTfbSpyroTag_ToyType_PET_MAX)
+	    || (this->_toyType == 98)                                         // Test Titan
+	    || (this->_toyType == kTfbSpyroTag_ToyType_Character_DebugMinion) // Debug Minion
+	    || (this->_toyType == 699)                                        // Goldie
+	    || (this->_toyType == kTfbSpyroTag_ToyType_Character_Template)    // Template Legacy
+	    || (this->_toyType == 9990)                                       // Debug CORE
+	    || (this->_toyType == 9991)                                       // Debug GIANT
+	    || (this->_toyType == 9992)                                       // Debug RANGER
+	;
+}
+
+
+
 //=============================================================================
 // isTrap: Determines whether this skylander is a trap or not
 //=============================================================================

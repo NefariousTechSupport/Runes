@@ -269,6 +269,7 @@ namespace Runes
 			void DecodeSubtype(ESkylandersGame* esg, bool* fullAltDeco, bool* reposeFlag, bool* lightcore, kTfbSpyroTag_DecoID* decoId);
 			void DebugPrintHeader();
 			void DebugSaveTagData();
+			bool isCore();
 			bool isTrap();
 			bool isVehicle();
 			uint8_t GetUpgrade(Upgrade upgrade) const;
