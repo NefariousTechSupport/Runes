@@ -590,7 +590,7 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[HardwareInterfac
 //=============================================================================
 // ProcessColour: Write out the current colour
 //=============================================================================
-HardwareErrorCode PortalDriver::ProcessColour(uint8_t writeBuffer[0x20], uint8_t* writeBufferLen)
+HardwareErrorCode PortalDriver::ProcessColour(uint8_t writeBuffer[HardwareInterface::EP0WriteSize], uint8_t* writeBufferLen)
 {
 	_colourMutex.lock();
 

@@ -125,9 +125,9 @@ namespace Runes::Portal
 
 		void                           PortalThread();
 
-		HardwareErrorCode              ProcessRead(uint8_t writeBuffer[0x20], uint8_t* writeBufferLen);
+		HardwareErrorCode              ProcessRead(uint8_t writeBuffer[HardwareInterface::EP0WriteSize], uint8_t* writeBufferLen);
 
-		HardwareErrorCode              ProcessColour(uint8_t writeBuffer[0x20], uint8_t* writeBufferLen);
+		HardwareErrorCode              ProcessColour(uint8_t writeBuffer[HardwareInterface::EP0WriteSize], uint8_t* writeBufferLen);
 
 		void                           QueueEvent(QueuedEvent* event);
 
