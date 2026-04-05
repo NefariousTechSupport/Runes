@@ -31,6 +31,8 @@ private:
 	QVBoxLayout* _root;
 	QMenuBar* _menuBar;
 	Runes::Portal::PortalDriver* _driver;
-	Runes::EventListenerID _readTagEventId;
-	Runes::EventListenerID _removeTagEventId;
+	Runes::EventListenerID _tagPlacedEventId;
+	Runes::EventListenerID _tagReadFinishedEventId;
+	Runes::EventListenerID _tagRemovedEventId;
+	Runes::EventListenerID _tagReadUpdateEventId;
 };

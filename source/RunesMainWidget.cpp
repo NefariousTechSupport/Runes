@@ -23,8 +23,10 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 , _root(nullptr)
 , _menuBar(nullptr)
 , _driver(nullptr)
-, _readTagEventId(Runes::kInvalidEventListenerID)
-, _removeTagEventId(Runes::kInvalidEventListenerID)
+, _tagPlacedEventId(Runes::kInvalidEventListenerID)
+, _tagReadFinishedEventId(Runes::kInvalidEventListenerID)
+, _tagRemovedEventId(Runes::kInvalidEventListenerID)
+, _tagReadUpdateEventId(Runes::kInvalidEventListenerID)
 {
 	QVBoxLayout* root = new QVBoxLayout(this);
 
@@ -122,7 +124,7 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 
 	_driver = new Runes::Portal::PortalDriver();
 
-	_readTagEventId = _driver->GetTagPlacedEvent().AddListener([=](uint8_t index)
+	_tagPlacedEventId = _driver->GetTagPlacedEvent().AddListener([=](uint8_t index)
 	{
 		FigureTabWidget* widget = new FigureTabWidget(_tabs);
 		_realFigures[index] = widget;
@@ -134,7 +136,7 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 		this->_tabs->setCurrentIndex(tabIndex);
 	});
 
-	_readTagEventId = _driver->GetTagReadFinishedEvent().AddListener([=](uint8_t index, Runes::PortalTag& newTag)
+	_tagReadFinishedEventId = _driver->GetTagReadFinishedEvent().AddListener([=](uint8_t index, Runes::PortalTag& newTag)
 	{
 		FigureTabWidget* widget = _realFigures[index];
 
@@ -144,7 +146,7 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 		widget->Initialize(&newTag);
 	});
 
-	_removeTagEventId = _driver->GetTagRemovedEvent().AddListener([=](uint8_t index)
+	_tagRemovedEventId = _driver->GetTagRemovedEvent().AddListener([=](uint8_t index)
 	{
 		FigureTabWidget* widget = _realFigures[index];
 
@@ -154,7 +156,7 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 		this->_tabs->removeTab(this->_tabs->indexOf(widget));
 	});
 
-	_removeTagEventId = _driver->GetTagReadUpdateEvent().AddListener([=](uint8_t index, uint8_t progress)
+	_tagReadUpdateEventId = _driver->GetTagReadUpdateEvent().AddListener([=](uint8_t index, uint8_t progress)
 	{
 		FigureTabWidget* widget = _realFigures[index];
 
@@ -176,6 +178,11 @@ RunesMainWidget::~RunesMainWidget()
 			_realFigures[f]->_tag = nullptr;
 		}
 	}
+
+	_driver->GetTagPlacedEvent().RemoveListener(_tagPlacedEventId);
+	_driver->GetTagReadFinishedEvent().RemoveListener(_tagReadFinishedEventId);
+	_driver->GetTagRemovedEvent().RemoveListener(_tagRemovedEventId);
+	_driver->GetTagReadUpdateEvent().RemoveListener(_tagReadUpdateEventId);
 }
 
 void RunesMainWidget::PumpDriver()
