@@ -40,10 +40,14 @@ namespace Runes::Portal
 
 		void QueueColour(PortalLEDColour colour);
 		void QueueColour(uint8_t r, uint8_t g, uint8_t b);
+		bool QueueWrite(int indexs);
 		Event<void, uint8_t>&                    GetTagPlacedEvent()       { return _tagPlacedEvent; }
 		Event<void, uint8_t>&                    GetTagRemovedEvent()      { return _tagRemovedEvent; }
 		Event<void, uint8_t, Runes::PortalTag&>& GetTagReadFinishedEvent() { return _tagReadFinishedEvent; }
 		Event<void, uint8_t, uint8_t>&           GetTagReadUpdateEvent()   { return _tagReadUpdateEvent; }
+
+	private:
+		static bool IsCore(kTfbSpyroTag_ToyType type);
 
 	private:
 		enum DriverState
@@ -100,6 +104,22 @@ namespace Runes::Portal
 			uint8_t _progress;
 		};
 
+		struct WriteCmd
+		{
+			WriteCmd(uint8_t figure, uint8_t block, uint8_t data[BLOCK_SIZE])
+			: _figure(figure)
+			, _block(block)
+			, _writeStage(0)
+			{
+				memcpy(_data, data, BLOCK_SIZE);
+			}
+
+			uint8_t _figure;
+			uint8_t _block;
+			uint8_t _writeStage;
+			uint8_t _data[BLOCK_SIZE];
+		};
+
 		void                           MainThreadPollDevices();
 		void                           MainThreadPumpQueue();
 
@@ -139,6 +159,9 @@ namespace Runes::Portal
 
 		std::mutex                      _eventQueueMutex;
 		std::queue<QueuedEvent*>        _eventQueue;
+
+		std::mutex                      _writeQueueMutex;
+		std::list<WriteCmd>             _writeQueue;
 	};
 }
 
