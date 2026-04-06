@@ -53,6 +53,12 @@ Runes::PortalTag::PortalTag()
 , _accoladeRanks()
 , _webCode()
 , _nickname()
+, _tagHeaderStored(false)
+, _tagDataStored(false)
+, _tagMagicMomentStored(false)
+, _tagRemainingDataStored(false)
+, _area0regionIndex(0)
+, _area1regionIndex(0)
 {
 }
 
@@ -175,8 +181,11 @@ void Runes::PortalTag::StoreTagData()
 {
 	if(!this->_tagDataStored)
 	{
-		this->_rfidTag->CopyBlocks(((uint8_t*)&this->_tagData) + 0x00, this->_rfidTag->DetermineActiveDataRegion0() ? 0x24 : 0x08, 0x7);
-		this->_rfidTag->CopyBlocks(((uint8_t*)&this->_tagData) + 0x70, this->_rfidTag->DetermineActiveDataRegion1() ? 0x2D : 0x11, 0x4);
+		this->_area0regionIndex = this->_rfidTag->DetermineActiveDataRegion0();
+		this->_area1regionIndex = this->_rfidTag->DetermineActiveDataRegion1();
+
+		this->_rfidTag->CopyBlocks(((uint8_t*)&this->_tagData) + 0x00, this->_area0regionIndex ? 0x24 : 0x08, 0x7);
+		this->_rfidTag->CopyBlocks(((uint8_t*)&this->_tagData) + 0x70, this->_area1regionIndex ? 0x2D : 0x11, 0x4);
 		this->_tagDataStored = true;
 	}
 }
@@ -463,6 +472,32 @@ void Runes::PortalTag::FillOutputFromStoredData()
 
 
 //=============================================================================
+// FillRfidTagWithStoredData: Fill memory with the stored data
+//=============================================================================
+void Runes::PortalTag::FillRfidTagWithStoredData()
+{
+	this->_tagData._areaSequence0++;
+	this->_tagData._areaSequence1++;
+	this->_area0regionIndex = 1 - this->_area0regionIndex;
+	this->_area1regionIndex = 1 - this->_area1regionIndex;
+
+	this->FillOutputFromStoredData();
+
+	// Rewrite checksums
+	this->ComputeTagDataChecksums(
+		this->_tagData._crcType6,
+		this->_tagData._crcType3,
+		this->_tagData._crcType2,
+		this->_tagData._crcType1
+	);
+
+	_rfidTag->SaveBlocks(((uint8_t*)&this->_tagData) + 0x00, this->_area0regionIndex ? 0x24 : 0x08, 0x7);
+	_rfidTag->SaveBlocks(((uint8_t*)&this->_tagData) + 0x70, this->_area1regionIndex ? 0x2D : 0x11, 0x4);
+}
+
+
+
+//=============================================================================
 // ComputeLevel: Determine which level this skylander is
 //=============================================================================
 uint8_t Runes::PortalTag::ComputeLevel()
@@ -505,21 +540,8 @@ void Runes::PortalTag::ReadFromFile(const char* fileName)
 //=============================================================================
 void Runes::PortalTag::SaveToFile(const char* fileName)
 {
-	this->_tagData._areaSequence0++;
-	this->_tagData._areaSequence1++;
-	this->FillOutputFromStoredData();
+	FillRfidTagWithStoredData();
 
-	// Rewrite checksums
-	this->ComputeTagDataChecksums(
-		this->_tagData._crcType6,
-		this->_tagData._crcType3,
-		this->_tagData._crcType2,
-		this->_tagData._crcType1
-	);
-
-	//We're writing to the other region hence the ternary operator looks like that
-	_rfidTag->SaveBlocks(((uint8_t*)&this->_tagData) + 0x00, this->_rfidTag->DetermineActiveDataRegion0() ? 0x08 : 0x24, 0x7);
-	_rfidTag->SaveBlocks(((uint8_t*)&this->_tagData) + 0x70, this->_rfidTag->DetermineActiveDataRegion1() ? 0x11 : 0x2D, 0x4);
 	//this->DebugSaveTagData();
 	_rfidTag->SaveToFile(fileName);
 }

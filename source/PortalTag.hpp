@@ -253,6 +253,12 @@ namespace Runes
 			uint8_t _accoladeRanks[2];
 			char _webCode[12];
 			uint16_t _nickname[16];
+			bool _tagHeaderStored : 1;
+			bool _tagDataStored : 1;
+			bool _tagMagicMomentStored : 1;
+			bool _tagRemainingDataStored : 1;
+			uint8_t _area0regionIndex : 1;
+			uint8_t _area1regionIndex : 1;
 
 			PortalTag();
 			~PortalTag();
@@ -262,6 +268,7 @@ namespace Runes
 			void StoreTagData();
 			void StoreMagicMoment();
 			void StoreRemainingData();
+			void FillRfidTagWithStoredData();
 			void FillOutputFromStoredData();
 			void ReadFromFile(const char* fileName);
 			void SaveToFile(const char* fileName);
@@ -280,10 +287,6 @@ namespace Runes
 			VerifyStatus Verify() const;
 
 		private:
-			bool _tagHeaderStored;
-			bool _tagDataStored;
-			bool _tagMagicMomentStored;
-			bool _tagRemainingDataStored;
 			void StoreQuestsSwapForce();
 			void StoreQuestsGiants();
 			void FillQuestsSwapForce();
