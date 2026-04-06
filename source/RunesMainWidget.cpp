@@ -109,7 +109,10 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 				size_t index = std::distance(_realFigures.begin(), iter);
 				_driver->QueueWrite(index);
 			}
-			figureWidget->_tag->SaveToFile(userPath.toLocal8Bit());
+			else
+			{
+				figureWidget->_tag->SaveToFile(userPath.toLocal8Bit());
+			}
 		}
 	});
 	menuFile->addAction(actSave);
