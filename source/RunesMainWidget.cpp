@@ -77,6 +77,14 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 	{
 		FigureTabWidget* figureWidget = static_cast<FigureTabWidget*>(this->_tabs->currentWidget());
 
+		if (!figureWidget
+		 || !figureWidget->_tag
+		 || !figureWidget->_tag->_rfidTag)
+		{
+			// Whoops
+			return;
+		}
+
 		bool writeToFigure = figureWidget->_tag->_rfidTag->fromFigure();
 		QString userPath;
 		if (!writeToFigure)
