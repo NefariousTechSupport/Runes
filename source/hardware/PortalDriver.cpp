@@ -246,9 +246,8 @@ bool PortalDriver::QueueWrite(int index)
 
 	if (tag.isCore())
 	{
-		// Flip the active regions cos we're writing
-		uint8_t active0 = tag._rfidTag->DetermineActiveDataRegion0() == 0 ? 0x24 : 0x08;
-		uint8_t active1 = tag._rfidTag->DetermineActiveDataRegion1() == 0 ? 0x1D : 0x11;
+		uint8_t active0 = tag._area0regionIndex ? 0x24 : 0x08;
+		uint8_t active1 = tag._area1regionIndex ? 0x2D : 0x11;
 
 		uint8_t dTagData[sizeof(PortalTagData)];
 		uint8_t eTagData[sizeof(PortalTagData)];
