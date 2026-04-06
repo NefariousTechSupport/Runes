@@ -285,6 +285,28 @@ void FigureTabWidget::StartSave(QString& path, bool& writeToFigure)
 
 
 //=============================================================================
+// FigureWriteBegan: Block UI since we're writing data to figure
+//=============================================================================
+void FigureTabWidget::FigureWriteBegan()
+{
+	_lblToyName->setText(tr("<h2>Writing...</h2>"));
+
+	setDisabled(true);
+}
+
+
+//=============================================================================
+// FigureWriteEnded: Unblock UI since we're done writing data to figure
+//=============================================================================
+void FigureTabWidget::FigureWriteEnded()
+{
+	setDisabled(false);
+
+	updateFields();
+}
+
+
+//=============================================================================
 // macros for defining elemental quest inputs easier.
 //=============================================================================
 #define defineElementalSpinQuest(form, generic, questGame, field, index, max, name) \

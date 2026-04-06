@@ -68,7 +68,6 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 			widget->Initialize(tag);
 
 			this->_tabs->setCurrentIndex(tabIndex);
-
 		}
 	});
 	menuFile->addAction(actOpen);
@@ -110,6 +109,8 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 				auto iter = std::find(_realFigures.begin(), _realFigures.end(), figureWidget);
 				size_t index = std::distance(_realFigures.begin(), iter);
 				_driver->QueueWrite(index);
+
+				figureWidget->FigureWriteBegan();
 			}
 			else
 			{
@@ -186,7 +187,7 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 	{
 		FigureTabWidget* widget = _realFigures[index];
 
-		widget->setEnabled(true);
+		widget->FigureWriteEnded();
 	});
 
 	_tagWriteCancelledEventId = _driver->GetTagWriteCancelledEvent().AddListener([=](uint8_t index)
@@ -198,6 +199,8 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 			QMessageBox::StandardButton::Ok,
 			QMessageBox::StandardButton::NoButton
 		);
+
+		// No need to update the figure widget because it's going to be destroyed
 	});
 
 	QTimer* driverTimer = new QTimer(this);

@@ -22,6 +22,8 @@ public:
 	void Initialize(Runes::PortalTag* tag);
 	void UpdateProgress(uint8_t progress);
 	void StartSave(QString& path, bool& valid);
+	void FigureWriteBegan();
+	void FigureWriteEnded();
 	Runes::PortalTag* _tag;
 
 private:

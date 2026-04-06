@@ -508,11 +508,20 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[HardwareInterfac
 								// Verify the request was successful
 								if (readBuffer[1] & 0x10 && memcmp(cmd._data, &readBuffer[3], BLOCK_SIZE) == 0)
 								{
+									// cmd is about to be removed, do not access it directly
+									uint8_t thisFigureId = cmd._figure;
+
 									// We're done here, it's been written and verified to be what we wanted
 									_writeQueue.pop_front();
 
-									// defer this so we don't lock both mutexes at once
-									sendWriteComplete = cmd._figure;
+									// check if any more writes remaining for this figure
+									auto nextItem = std::find_if(_writeQueue.begin(), _writeQueue.end(), [thisFigureId](WriteCmd& cmdIter)
+									{
+										return cmdIter._figure == thisFigureId;
+									});
+
+									// defer sending the event so we don't lock both mutexes at the same time
+									sendWriteComplete = nextItem == _writeQueue.end() ? thisFigureId : -1;
 								}
 								else
 								{
