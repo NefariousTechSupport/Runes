@@ -19,9 +19,3 @@ Compiling:
 * cd into the build folder
 * run `cmake -S .. -B . -DCMAKE_PREFIX_PATH=%QT_DIR%\6.9.0\msvc2022_64`
 * run `msbuild Runes.sln /p:Configuration=Debug /p:Platform=x64`
-
-## Usage
-
-Requires a salt.txt file in the Resources folder, its contents should be the salt used in the MD5 hash that generates the encryption key.
-
-`Runes <Path to encrypted dump file>`

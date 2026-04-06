@@ -7,7 +7,6 @@
 #include <QString>
 
 #include "RunesMainWidget.hpp"
-#include "PortalAlgos.hpp"
 #include "debug.hpp"
 #include "RunesDebug.hpp"
 
@@ -22,24 +21,8 @@ int main(int argc, char *argv[])
 	QDir dir = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
 	dir.mkdir(".");
 
-	std::optional<std::string> result = Runes::readSalt();
-	if (result.has_value())
-	{
-		QMessageBox::critical(
-			nullptr,
-			QString("salt.txt error"),
-			QString(result.value().c_str()),
-			QMessageBox::StandardButton::Abort,
-			QMessageBox::StandardButton::NoButton);
+	RunesMainWidget rw = RunesMainWidget(nullptr);
+	rw.show();
 
-		a.exit(1);
-		return 1;
-	}
-	else
-	{
-		RunesMainWidget rw = RunesMainWidget(nullptr);
-		rw.show();
-
-		return a.exec();
-	}
+	return a.exec();
 }
