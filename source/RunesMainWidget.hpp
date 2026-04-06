@@ -35,4 +35,6 @@ private:
 	Runes::EventListenerID _tagReadFinishedEventId;
 	Runes::EventListenerID _tagRemovedEventId;
 	Runes::EventListenerID _tagReadUpdateEventId;
+	Runes::EventListenerID _tagWriteCompleteEventId;
+	Runes::EventListenerID _tagWriteCancelledEventId;
 };
