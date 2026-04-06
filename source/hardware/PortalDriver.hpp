@@ -41,10 +41,12 @@ namespace Runes::Portal
 		void QueueColour(PortalLEDColour colour);
 		void QueueColour(uint8_t r, uint8_t g, uint8_t b);
 		bool QueueWrite(int indexs);
-		Event<void, uint8_t>&                    GetTagPlacedEvent()       { return _tagPlacedEvent; }
-		Event<void, uint8_t>&                    GetTagRemovedEvent()      { return _tagRemovedEvent; }
-		Event<void, uint8_t, Runes::PortalTag&>& GetTagReadFinishedEvent() { return _tagReadFinishedEvent; }
-		Event<void, uint8_t, uint8_t>&           GetTagReadUpdateEvent()   { return _tagReadUpdateEvent; }
+		Event<void, uint8_t>&                    GetTagPlacedEvent()         { return _tagPlacedEvent; }
+		Event<void, uint8_t>&                    GetTagRemovedEvent()        { return _tagRemovedEvent; }
+		Event<void, uint8_t, Runes::PortalTag&>& GetTagReadFinishedEvent()   { return _tagReadFinishedEvent; }
+		Event<void, uint8_t, uint8_t>&           GetTagReadUpdateEvent()     { return _tagReadUpdateEvent; }
+		Event<void, uint8_t>&                    GetTagWriteCompleteEvent()  { return _tagWriteCompleteEvent; }
+		Event<void, uint8_t>&                    GetTagWriteCancelledEvent() { return _tagWriteCancelledEvent; }
 
 	private:
 		static bool IsCore(kTfbSpyroTag_ToyType type);
@@ -68,6 +70,8 @@ namespace Runes::Portal
 			kEventTypeFigureReadComplete,
 			kEventTypeFigureRemoved,
 			kEventTypeFigureReadUpdate,
+			kEventTypeFigureWriteComplete,
+			kEventTypeFigureWriteCancelled,
 		};
 		struct QueuedEvent
 		{
@@ -103,6 +107,9 @@ namespace Runes::Portal
 			uint8_t _figureId;
 			uint8_t _progress;
 		};
+
+		typedef QueuedEventDataByte<kEventTypeFigureWriteComplete>  QueuedEventFigureWriteComplete;
+		typedef QueuedEventDataByte<kEventTypeFigureWriteCancelled> QueuedEventFigureWriteCancelled;
 
 		struct WriteCmd
 		{
@@ -156,6 +163,8 @@ namespace Runes::Portal
 		Event<void, uint8_t>                    _tagRemovedEvent;
 		Event<void, uint8_t, Runes::PortalTag&> _tagReadFinishedEvent;
 		Event<void, uint8_t, uint8_t>           _tagReadUpdateEvent;
+		Event<void, uint8_t>                    _tagWriteCompleteEvent;
+		Event<void, uint8_t>                    _tagWriteCancelledEvent;
 
 		std::mutex                      _eventQueueMutex;
 		std::queue<QueuedEvent*>        _eventQueue;

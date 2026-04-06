@@ -27,6 +27,8 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 , _tagReadFinishedEventId(Runes::kInvalidEventListenerID)
 , _tagRemovedEventId(Runes::kInvalidEventListenerID)
 , _tagReadUpdateEventId(Runes::kInvalidEventListenerID)
+, _tagWriteCompleteEventId(Runes::kInvalidEventListenerID)
+, _tagWriteCancelledEventId(Runes::kInvalidEventListenerID)
 {
 	QVBoxLayout* root = new QVBoxLayout(this);
 
@@ -163,6 +165,24 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 		widget->UpdateProgress(progress);
 	});
 
+	_tagWriteCompleteEventId = _driver->GetTagWriteCompleteEvent().AddListener([=](uint8_t index)
+	{
+		FigureTabWidget* widget = _realFigures[index];
+
+		widget->setEnabled(true);
+	});
+
+	_tagWriteCancelledEventId = _driver->GetTagWriteCancelledEvent().AddListener([=](uint8_t index)
+	{
+		QMessageBox::warning(
+			this,
+			tr("Figure Removed During Write"),
+			tr("A figure was removed while it was being written to, this is a bad idea normally.\nPlease do not do this again.\nIt's possible your figure is corrupted but it can be recovered using a backup by placing the figure on the portal again."),
+			QMessageBox::StandardButton::Ok,
+			QMessageBox::StandardButton::NoButton
+		);
+	});
+
 	QTimer* driverTimer = new QTimer(this);
 	connect(driverTimer, SIGNAL(timeout()), this, SLOT(PumpDriver()));
 	driverTimer->start(50);
@@ -183,6 +203,8 @@ RunesMainWidget::~RunesMainWidget()
 	_driver->GetTagReadFinishedEvent().RemoveListener(_tagReadFinishedEventId);
 	_driver->GetTagRemovedEvent().RemoveListener(_tagRemovedEventId);
 	_driver->GetTagReadUpdateEvent().RemoveListener(_tagReadUpdateEventId);
+	_driver->GetTagWriteCompleteEvent().RemoveListener(_tagWriteCompleteEventId);
+	_driver->GetTagWriteCancelledEvent().RemoveListener(_tagWriteCancelledEventId);
 }
 
 void RunesMainWidget::PumpDriver()

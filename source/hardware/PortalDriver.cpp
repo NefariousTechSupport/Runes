@@ -38,6 +38,8 @@ PortalDriver::PortalDriver()
 , _tagRemovedEvent()
 , _tagReadFinishedEvent()
 , _tagReadUpdateEvent()
+, _tagWriteCompleteEvent()
+, _tagWriteCancelledEvent()
 , _eventQueueMutex()
 , _eventQueue()
 , _writeQueue()
@@ -175,6 +177,21 @@ void PortalDriver::MainThreadPumpQueue()
 				QueuedEventFigureReadUpdate* fruEvent = static_cast<QueuedEventFigureReadUpdate*>(event);
 				_tagReadUpdateEvent.Invoke(fruEvent->_figureId, fruEvent->_progress);
 				delete fruEvent;
+				break;
+			}
+			case kEventTypeFigureWriteComplete:
+			{
+				QueuedEventFigureWriteComplete* fwcEvent = static_cast<QueuedEventFigureWriteComplete*>(event);
+				_tagWriteCompleteEvent.Invoke(fwcEvent->_data);
+				delete fwcEvent;
+				break;
+			}
+			case kEventTypeFigureWriteCancelled:
+			{
+				QueuedEventFigureWriteCancelled* fwcEvent = static_cast<QueuedEventFigureWriteCancelled*>(event);
+				_tagWriteCancelledEvent.Invoke(fwcEvent->_data);
+				delete fwcEvent;
+				break;
 			}
 		}
 	}
@@ -446,6 +463,7 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[HardwareInterfac
 			{
 				_writeQueueMutex.lock();
 				bool processedQuery = false;
+				int8_t sendWriteComplete = -1;
 
 				if (!_writeQueue.empty())
 				{
@@ -491,6 +509,9 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[HardwareInterfac
 								{
 									// We're done here, it's been written and verified to be what we wanted
 									_writeQueue.pop_front();
+
+									// defer this so we don't lock both mutexes at once
+									sendWriteComplete = cmd._figure;
 								}
 								else
 								{
@@ -503,6 +524,12 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[HardwareInterfac
 				}
 
 				_writeQueueMutex.unlock();
+
+				if (sendWriteComplete >= 0)
+				{
+					// We send the event here to avoid locking multiple mutexes at once
+					QueueEvent(new QueuedEventFigureWriteComplete(sendWriteComplete));
+				}
 
 				if (!processedQuery && readBuffer[0] == 'Q')
 				{
@@ -554,11 +581,24 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[HardwareInterfac
 							case 0b01:
 								break;
 							case 0b10:
-								_tags[s]._rfidTag->PortalClearData();
-								_writeQueueMutex.lock();
-								_writeQueue.remove_if([s](WriteCmd& cmd){ return cmd._figure == s; });
-								_writeQueueMutex.unlock();
-								QueueEvent(new QueuedEventFigureRemoved(s));
+								{
+									_tags[s]._rfidTag->PortalClearData();
+
+									_writeQueueMutex.lock();
+
+									uint8_t oldQueueLen = _writeQueue.size();
+									_writeQueue.remove_if([s](WriteCmd& cmd){ return cmd._figure == s; });
+									bool sendWriteCancelled = oldQueueLen != _writeQueue.size();
+
+									_writeQueueMutex.unlock();
+
+									// Defer the event to prevent locking both mutexes at once
+									if (sendWriteCancelled)
+									{
+										QueueEvent(new QueuedEventFigureWriteCancelled(s));
+									}
+									QueueEvent(new QueuedEventFigureRemoved(s));
+								}
 								break;
 							case 0b11:
 								{
