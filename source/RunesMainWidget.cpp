@@ -57,7 +57,9 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 		if (!sourceFile.isEmpty())
 		{
 			FigureTabWidget* widget = new FigureTabWidget(_tabs);
-			int tabIndex = this->_tabs->addTab(widget, tr("Figure File"));
+
+			QString tabName = tr("File %1").arg(QFileInfo(sourceFile).fileName());
+			int tabIndex = this->_tabs->addTab(widget, tabName);
 
 			Runes::PortalTag* tag = new Runes::PortalTag();
 			tag->_rfidTag = new Runes::RfidTag(false);
