@@ -716,7 +716,56 @@ void FigureTabWidget::backupFigure()
 {
 	QString dumpFile = getFigurePath(this->_tag->_serial);
 
-	this->_tag->_rfidTag->SaveToFile(dumpFile.toUtf8());
+	bool backupExists = QFile::exists(dumpFile);
+
+	Runes::VerifyStatus status = this->_tag->Verify();
+
+	if (status == Runes::VerifyStatus::kSuccess || !backupExists)
+	{
+		this->_tag->_rfidTag->SaveToFile(dumpFile.toUtf8());
+	}
+	else
+	{
+		const char* messageBody;
+		if (backupExists)
+		{
+			messageBody = "This figure is corrupt, however, a backup exists.\nWould you like to restore this backup? You will need to press File>Save afterwards.";
+		}
+		else
+		{
+			messageBody = "This figure is corrupt, no local backup exists.\nA backup has been created.\nWould you like to recompute checksums? (not guaranteed to work). You will need to pres File>Save afterwards.";
+		}
+
+		int result = QMessageBox::warning(
+			this,
+			tr("This Figure is Corrupt"),
+			tr(messageBody),
+			QMessageBox::StandardButton::Yes,
+			QMessageBox::StandardButton::Ignore
+		);
+
+		if (result == QMessageBox::StandardButton::Yes)
+		{
+			if (backupExists)
+			{
+				this->_tag->_rfidTag->ReadFromFile(dumpFile.toUtf8());
+				this->_tag->StoreTagData();
+				this->_tag->StoreHeader();
+				this->_tag->StoreMagicMoment();
+				this->_tag->StoreRemainingData();
+			}
+			else
+			{
+				// Rewrite checksums
+				this->_tag->ComputeTagDataChecksums(
+					this->_tag->_tagData._crcType6,
+					this->_tag->_tagData._crcType3,
+					this->_tag->_tagData._crcType2,
+					this->_tag->_tagData._crcType1
+				);
+			}
+		}
+	}
 }
 
 
@@ -728,6 +777,8 @@ void FigureTabWidget::saveFigure(QString& path, bool& valid)
 	valid = false;
 
 	path = getFigurePath(this->_tag->_serial);
+
+	this->_tag->FillRfidTagWithStoredData();
 
 	Runes::VerifyStatus status = this->_tag->Verify();
 
