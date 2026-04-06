@@ -147,6 +147,8 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 
 		int tabIndex = this->_tabs->addTab(widget, QString("Real Figure %1").arg(index));
 		this->_tabs->setCurrentIndex(tabIndex);
+
+		actSave->setEnabled(true);
 	});
 
 	_tagReadFinishedEventId = _driver->GetTagReadFinishedEvent().AddListener([=](uint8_t index, Runes::PortalTag& newTag)
@@ -167,6 +169,8 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 		widget->_tag = nullptr;
 
 		this->_tabs->removeTab(this->_tabs->indexOf(widget));
+
+		actSave->setEnabled(this->_tabs->currentWidget() != nullptr);
 	});
 
 	_tagReadUpdateEventId = _driver->GetTagReadUpdateEvent().AddListener([=](uint8_t index, uint8_t progress)
