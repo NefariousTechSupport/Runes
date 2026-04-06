@@ -168,6 +168,8 @@ void PortalDriver::MainThreadPumpQueue()
 			case kEventTypeFigureRemoved:
 			{
 				QueuedEventFigureRemoved* frEvent = static_cast<QueuedEventFigureRemoved*>(event);
+				_tags[frEvent->_data] = PortalTag();
+				_tags[frEvent->_data]._rfidTag = new RfidTag(true);
 				_tagRemovedEvent.Invoke(frEvent->_data);
 				delete frEvent;
 				break;
