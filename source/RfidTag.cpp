@@ -47,20 +47,19 @@ bool Runes::RfidTag::ReadFromFile(const char* path)
 {
 	FILE* f = fopen(path, "rb");
 	int res = 0;
+	bool success = true;
 
-	if(!f) goto error;
+	if (f)
+	{
+		fseek(f, 0, SEEK_SET);
+		res = fread(this->_tag, 0x01, 1024, f);
 
-	fseek(f, 0, SEEK_SET);
-	res = fread(this->_tag, 0x01, 1024, f);
+		success = (res == 1024);
 
-	if(res != 1024) goto error;
+		fclose(f);
+	}
 
-	fclose(f);
-	return true;
-
-	error:
-	fclose(f);
-	return false;
+	return success;
 }
 
 
