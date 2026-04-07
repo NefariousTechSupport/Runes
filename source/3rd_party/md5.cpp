@@ -220,7 +220,7 @@ order.
 #ifdef LITTLE_ENDIAN
 #define ENCODE(p,n) *(UINT4 *)(p) = n
 #else
-#define ENCODE(p,n) (p)[0]=n,(p)[1]=n>>8,(p)[2]=n>>16,(p)[3]=n>>24
+#define ENCODE(p,n) (p)[0]=static_cast<unsigned char>(n),(p)[1]=static_cast<unsigned char>(n>>8),(p)[2]=static_cast<unsigned char>(n>>16),(p)[3]=static_cast<unsigned char>(n>>24)
 #endif
 
 void MD5Close(MD5 *md5, unsigned char digest[16])

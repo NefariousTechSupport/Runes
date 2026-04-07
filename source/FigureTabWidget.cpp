@@ -370,7 +370,7 @@ void FigureTabWidget::FigureWriteEnded()
 	QCheckBox* field = new QCheckBox(); \
 	this->generic = field; \
 	field->setChecked(intToChecked(this->_tag->questGame[index])); \
-	connect(field, &QCheckBox::stateChanged, [this](int newState) \
+	connect(field, &QCheckBox::checkStateChanged, [this](Qt::CheckState newState) \
 	{ \
 		this->_tag->questGame[index] = newState == Qt::Checked ? 1 : 0; \
 	}); \
@@ -617,7 +617,7 @@ void FigureTabWidget::updateLevelNumber()
 	});
 #define defineCheckQuest(questGame, field, index) \
 	this->field = new QCheckBox(); \
-	connect(this->field, &QCheckBox::stateChanged, [this](int newState) \
+	connect(this->field, &QCheckBox::checkStateChanged, [this](Qt::CheckState newState) \
 	{ \
 		this->_tag->questGame[index] = newState == Qt::Checked ? 1 : 0; \
 	});
@@ -682,7 +682,7 @@ void FigureTabWidget::initSwapForceQuests()
 	do \
 	{ \
 		this->field = new QCheckBox(); \
-		connect(this->field, &QCheckBox::stateChanged, [this](int newState) \
+		connect(this->field, &QCheckBox::checkStateChanged, [this](Qt::CheckState newState) \
 		{ \
 			this->_tag->SetUpgrade(upgrade, newState == Qt::Checked); \
 		}); \

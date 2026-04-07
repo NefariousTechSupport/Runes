@@ -45,11 +45,12 @@ bool Runes::RfidTag::isAccessControlBlock(int blockId)
 //=============================================================================
 bool Runes::RfidTag::ReadFromFile(const char* path)
 {
-	FILE* f = fopen(path, "rb");
-	int res = 0;
+	FILE* f = nullptr;
+	errno_t error = fopen_s(&f, path, "rb");
+	size_t res = 0;
 	bool success = true;
 
-	if (f)
+	if (f && error == 0)
 	{
 		fseek(f, 0, SEEK_SET);
 		res = fread(this->_tag, 0x01, 1024, f);
@@ -68,11 +69,12 @@ bool Runes::RfidTag::ReadFromFile(const char* path)
 //=============================================================================
 bool Runes::RfidTag::SaveToFile(const char* path)
 {
-	FILE* f = fopen(path, "wb");
-	int res = 0;
+	FILE* f = nullptr;
+	errno_t error = fopen_s(&f, path, "rb");
+	size_t res = 0;
 	bool success = true;
 
-	if (f)
+	if (f && error == 0)
 	{
 		fseek(f, 0, SEEK_SET);
 		res = fwrite(this->_tag, 0x01, 1024, f);
@@ -101,7 +103,7 @@ bool Runes::RfidTag::shouldEncrypt(uint8_t blockId)
 void Runes::RfidTag::decrypt()
 {
 	uint8_t blockData[BLOCK_SIZE];
-	for(int i = 8; i < NUM_BLOCKS; i++)
+	for(uint8_t i = 8; i < NUM_BLOCKS; i++)
 	{
 		if(Runes::RfidTag::isAccessControlBlock(i)) continue;
 
@@ -285,7 +287,7 @@ uint8_t Runes::RfidTag::PortalBlocksRequested()
 //=============================================================================
 uint32_t Runes::RfidTag::PortalTimeSinceQuery()
 {
-	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _queryTimestamp).count();
+	return static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _queryTimestamp).count());
 }
 
 

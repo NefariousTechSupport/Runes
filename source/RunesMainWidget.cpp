@@ -107,8 +107,8 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 			if (writeToFigure)
 			{
 				auto iter = std::find(_realFigures.begin(), _realFigures.end(), figureWidget);
-				size_t index = std::distance(_realFigures.begin(), iter);
-				_driver->QueueWrite(index);
+				ptrdiff_t index = std::distance(_realFigures.begin(), iter);
+				_driver->QueueWrite(static_cast<int>(index));
 
 				figureWidget->FigureWriteBegan();
 			}
@@ -190,7 +190,7 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 		widget->FigureWriteEnded();
 	});
 
-	_tagWriteCancelledEventId = _driver->GetTagWriteCancelledEvent().AddListener([=](uint8_t index)
+	_tagWriteCancelledEventId = _driver->GetTagWriteCancelledEvent().AddListener([=](uint8_t)
 	{
 		QMessageBox::warning(
 			this,

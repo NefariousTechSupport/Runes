@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <string_view>
 
-enum kTfbSpyroTag_TrinketType : uint16_t
+enum kTfbSpyroTag_TrinketType : uint8_t
 {
 	kTfbSpyroTag_Trinket_NONE = 0,
 	kTfbSpyroTag_Trinket_LuckyTie = 1,

@@ -15,7 +15,15 @@
 
 #include <algorithm>
 
+// Libusb uses nonstandard extensions that msvc warns about
+#if _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4200)
+#endif // _MSC_VER
 #include <libusb.h>
+#if _MSC_VER
+#pragma warning(pop)
+#endif // _MSC_VER
 
 using namespace Runes::Portal;
 
@@ -115,11 +123,11 @@ HardwareErrorCode LibUsbInterface::writeOut(uint8_t buffer[], size_t len)
 	int res = -1;
 	if (getPortalType() == PORTAL_TYPE_XBOX360)
 	{
-		res = libusb_interrupt_transfer(_deviceHandle, 0x02, writeBuffer, len, nullptr, 20);
+		res = libusb_interrupt_transfer(_deviceHandle, 0x02, writeBuffer, static_cast<int>(len), nullptr, 20);
 	}
 	else
 	{
-		res = libusb_control_transfer(_deviceHandle, 0x21, 0x09, 0x0200, 0x00, writeBuffer, len, 20);
+		res = libusb_control_transfer(_deviceHandle, 0x21, 0x09, 0x0200, 0x00, writeBuffer, static_cast<uint16_t>(len), 20);
 	}
 
 	return res >= 0 ? kHWErrNoError : kHWErrLostConnection;
@@ -156,7 +164,7 @@ HardwareErrorCode LibUsbInterface::readIn(uint8_t buffer[], size_t len)
 	uint8_t readBuffer[EP0ReadSize] = {};
 
 	int bytesRead = 0;
-	int res = libusb_bulk_transfer(_deviceHandle, 0x81, readBuffer, std::min(sizeof(readBuffer), len), &bytesRead, 5000);
+	int res = libusb_bulk_transfer(_deviceHandle, 0x81, readBuffer, static_cast<int>(std::min<size_t>(sizeof(readBuffer), len)), &bytesRead, 5000);
 
 	if (res == 0 && bytesRead >= 0)
 	{

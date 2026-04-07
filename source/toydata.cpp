@@ -1,11 +1,11 @@
 #include "toydata.hpp"
 #include "PortalTag.hpp"
+#include "RunesDebug.hpp"
 #include <iostream>
 #include <string.h>
 #include <sstream>
 #include <cstring>
-#include <assert.h>
-#include <sys/stat.h>
+
 #include <yaml-cpp/yaml.h>
 
 #define parseBool(str) (strcmp(str, "True") == 0)
@@ -28,10 +28,10 @@ Runes::ToyDataManager* Runes::ToyDataManager::getInstance()
 Runes::ToyDataManager::ToyDataManager(const char* yamlPath)
 {
 	YAML::Node root = YAML::LoadFile(yamlPath);
-	assert(root.Type() == YAML::NodeType::Map);
+	RUNES_ASSERT(root.Type() == YAML::NodeType::Map, "the root node is of an incorrect type");
 	YAML::Node list = root["list"];
-	assert(list);
-	assert(list.Type() == YAML::NodeType::Sequence);
+	RUNES_ASSERT(list, "the root node missing \"list\" node");
+	RUNES_ASSERT(list.Type() == YAML::NodeType::Sequence, "\"list\" node is not a sequence node");
 	YAML::const_iterator it = list.begin();
 	while(it != list.end())
 	{

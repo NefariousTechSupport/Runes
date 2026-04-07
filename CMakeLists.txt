@@ -72,9 +72,11 @@ qt_add_executable(Runes
 get_target_property(QMAKE_EXE Qt6::qmake IMPORTED_LOCATION)
 get_filename_component(QT_BIN_DIR "${QMAKE_EXE}" DIRECTORY)
 
+set_target_properties(Runes PROPERTIES COMPILE_WARNING_AS_ERROR ON)
+
 if (MSVC)
 	# Required compile options for MSVC with Qt
-	target_compile_options(Runes PUBLIC -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -permissive- -Zc:__cplusplus -Zc:externConstexpr -utf-8 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -W4)
+	target_compile_options(Runes PUBLIC -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -permissive- -Zc:__cplusplus -Zc:externConstexpr -utf-8 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -W4 -EHsc)
 
 	# Set it as Win32 app to hide console window
 	#set_property(TARGET Runes PROPERTY WIN32_EXECUTABLE true)

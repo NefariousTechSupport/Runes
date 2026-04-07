@@ -90,7 +90,7 @@ void PortalDriver::MainThreadPollDevices()
 	if (_interface)
 	{
 		// Send tag removed events
-		for (int i = 0; i < _tags.size(); i++)
+		for (uint8_t i = 0; i < _tags.size(); i++)
 		{
 			if (_tags[i]._rfidTag->PortalBlocksFilled() != -1)
 			{
@@ -236,7 +236,7 @@ void PortalDriver::QueueColour(uint8_t r, uint8_t g, uint8_t b)
 //=============================================================================
 bool PortalDriver::QueueWrite(int index)
 {
-	RUNES_ASSERT(index < 16);
+	RUNES_ASSERT(index < 16, "index out of range");
 	if (index >= 16)
 	{
 		return false;
@@ -259,17 +259,17 @@ bool PortalDriver::QueueWrite(int index)
 		// so much simpler to just have an array here
 		std::array<uint8_t, sizeof(dTagData) / BLOCK_SIZE> blockIds =
 		{
-			/* 08 24 */ active0 + 0,
-			/* 09 25 */ active0 + 1,
-			/* 0A 26 */ active0 + 2,
-			/* 0C 28 */ active0 + 4,
-			/* 0D 29 */ active0 + 5,
-			/* 0E 2A */ active0 + 6,
-			/* 10 2C */ active0 + 8,
-			/* 11 2D */ active1 + 0,
-			/* 12 2E */ active1 + 1,
-			/* 14 30 */ active1 + 3,
-			/* 15 31 */ active1 + 4
+			/* 08 24 */ static_cast<uint8_t>(active0 + 0),
+			/* 09 25 */ static_cast<uint8_t>(active0 + 1),
+			/* 0A 26 */ static_cast<uint8_t>(active0 + 2),
+			/* 0C 28 */ static_cast<uint8_t>(active0 + 4),
+			/* 0D 29 */ static_cast<uint8_t>(active0 + 5),
+			/* 0E 2A */ static_cast<uint8_t>(active0 + 6),
+			/* 10 2C */ static_cast<uint8_t>(active0 + 8),
+			/* 11 2D */ static_cast<uint8_t>(active1 + 0),
+			/* 12 2E */ static_cast<uint8_t>(active1 + 1),
+			/* 14 30 */ static_cast<uint8_t>(active1 + 3),
+			/* 15 31 */ static_cast<uint8_t>(active1 + 4)
 		};
 
 		static_assert(sizeof(dTagData)      == (blockIds.size() * BLOCK_SIZE));
@@ -596,7 +596,7 @@ HardwareErrorCode PortalDriver::ProcessRead(uint8_t writeBuffer[HardwareInterfac
 
 									_writeQueueMutex.lock();
 
-									uint8_t oldQueueLen = _writeQueue.size();
+									size_t oldQueueLen = _writeQueue.size();
 									_writeQueue.remove_if([s](WriteCmd& cmd){ return cmd._figure == s; });
 									bool sendWriteCancelled = oldQueueLen != _writeQueue.size();
 

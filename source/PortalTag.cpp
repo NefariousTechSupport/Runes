@@ -10,6 +10,7 @@
 #include "toydata.hpp"
 #include "Constants.hpp"
 #include "EElementType.hpp"
+#include "RunesDebug.hpp"
 
 #include <iostream>
 #include <cstring>
@@ -131,7 +132,11 @@ void Runes::PortalTag::DebugSaveTagData()
 {
 	std::string fileName(Runes::ToyDataManager::getInstance()->LookupCharacter(this->_toyType)->_toyName.get());
 	fileName += ".dat";
-	FILE* f = fopen(fileName.c_str(), "wb");
+
+	FILE* f = nullptr;
+	errno_t error = fopen_s(&f, fileName.c_str(), "wb");
+	RUNES_ASSERT(error == 0, "failed to open file");
+
 	fwrite(&this->_tagData, 1, sizeof(Runes::PortalTagData), f);
 	fflush(f);
 	fclose(f);
@@ -406,20 +411,20 @@ void Runes::PortalTag::FillOutputFromStoredData()
 
 	//Set exp
 	uint32_t currentExp = this->_exp;
-	tagData->_experience2011_low = (currentExp > 33000 ? 33000 : currentExp);
+	tagData->_experience2011_low = static_cast<uint16_t>(currentExp > 33000 ? 33000 : currentExp);
 	tagData->_experience2011_high = 0;
 	if(currentExp > 33000) currentExp -= 33000;
 	else currentExp = 0;
 
 	if((this->_subType >> 0xC) > 1)
 	{
-		tagData->_experience2012 = (currentExp > 63500 ? 63500 : currentExp);
+		tagData->_experience2012 = static_cast<uint16_t>(currentExp > 63500 ? 63500 : currentExp);
 		if(currentExp > 63500) currentExp -= 63500;
 		else currentExp = 0;
 	}
 	else
 	{
-		tagData->_experience2012 = (currentExp > 0xFFFF ? 0xFFFF : currentExp);
+		tagData->_experience2012 = static_cast<uint16_t>(currentExp > 0xFFFF ? 0xFFFF : currentExp);
 		if(currentExp > 0xFFFF) currentExp -= 0xFFFF;
 		else currentExp = 0;
 	}
@@ -453,10 +458,10 @@ void Runes::PortalTag::FillOutputFromStoredData()
 	this->_tagData._hat2012 = kTfbSpyroTag_Hat_NONE;
 	this->_tagData._hat2013 = kTfbSpyroTag_Hat_NONE;
 	this->_tagData._hat2015 = kTfbSpyroTag_Hat_NONE;
-	     if(this->_hatType >= kTfbSpyroTag_Hat_OFFSET_2015) this->_tagData._hat2015 = this->_hatType - kTfbSpyroTag_Hat_OFFSET_2015;
-	else if(this->_hatType >= kTfbSpyroTag_Hat_MIN_2013)    this->_tagData._hat2013 = this->_hatType;
-	else if(this->_hatType >= kTfbSpyroTag_Hat_MIN_2012)    this->_tagData._hat2012 = this->_hatType;
-	else                                                    this->_tagData._hat2011 = this->_hatType;
+	     if(this->_hatType >= kTfbSpyroTag_Hat_OFFSET_2015) this->_tagData._hat2015 = static_cast<uint8_t>(this->_hatType - kTfbSpyroTag_Hat_OFFSET_2015);
+	else if(this->_hatType >= kTfbSpyroTag_Hat_MIN_2013)    this->_tagData._hat2013 = static_cast<uint8_t>(this->_hatType);
+	else if(this->_hatType >= kTfbSpyroTag_Hat_MIN_2012)    this->_tagData._hat2012 = static_cast<uint8_t>(this->_hatType);
+	else                                                    this->_tagData._hat2011 = static_cast<uint8_t>(this->_hatType);
 
 	// Set trinket type
 	this->_tagData._trinketType = this->_trinketType;
@@ -628,7 +633,7 @@ void Runes::PortalTagData::setExperience(uint32_t experience)
 	}
 	else
 	{
-		this->_experience2012 = currentExp;
+		this->_experience2012 = static_cast<uint16_t>(currentExp);
 		return;
 	}
 	//2013 (level 15->20)
@@ -690,22 +695,22 @@ void Runes::PortalTagData::setHat(kTfbSpyroTag_HatType hat)
 	this->_hat2015 = 0;
 	if(hat <= kTfbSpyroTag_Hat_MAX_2011)
 	{
-		this->_hat2011 = hat;
+		this->_hat2011 = static_cast<uint8_t>(hat);
 		return;
 	}
 	else if(hat <= kTfbSpyroTag_Hat_MAX_2012)
 	{
-		this->_hat2012 = hat;
+		this->_hat2012 = static_cast<uint8_t>(hat);
 		return;
 	}
 	else if(hat <= kTfbSpyroTag_Hat_MAX_2014)
 	{
-		this->_hat2013 = hat;
+		this->_hat2013 = static_cast<uint8_t>(hat);
 		return;
 	}
 	else if(hat >= kTfbSpyroTag_Hat_MIN_2015 && hat <= kTfbSpyroTag_Hat_MAX_2015)
 	{
-		this->_hat2015 = hat - kTfbSpyroTag_Hat_OFFSET_2015;
+		this->_hat2015 = static_cast<uint8_t>(hat - kTfbSpyroTag_Hat_OFFSET_2015);
 		return;
 	}
 	printf("Invalid Hat ID");
@@ -828,7 +833,7 @@ bool Runes::PortalTag::GetHeroic(uint8_t heroic) const
 //=============================================================================
 void Runes::PortalTag::SetHeroic(uint8_t heroic, bool value)
 {
-	_heroics = static_cast<uint64_t>(static_cast<uint64_t>(_heroics & ~static_cast<uint64_t>(1ul << heroic)) | (static_cast<uint64_t>(static_cast<uint64_t>(value ? 1ul : 0ul) << heroic)));
+	_heroics = static_cast<uint64_t>(static_cast<uint64_t>(_heroics & ~static_cast<uint64_t>(1ull << heroic)) | (static_cast<uint64_t>(static_cast<uint64_t>(value ? 1ull : 0ull) << heroic)));
 }
 
 
