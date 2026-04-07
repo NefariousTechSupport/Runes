@@ -260,11 +260,11 @@ Sum of all experience values. In SSCR instead, the experience value for each yea
 | 13    | 66600      |
 | 14    | 80800      |
 | 15    | 96500      |
-| 16    | 113700     |
-| 17    | 132400     |
-| 18    | 152600     |
-| 19    | 174300     |
-| 20    | 197500     |
+| 16    | 115735     |
+| 17    | 134435     |
+| 18    | 154635     |
+| 19    | 176335     |
+| 20    | 199535     |
 
 Note that vehicle experience in SuperChargers Racing uses the exact same experience amounts for levels, but instead of having different bytes for the 2012/13 experience etc... it is all self contained within the initial "2011" `uint24_t`.
 

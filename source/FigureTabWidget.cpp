@@ -112,7 +112,7 @@ FigureTabWidget::FigureTabWidget(QWidget* parent)
 	root->addWidget(this->_spinMoney, basicRow + 0, 1);
 
 	this->_spinExp = new QSpinBox(this);
-	this->_spinExp->setRange(0, 197500);
+	this->_spinExp->setRange(0, kExperienceLevel20);
 	connect(this->_spinExp, &QSpinBox::valueChanged, [this](int newExp)
 	{
 		this->_tag->_exp = newExp;
