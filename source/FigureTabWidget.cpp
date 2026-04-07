@@ -9,6 +9,7 @@
 
 #include "FigureTabWidget.hpp"
 
+#include <QPushButton>
 #include <QFormLayout>
 #include <QSpinBox>
 #include <QCheckBox>
@@ -28,7 +29,7 @@
 #include "HeroicsNames.hpp"
 #include "toydata.hpp"
 
-#define intToChecked(value) ((value) == 1 ? Qt::Checked : Qt::Unchecked)
+#define intToChecked(value) ((value) != 0 ? Qt::Checked : Qt::Unchecked)
 
 
 
@@ -183,6 +184,52 @@ FigureTabWidget::FigureTabWidget(Runes::PortalTag* tag, const char* fileName, QW
 	});
 	root->addWidget(new QLabel(tr("<h3>Heroics</h3>"), this), questStart, 3);
 	root->addWidget(this->_lstHeroics, questStart + 1, 3, 1, std::max<int32_t>(std::max<int32_t>(this->_subUpgrades->count(), this->_subSwapForceQuests->count()), this->_subGiantsQuests->count()));
+
+	this->_btnMax = new QPushButton("Max", this);
+	connect(this->_btnMax, &QPushButton::clicked, [this]()
+	{
+		this->_tag->_exp        = kExperienceLevel20;
+		this->_tag->_heroics    = 0xFFFFFFFFFFFFFFFF;
+		this->_tag->_heroPoints = 0xFFFF;
+		this->_tag->_coins      = 0xFFFF;
+
+		// Set all upgrades
+		this->_tag->SetUpgrade(Runes::kUpgradeBase1,              true);
+		this->_tag->SetUpgrade(Runes::kUpgradeBase2,              true);
+		this->_tag->SetUpgrade(Runes::kUpgradeBase3,              true);
+		this->_tag->SetUpgrade(Runes::kUpgradeBase4,              true);
+		this->_tag->SetUpgrade(Runes::kUpgradeActivePathUpgrade1, true);
+		this->_tag->SetUpgrade(Runes::kUpgradeActivePathUpgrade2, true);
+		this->_tag->SetUpgrade(Runes::kUpgradeActivePathUpgrade3, true);
+		this->_tag->SetUpgrade(Runes::kUpgradeAltPathUpgrade1,    true);
+		this->_tag->SetUpgrade(Runes::kUpgradeAltPathUpgrade2,    true);
+		this->_tag->SetUpgrade(Runes::kUpgradeAltPathUpgrade3,    true);
+		this->_tag->SetUpgrade(Runes::kUpgradeSoulgem,            true);
+		this->_tag->SetUpgrade(Runes::kUpgradeWowPow,             true);
+
+		this->_tag->_giantsQuests[0] = 0xFFFF;
+		this->_tag->_giantsQuests[1] = 0xFFFF;
+		this->_tag->_giantsQuests[2] = 0xFFFF;
+		this->_tag->_giantsQuests[3] = 0xFFFF;
+		this->_tag->_giantsQuests[4] = 0xFFFF;
+		this->_tag->_giantsQuests[5] = 0xFFFF;
+		this->_tag->_giantsQuests[6] = 0xFFFF;
+		this->_tag->_giantsQuests[7] = 0xFFFF;
+		this->_tag->_giantsQuests[8] = 0xFFFF;
+
+		this->_tag->_swapforceQuests[0] = 0xFFFF;
+		this->_tag->_swapforceQuests[1] = 0xFFFF;
+		this->_tag->_swapforceQuests[2] = 0xFFFF;
+		this->_tag->_swapforceQuests[3] = 0xFFFF;
+		this->_tag->_swapforceQuests[4] = 0xFFFF;
+		this->_tag->_swapforceQuests[5] = 0xFFFF;
+		this->_tag->_swapforceQuests[6] = 0xFFFF;
+		this->_tag->_swapforceQuests[7] = 0xFFFF;
+		this->_tag->_swapforceQuests[8] = 0xFFFF;
+
+		updateFields();
+	});
+	root->addWidget(this->_btnMax, basicRow + 0, 3);
 
 	// Hardcoded cos cry
 	root->setColumnMinimumWidth(0, 224);

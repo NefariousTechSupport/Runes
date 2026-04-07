@@ -10,6 +10,7 @@ class QCheckBox;
 class QLabel;
 class QListWidget;
 class QFormLayout;
+class QPushButton;
 class QTextEdit;
 
 class FigureTabWidget : public QWidget
@@ -87,4 +88,5 @@ private:
 	QCheckBox*   _chkUG_WowPow;
 
 	QListWidget* _lstHeroics;
+	QPushButton* _btnMax;
 };
