@@ -24,6 +24,46 @@
 
 
 //=============================================================================
+// PortalTag: Constructor.
+//=============================================================================
+Runes::PortalTag::PortalTag()
+: _tagHeader({})
+, _tagData({})
+, _rfidTag(nullptr)
+, _serial(0)
+, _toyType(kTfbSpyroTag_ToyType_MIN)
+, _subType(0)
+, _exp(0)
+, _coins(0)
+, _cumulativeTime(0)
+, _platformUse(0)
+, _heroics(0)
+, _hatType(kTfbSpyroTag_Hat_NONE)
+, _trinketType(kTfbSpyroTag_Trinket_NONE)
+, _firstUsed({})
+, _recentlyUsed({})
+, _heroPoints(0)
+, _ownerCount(0)
+, _ownerId()
+, _giantsQuests()
+, _swapforceQuests()
+, _upgrades(0)
+, _elementCollectionCounts()
+, _elementCollection(0)
+, _accoladeRanks()
+, _webCode()
+, _nickname()
+, _tagHeaderStored(false)
+, _tagDataStored(false)
+, _tagMagicMomentStored(false)
+, _tagRemainingDataStored(false)
+, _area0regionIndex(0)
+, _area1regionIndex(0)
+{
+}
+
+
+//=============================================================================
 // ~PortalTag: Destructor.
 //=============================================================================
 Runes::PortalTag::~PortalTag()
@@ -141,8 +181,11 @@ void Runes::PortalTag::StoreTagData()
 {
 	if(!this->_tagDataStored)
 	{
-		this->_rfidTag->CopyBlocks(((uint8_t*)&this->_tagData) + 0x00, this->_rfidTag->DetermineActiveDataRegion0() ? 0x24 : 0x08, 0x7);
-		this->_rfidTag->CopyBlocks(((uint8_t*)&this->_tagData) + 0x70, this->_rfidTag->DetermineActiveDataRegion1() ? 0x2D : 0x11, 0x4);
+		this->_area0regionIndex = this->_rfidTag->DetermineActiveDataRegion0();
+		this->_area1regionIndex = this->_rfidTag->DetermineActiveDataRegion1();
+
+		this->_rfidTag->CopyBlocks(((uint8_t*)&this->_tagData) + 0x00, this->_area0regionIndex ? 0x24 : 0x08, 0x7);
+		this->_rfidTag->CopyBlocks(((uint8_t*)&this->_tagData) + 0x70, this->_area1regionIndex ? 0x2D : 0x11, 0x4);
 		this->_tagDataStored = true;
 	}
 }
@@ -429,6 +472,32 @@ void Runes::PortalTag::FillOutputFromStoredData()
 
 
 //=============================================================================
+// FillRfidTagWithStoredData: Fill memory with the stored data
+//=============================================================================
+void Runes::PortalTag::FillRfidTagWithStoredData()
+{
+	this->_tagData._areaSequence0++;
+	this->_tagData._areaSequence1++;
+	this->_area0regionIndex = 1 - this->_area0regionIndex;
+	this->_area1regionIndex = 1 - this->_area1regionIndex;
+
+	this->FillOutputFromStoredData();
+
+	// Rewrite checksums
+	this->ComputeTagDataChecksums(
+		this->_tagData._crcType6,
+		this->_tagData._crcType3,
+		this->_tagData._crcType2,
+		this->_tagData._crcType1
+	);
+
+	_rfidTag->SaveBlocks(((uint8_t*)&this->_tagData) + 0x00, this->_area0regionIndex ? 0x24 : 0x08, 0x7);
+	_rfidTag->SaveBlocks(((uint8_t*)&this->_tagData) + 0x70, this->_area1regionIndex ? 0x2D : 0x11, 0x4);
+}
+
+
+
+//=============================================================================
 // ComputeLevel: Determine which level this skylander is
 //=============================================================================
 uint8_t Runes::PortalTag::ComputeLevel()
@@ -452,6 +521,11 @@ void Runes::PortalTag::ReadFromFile(const char* fileName)
 	this->_tagRemainingDataStored = false;
 	this->_tagDataStored = false;
 
+	if (!this->_rfidTag)
+	{
+		this->_rfidTag = new RfidTag(false);
+	}
+
 	this->_rfidTag->ReadFromFile(fileName);
 
 	this->StoreHeader();
@@ -466,13 +540,8 @@ void Runes::PortalTag::ReadFromFile(const char* fileName)
 //=============================================================================
 void Runes::PortalTag::SaveToFile(const char* fileName)
 {
-	this->_tagData._areaSequence0++;
-	this->_tagData._areaSequence1++;
-	this->FillOutputFromStoredData();
-	this->RecalculateTagDataChecksums();
-	//We're writing to the other region hence the ternary operator looks like that
-	_rfidTag->SaveBlocks(((uint8_t*)&this->_tagData) + 0x00, this->_rfidTag->DetermineActiveDataRegion0() ? 0x08 : 0x24, 0x7);
-	_rfidTag->SaveBlocks(((uint8_t*)&this->_tagData) + 0x70, this->_rfidTag->DetermineActiveDataRegion1() ? 0x11 : 0x2D, 0x4);
+	FillRfidTagWithStoredData();
+
 	//this->DebugSaveTagData();
 	_rfidTag->SaveToFile(fileName);
 }
@@ -480,32 +549,41 @@ void Runes::PortalTag::SaveToFile(const char* fileName)
 
 
 //=============================================================================
-// RecalculateTagDataChecksums: Recompute and assign the new checksums for
-// the data
+// ComputeTagDataChecksums: Compute the checksums for the data
 //=============================================================================
-void Runes::PortalTag::RecalculateTagDataChecksums()
+void Runes::PortalTag::ComputeTagDataChecksums(uint16_t& crc6, uint16_t& crc3, uint16_t& crc2, uint16_t& crc1) const
 {
-	char checksumBuffer[0x110];
-	memset(checksumBuffer, 0x00, 0x110);
+	// In case someone tries storing checksums directly into the tagdata
+	uint8_t tagDataCopy[sizeof(this->_tagData)];
+	memcpy(tagDataCopy, &this->_tagData, sizeof(this->_tagData));
+
+	char checksumBuffer[0x110] = {};
 
 	//Type 6
-	memcpy(checksumBuffer, ((uint8_t*)&this->_tagData) + 7 * BLOCK_SIZE, 4 * BLOCK_SIZE);
+	memcpy(checksumBuffer, &tagDataCopy[7 * BLOCK_SIZE], 4 * BLOCK_SIZE);
 	checksumBuffer[0] = 6;
 	checksumBuffer[1] = 1;
-	this->_tagData._crcType6 = crc16(checksumBuffer, 0x04 * BLOCK_SIZE);
+	crc6 = crc16(checksumBuffer, 0x04 * BLOCK_SIZE);
+	// Clear it since later checksums may use that space
+	memset(checksumBuffer, 0x00, 0x04 * BLOCK_SIZE);
 
 	//Type 3
-	memcpy(checksumBuffer, ((uint8_t*)&this->_tagData) + 4 * BLOCK_SIZE, 3 * BLOCK_SIZE);
-	this->_tagData._crcType3 = crc16(checksumBuffer, 0x11 * BLOCK_SIZE);
+	memcpy(checksumBuffer, &tagDataCopy[4 * BLOCK_SIZE], 3 * BLOCK_SIZE);
+	crc3 = crc16(checksumBuffer, 0x11 * BLOCK_SIZE);
 
 	//Type 2
-	memcpy(checksumBuffer, ((uint8_t*)&this->_tagData) + 1 * BLOCK_SIZE, 3 * BLOCK_SIZE);
-	this->_tagData._crcType2 = crc16(checksumBuffer, 0x03 * BLOCK_SIZE);
+	memcpy(checksumBuffer, &tagDataCopy[1 * BLOCK_SIZE], 3 * BLOCK_SIZE);
+	crc2 = crc16(checksumBuffer, 0x03 * BLOCK_SIZE);
 
 	//Type 1
-	this->_tagData._crcType1 = 5;
-	memcpy(checksumBuffer, ((uint8_t*)&this->_tagData), BLOCK_SIZE);
-	this->_tagData._crcType1 = crc16(checksumBuffer, 0x01 * BLOCK_SIZE);
+	memcpy(checksumBuffer, &tagDataCopy[0], BLOCK_SIZE);
+	checksumBuffer[offsetof(Runes::PortalTagData, _crcType1) + 0] = 0x05;
+	checksumBuffer[offsetof(Runes::PortalTagData, _crcType1) + 1] = 0x00;
+	checksumBuffer[offsetof(Runes::PortalTagData, _crcType2) + 0] = (crc2 >> 0) & 0xFF;
+	checksumBuffer[offsetof(Runes::PortalTagData, _crcType2) + 1] = (crc2 >> 8) & 0xFF;
+	checksumBuffer[offsetof(Runes::PortalTagData, _crcType3) + 0] = (crc3 >> 0) & 0xFF;
+	checksumBuffer[offsetof(Runes::PortalTagData, _crcType3) + 1] = (crc3 >> 8) & 0xFF;
+	crc1 = crc16(checksumBuffer, 0x01 * BLOCK_SIZE);
 }
 
 
@@ -633,6 +711,33 @@ void Runes::PortalTagData::setHat(kTfbSpyroTag_HatType hat)
 	printf("Invalid Hat ID");
 }
 
+
+
+//=============================================================================
+// isCore: Determines whether this skylander is a core or not
+//=============================================================================
+bool Runes::PortalTag::isCore()
+{
+	return (this->_toyType >= kTfbSpyroTag_ToyType_CHARACTER_2011 && this->_toyType <= kTfbSpyroTag_ToyType_CHARACTER_2011_MAX)
+	    || (this->_toyType >= kTfbSpyroTag_ToyType_Character_2012 && this->_toyType <= kTfbSpyroTag_ToyType_Character_2012_MAX)
+	    || (this->_toyType >= kTfbSpyroTag_ToyType_Character_2013 && this->_toyType <= kTfbSpyroTag_ToyType_Character_2013_MAX)
+	    || (this->_toyType >= kTfbSpyroTag_ToyType_Character_2014 && this->_toyType <= kTfbSpyroTag_ToyType_Character_2014_MAX)
+	    || (this->_toyType >= kTfbSpyroTag_ToyType_CHARACTER_2015 && this->_toyType <= kTfbSpyroTag_ToyType_CHARACTER_2015_MAX)
+	    || (this->_toyType >= kTfbSpyroTag_ToyType_CHARACTER_2016 && this->_toyType <= kTfbSpyroTag_ToyType_CHARACTER_2016_MAX)
+	    || (this->_toyType >= kTfbSpyroTag_ToyType_LEGENDARY      && this->_toyType <= kTfbSpyroTag_ToyType_PET_MAX)
+	    || (this->_toyType >= kTfbSpyroTag_ToyType_PET            && this->_toyType <= kTfbSpyroTag_ToyType_PET_MAX)
+	    || (this->_toyType == 98)                                         // Test Titan
+	    || (this->_toyType == kTfbSpyroTag_ToyType_Character_DebugMinion) // Debug Minion
+	    || (this->_toyType == 699)                                        // Goldie
+	    || (this->_toyType == kTfbSpyroTag_ToyType_Character_Template)    // Template Legacy
+	    || (this->_toyType == 9990)                                       // Debug CORE
+	    || (this->_toyType == 9991)                                       // Debug GIANT
+	    || (this->_toyType == 9992)                                       // Debug RANGER
+	;
+}
+
+
+
 //=============================================================================
 // isTrap: Determines whether this skylander is a trap or not
 //=============================================================================
@@ -724,4 +829,44 @@ bool Runes::PortalTag::GetHeroic(uint8_t heroic) const
 void Runes::PortalTag::SetHeroic(uint8_t heroic, bool value)
 {
 	_heroics = static_cast<uint64_t>(static_cast<uint64_t>(_heroics & ~static_cast<uint64_t>(1ul << heroic)) | (static_cast<uint64_t>(static_cast<uint64_t>(value ? 1ul : 0ul) << heroic)));
+}
+
+
+
+//=============================================================================
+// Verify: Ensures the figure isn't corrupt
+//=============================================================================
+Runes::VerifyStatus Runes::PortalTag::Verify() const
+{
+	uint16_t crc6 = 0;
+	uint16_t crc3 = 0;
+	uint16_t crc2 = 0;
+	uint16_t crc1 = 0;
+
+	ComputeTagDataChecksums(crc6, crc3, crc2, crc1);
+
+	VerifyStatus status = VerifyStatus::kSuccess;
+
+	if (crc6 != this->_tagData._crcType6
+	 && this->_tagData._regionCountCoded >= 1)
+	{
+		status |= VerifyStatus::kRegion0Area1;
+	}
+
+	if (crc3 != this->_tagData._crcType3)
+	{
+		status |= VerifyStatus::kRegion0RemainingData1;
+	}
+
+	if (crc2 != this->_tagData._crcType2)
+	{
+		status |= VerifyStatus::kRegion0MagicMoment1;
+	}
+
+	if (crc1 != this->_tagData._crcType1)
+	{
+		status |= VerifyStatus::kRegion0Header;
+	}
+
+	return status;
 }

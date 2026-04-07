@@ -18,18 +18,25 @@ class FigureTabWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit FigureTabWidget(Runes::PortalTag* tag, const char* fileName, QWidget* parent = nullptr);
+	explicit FigureTabWidget(QWidget* parent = nullptr);
 	virtual ~FigureTabWidget();
+	void Initialize(Runes::PortalTag* tag);
+	void UpdateProgress(uint8_t progress);
+	void StartSave(QString& path, bool& valid);
+	void FigureWriteBegan();
+	void FigureWriteEnded();
 	Runes::PortalTag* _tag;
 
 private:
-	QString _sourceFile;
-
 	void updateFields();
 	void updateLevelNumber();
 	void initGiantsQuests();
 	void initSwapForceQuests();
 	void initUpgrades();
+
+	static QString getFigurePath(uint32_t serial);
+	void backupFigure();
+	void saveFigure(QString& path, bool& valid);
 
 	QSpinBox* _spinExp;
 	QSpinBox* _spinMoney;

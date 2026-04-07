@@ -9,13 +9,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 
-# Set up yaml-cpp
-FetchContent_Declare(
-  yaml-cpp
-  GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
-  GIT_TAG 0.8.0
-)
-FetchContent_MakeAvailable(yaml-cpp)
+include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindFmtLib.cmake)
+include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindHidApi.cmake)
+include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindLibUSB.cmake)
+include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindYamlCpp.cmake)
 
 qt_standard_project_setup()
 
@@ -34,6 +31,16 @@ qt_add_executable(Runes
 	source/ESkylandersGame.hpp
 	source/FigureTabWidget.cpp
 	source/FigureTabWidget.hpp
+	source/hardware/HardwareIds.hpp
+	source/hardware/HardwareInterface.cpp
+	source/hardware/HardwareInterface.hpp
+	source/hardware/HidUsbInterface.cpp
+	source/hardware/HidUsbInterface.hpp
+	source/hardware/LibUsbInterface.cpp
+	source/hardware/LibUsbInterface.hpp
+	source/hardware/PortalDriver.cpp
+	source/hardware/PortalDriver.hpp
+	source/hardware/PortalType.hpp
 	source/HeroicsNames.cpp
 	source/HeroicsNames.hpp
 	source/kTfbSpyroTag_DecoID.hpp
@@ -46,11 +53,14 @@ qt_add_executable(Runes
 	source/main.cpp
 	source/PortalAlgos.cpp
 	source/PortalAlgos.hpp
+	source/PortalDebuggerWidget.cpp
+	source/PortalDebuggerWidget.hpp
 	source/PortalTag.cpp
 	source/PortalTag.hpp
 	source/PortalTagAsserts.inc
 	source/RfidTag.cpp
 	source/RfidTag.hpp
+	source/RunesDebug.hpp
 	source/RunesMainWidget.cpp
 	source/RunesMainWidget.hpp
 	source/toydata.cpp
@@ -64,10 +74,10 @@ get_filename_component(QT_BIN_DIR "${QMAKE_EXE}" DIRECTORY)
 
 if (MSVC)
 	# Required compile options for MSVC with Qt
-	target_compile_options(Runes PUBLIC -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -permissive- -Zc:__cplusplus -Zc:externConstexpr -utf-8 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458)
+	target_compile_options(Runes PUBLIC -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -permissive- -Zc:__cplusplus -Zc:externConstexpr -utf-8 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -W4)
 
 	# Set it as Win32 app to hide console window
-	set_property(TARGET Runes PROPERTY WIN32_EXECUTABLE true)
+	#set_property(TARGET Runes PROPERTY WIN32_EXECUTABLE true)
 
 	# Run windeployqt
 	find_program(WINDEPLOYQT_ENV_SETUP qtenv2.bat HINTS "${QT_BIN_DIR}")
@@ -79,6 +89,10 @@ if (MSVC)
 	)
 endif()
 
+if (WIN32)
+	target_link_libraries(Runes PRIVATE "Hid.dll")
+endif()
+
 # Copy resources directory
 add_custom_command(
 	TARGET Runes
@@ -86,9 +100,22 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Resources" "$<TARGET_FILE_DIR:Runes>/Resources"
 )
 
+# This is a cursed way to include the hidapi.h file but ignore it
+target_include_directories(Runes PRIVATE ${hidapi_SOURCE_DIR}/hidapi)
+
+target_include_directories(Runes PRIVATE
+	source
+	source/3rd_party
+	source/hardware
+	${LIBUSB_INCLUDE_DIR}
+)
+
 # Link libraries
 target_link_libraries(Runes PRIVATE
 	Qt6::Core
 	Qt6::Widgets
 	yaml-cpp::yaml-cpp
+	fmt::fmt
+	hidapi::hidapi
+	${LIBUSB_LIBRARY}
 )

@@ -59,11 +59,11 @@ enum Constants
 	kExperienceLevel13 = 66600,
 	kExperienceLevel14 = 80800,
 	kExperienceLevel15 = 96500,
-	kExperienceLevel16 = 113700,
-	kExperienceLevel17 = 132400,
-	kExperienceLevel18 = 152600,
-	kExperienceLevel19 = 174300,
-	kExperienceLevel20 = 197500,
+	kExperienceLevel16 = 115735,
+	kExperienceLevel17 = 134435,
+	kExperienceLevel18 = 154635,
+	kExperienceLevel19 = 176335,
+	kExperienceLevel20 = 199535,
 	kExperienceLevelCount = 20,
 };
 
