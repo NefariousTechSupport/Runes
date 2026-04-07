@@ -17,5 +17,5 @@ Compiling:
 * cd into the Runes folder
 * run `mkdir build`
 * cd into the build folder
-* run `cmake -S .. -B . -DCMAKE_PREFIX_PATH=%QT_DIR%\6.9.0\msvc2022_64`
-* run `msbuild Runes.sln /p:Configuration=Debug /p:Platform=x64`
+* run `cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=%QT_DIR%\6.9.0\msvc2022_64`
+* run `msbuild Runes.sln /p:Configuration=Release /p:Platform=x64`
