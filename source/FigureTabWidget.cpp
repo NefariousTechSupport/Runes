@@ -296,6 +296,46 @@ void FigureTabWidget::Initialize(Runes::PortalTag* tag)
 	}
 
 	updateFields();
+
+	ESkylandersGame game;
+	bool fullAltDeco;
+	bool repose;
+	bool lightcore;
+	kTfbSpyroTag_DecoID decoId;
+	_tag->DecodeSubtype(&game, &fullAltDeco, &repose, &lightcore, &decoId);
+	if (game >= eSG_Skylanders2016 && _tag->_toyType != 699)
+	{
+		// Throw a warning to let the user know that this may irreversably destroy their figure.
+
+		if (_tag->_rfidTag->fromFigure())
+		{
+			QMessageBox::warning(
+				this,
+				"Imaginators Figure Detected!",
+				"<h1>Warning!</h1>\n\n"
+				"Imaginators figures are digitally signed in such a way that we are not able to resign.\n"
+				"it's possible that Runes will overwrite this signature, <b>permanently</b> corrupting the figure if you don't have a backup.\n"
+				"Saving is therefore disabled, you can edit Senseis using the raw dump file, however you must ensure you make plenty of backups of your dump files\n"
+				"I, NefariousTechSupport, am <b>not</b> responsible for any figures that are broken",
+				QMessageBox::StandardButton::Ok,
+				QMessageBox::StandardButton::NoButton
+			);
+		}
+		else
+		{
+			QMessageBox::warning(
+				this,
+				"Imaginators Figure Detected!",
+				"<h1>Warning!</h1>\n\n"
+				"Imaginators figures are digitally signed in such a way that we are not able to resign.\n"
+				"it's possible that Runes will overwrite this signature, <b>permanently</b> corrupting the figure if you don't have a backup.\n"
+				"<h1>Proceed with caution and keep plenty of backups!!!!</h1>\n"
+				"I, NefariousTechSupport, am <b>not</b> responsible for any figures that are broken",
+				QMessageBox::StandardButton::Ok,
+				QMessageBox::StandardButton::NoButton
+			);
+		}
+	}
 }
 
 
@@ -328,6 +368,17 @@ void FigureTabWidget::StartSave(QString& path, bool& writeToFigure)
 	{
 		writeToFigure = false;
 	}
+
+
+	ESkylandersGame game;
+	bool fullAltDeco;
+	bool repose;
+	bool lightcore;
+	kTfbSpyroTag_DecoID decoId;
+	_tag->DecodeSubtype(&game, &fullAltDeco, &repose, &lightcore, &decoId);
+
+	// Do not write to Imaginators figures
+	writeToFigure &= game < eSG_Skylanders2016 || _tag->_toyType == 699;
 }
 
 
