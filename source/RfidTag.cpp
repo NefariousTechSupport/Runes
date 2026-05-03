@@ -70,7 +70,7 @@ bool Runes::RfidTag::ReadFromFile(const char* path)
 bool Runes::RfidTag::SaveToFile(const char* path)
 {
 	FILE* f = nullptr;
-	errno_t error = fopen_s(&f, path, "rb");
+	errno_t error = fopen_s(&f, path, "wb");
 	size_t res = 0;
 	bool success = true;
 
