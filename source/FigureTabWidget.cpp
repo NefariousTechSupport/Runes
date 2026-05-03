@@ -152,7 +152,7 @@ FigureTabWidget::FigureTabWidget(QWidget* parent)
 	{
 		this->_tag->_heroPoints = newHeroPoints;
 	});
-	root->addWidget(new QLabel(tr("Hero Points"), this), basicRow + 4, 0);
+	root->addWidget(new QLabel(tr("Hero Level"), this), basicRow + 4, 0);
 	root->addWidget(this->_spinHeroPoints, basicRow + 4, 1);
 
 	this->_cmbLevelNumber = new QComboBox(this);
