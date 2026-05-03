@@ -98,12 +98,6 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 			QString backupPath;
 			figureWidget->StartSave(backupPath, writeToFigure);
 
-			if (!userPath.isEmpty())
-			{
-				QFile backup = QFile(backupPath);
-				backup.copy(userPath);
-			}
-
 			if (writeToFigure)
 			{
 				auto iter = std::find(_realFigures.begin(), _realFigures.end(), figureWidget);
@@ -112,7 +106,7 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 
 				figureWidget->FigureWriteBegan();
 			}
-			else
+			else if (!userPath.isEmpty())
 			{
 				figureWidget->_tag->SaveToFile(userPath.toLocal8Bit());
 			}
