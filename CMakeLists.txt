@@ -78,8 +78,10 @@ if (MSVC)
 	# Required compile options for MSVC with Qt
 	target_compile_options(Runes PUBLIC -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -permissive- -Zc:__cplusplus -Zc:externConstexpr -utf-8 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -W4 -EHsc)
 
-	# Set it as Win32 app to hide console window
-	#set_property(TARGET Runes PROPERTY WIN32_EXECUTABLE true)
+	if (CMAKE_BUILD_TYPE STREQUAL "Release")
+		# Set it as Win32 app to hide console window
+		set_property(TARGET Runes PROPERTY WIN32_EXECUTABLE true)
+	endif()
 
 	# Run windeployqt
 	find_program(WINDEPLOYQT_ENV_SETUP qtenv2.bat HINTS "${QT_BIN_DIR}")
