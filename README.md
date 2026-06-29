@@ -41,6 +41,7 @@ The following skylander types are supported:
 - Sidekicks/Minis
 
 The following are not supported (do not try loading these):
+- Swap-Force Skylanders (Top and Bottom Halves)
 - Traps
 - Vehicles
 - Magic Items
