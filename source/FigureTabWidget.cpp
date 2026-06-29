@@ -517,8 +517,8 @@ void FigureTabWidget::updateFields()
 				break;
 			case eET_Air:
 				{
-					defineElementalSpinQuest(_subGiantsQuests, _wdGiantsElementalQuest1, _giantsQuests, gqAirSkylooter, 6, 500, "Skylooter");
-					defineElementalSpinQuest(_subGiantsQuests, _wdGiantsElementalQuest2, _giantsQuests, gqAirFromAbove, 7, 25, "From Above");
+					defineElementalSpinQuest(_subGiantsQuests, _wdGiantsElementalQuest2, _giantsQuests, gqAirFromAbove, 6, 25, "From Above");
+					defineElementalSpinQuest(_subGiantsQuests, _wdGiantsElementalQuest1, _giantsQuests, gqAirSkylooter, 7, 500, "Skylooter");
 					defineElementalSpinQuest(_subSwapForceQuests, _wdSwapForceElementalQuest1, _swapforceQuests, ssfqAirGeronimo, 6, 250, "Geronimo!");
 					defineElementalSpinQuest(_subSwapForceQuests, _wdSwapForceElementalQuest2, _swapforceQuests, ssfqAirSkylooter, 7, 500, "Skylooter");
 				}
