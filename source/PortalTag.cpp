@@ -445,7 +445,7 @@ void Runes::PortalTag::FillOutputFromStoredData()
 	//Set heroics
 	tagData->_heroics2011      =  this->_heroics & 0xFFFFFFFF;
 	tagData->_heroics2012_low  = (this->_heroics >> 32) & 0xFFFF;
-	tagData->_heroics2012_high = (this->_heroics >> 40) & 0xFF;
+	tagData->_heroics2012_high = (this->_heroics >> 48) & 0xFF;
 	//Set portal placed times
 	tagData->_recentlyUsed     = this->_recentlyUsed;
 	tagData->_firstUsed        = this->_firstUsed;
