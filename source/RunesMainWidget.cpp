@@ -168,6 +168,9 @@ RunesMainWidget::RunesMainWidget(QWidget* parent)
 		this->_tabs->removeTab(this->_tabs->indexOf(widget));
 
 		actSave->setEnabled(this->_tabs->currentWidget() != nullptr);
+
+		_realFigures[index] = nullptr;
+		delete widget;
 	});
 
 	_tagReadUpdateEventId = _driver->GetTagReadUpdateEvent().AddListener([=](uint8_t index, uint8_t progress)
